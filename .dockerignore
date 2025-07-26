@@ -1,0 +1,9 @@
+# Evita copiar archivos innecesarios al contenedor
+node_modules
+dist
+.vscode
+Dockerfile
+docker-compose.yml
+bun.lockb (opcional si deseas forzar bun a resolver fresh)
+*.log
+*.env

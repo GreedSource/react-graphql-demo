@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_APP_NAME=${VITE_APP_NAME}
+        - VITE_INDEXED_DB_NAME=${VITE_INDEXED_DB_NAME}
+        - VITE_CRYPTO_SECRET=${VITE_CRYPTO_SECRET}
+        - VITE_GRAPHQL_ENDPOINT=${VITE_GRAPHQL_ENDPOINT}
+    ports:
+      - '3000:80'
+
+    restart: unless-stopped
+    container_name: react-vite-bun
