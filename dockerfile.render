@@ -14,7 +14,7 @@ COPY bun.lock package.json ./
 
 # Instalar dependencias y confiar en scripts postinstall necesarios
 RUN bun install
-RUN bun pm trust
+RUN bun pm trust --all
 
 # Copiar el resto de archivos
 COPY . .
