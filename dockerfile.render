@@ -7,9 +7,6 @@ ENV VITE_INDEXED_DB_NAME=""
 ENV VITE_CRYPTO_SECRET=""
 ENV VITE_GRAPHQL_ENDPOINT=""
 
-# Permitir postinstalls bloqueados
-ENV BUN_INSTALL_ALLOW_UNTRUSTED=1
-
 # Directorio de trabajo
 WORKDIR /app
 
@@ -18,6 +15,9 @@ COPY . .
 
 # Instalar dependencias
 RUN bun install
+
+# Permitir scripts postinstall bloqueados por Bun
+RUN bun pm untrusted --allow
 
 # Construir proyecto Vite
 RUN bun run build
