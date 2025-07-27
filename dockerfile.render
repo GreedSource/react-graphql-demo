@@ -10,7 +10,7 @@ ENV VITE_GRAPHQL_ENDPOINT=""
 WORKDIR /app
 
 # Copiar solo archivos necesarios para instalar dependencias
-COPY bun.lockb package.json ./
+COPY bun.lock package.json ./
 
 # Instalar dependencias y confiar en scripts postinstall necesarios
 RUN bun install
