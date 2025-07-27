@@ -16,8 +16,8 @@ COPY . .
 # Instalar dependencias
 RUN bun install
 
-# Permitir scripts postinstall bloqueados por Bun
-RUN bun pm untrusted --allow
+# Marcar paquetes como confiables y permitir postinstall
+RUN bun pm trust
 
 # Construir proyecto Vite
 RUN bun run build
