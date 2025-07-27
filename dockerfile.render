@@ -1,23 +1,23 @@
 # Etapa 1: Build con Bun
 FROM oven/bun:1.1.13 as builder
 
-# Render pasa solo ENV, no ARG
+# Variables de entorno para Vite (Render las debe proveer)
 ENV VITE_APP_NAME=""
 ENV VITE_INDEXED_DB_NAME=""
 ENV VITE_CRYPTO_SECRET=""
 ENV VITE_GRAPHQL_ENDPOINT=""
 
-# Directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos del proyecto
-COPY . .
+# Copiar solo archivos necesarios para instalar dependencias
+COPY bun.lockb package.json ./
 
-# Instalar dependencias
+# Instalar dependencias y confiar en scripts postinstall necesarios
 RUN bun install
+RUN bun pm trust
 
-# Marcar paquetes como confiables y permitir postinstall
-RUN bun pm trust --all
+# Copiar el resto de archivos
+COPY . .
 
 # Construir proyecto Vite
 RUN bun run build
@@ -25,17 +25,16 @@ RUN bun run build
 # Etapa 2: Servir con nginx
 FROM nginx:stable-alpine as production
 
-# Copiar archivos estáticos de Vite
+# Copiar archivos estáticos del build
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Eliminar configuración default
+# Eliminar configuración default de nginx
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Agregar configuración personalizada
+# Copiar configuración custom para SPA
 COPY nginx.conf /etc/nginx/conf.d
 
-# Exponer puerto
+# Exponer puerto 80
 EXPOSE 80
 
-# Iniciar nginx
 CMD ["nginx", "-g", "daemon off;"]
