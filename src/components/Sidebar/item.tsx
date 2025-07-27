@@ -27,16 +27,16 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <Link
       to={to}
-      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium space-x-3 ${
+      className={`flex items-center justify-center md:justify-start px-0 md:px-3 md:py-3 rounded-md text-sm font-medium space-x-0 md:space-x-3 transition-colors duration-200 ${
         active
           ? 'bg-gray-900 text-white'
           : 'text-gray-300 hover:bg-gray-700 hover:text-white'
       }`}
     >
       <span className="text-lg">{icon}</span>
-      <span>{label}</span>
+      <span className="hidden md:inline">{label}</span>
       {badge && (
-        <span className="ml-auto rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-semibold text-white">
+        <span className="ml-auto rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-semibold text-white hidden md:inline">
           {badge}
         </span>
       )}

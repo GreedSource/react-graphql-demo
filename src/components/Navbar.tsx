@@ -1,11 +1,8 @@
 import { useUserStore } from '@/stores/user.store';
-import {
-  Menu as MenuIcon,
-  Close as CloseIcon,
-  Notifications as NotificationsIcon,
-} from '@mui/icons-material';
+import { Notifications as NotificationsIcon } from '@mui/icons-material';
 import { Avatar, IconButton, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // const Navbar = () => {
 //   const { user } = useUserStore();
@@ -25,8 +22,8 @@ import { useState } from 'react';
 // };
 
 export default function Navbar() {
-  const { user } = useUserStore();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logout } = useUserStore();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const openProfileMenu = Boolean(anchorEl);
@@ -38,24 +35,15 @@ export default function Navbar() {
     setAnchorEl(null);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <nav className="bg-gray-800">
       <div className="mx-auto px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-end">
-          {/* Mobile menu button */}
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            <IconButton
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="open main menu"
-              aria-expanded={mobileMenuOpen ? 'true' : undefined}
-              aria-controls="mobile-menu"
-              className="text-gray hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-none focus:ring-inset"
-              size="large"
-            >
-              {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
-            </IconButton>
-          </div>
-
           {/* Right side: notifications + profile */}
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
             <IconButton
@@ -104,7 +92,7 @@ export default function Navbar() {
             >
               <MenuItem onClick={handleProfileMenuClose}>Your Profile</MenuItem>
               <MenuItem onClick={handleProfileMenuClose}>Settings</MenuItem>
-              <MenuItem onClick={handleProfileMenuClose}>Sign out</MenuItem>
+              <MenuItem onClick={handleLogout}>Sign out</MenuItem>
             </Menu>
           </div>
         </div>

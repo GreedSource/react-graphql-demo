@@ -41,7 +41,9 @@ const errorLink = onError(
     if (graphQLErrors && graphQLErrors.length > 0) {
       graphQLErrors.forEach(({ message, extensions }) => {
         const code = extensions?.code || 'UNKNOWN_ERROR';
-        toast.error(`${code}: ${message}`);
+        if (code !== 'UNAUTHORIZED') {
+          toast.error(`${code}: ${message}`);
+        }
       });
     }
     if (
