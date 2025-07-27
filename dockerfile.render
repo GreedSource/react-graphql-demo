@@ -7,6 +7,9 @@ ENV VITE_INDEXED_DB_NAME=""
 ENV VITE_CRYPTO_SECRET=""
 ENV VITE_GRAPHQL_ENDPOINT=""
 
+# Permitir postinstalls bloqueados
+ENV BUN_INSTALL_ALLOW_UNTRUSTED=1
+
 # Directorio de trabajo
 WORKDIR /app
 
