@@ -17,7 +17,7 @@ COPY . .
 RUN bun install
 
 # Marcar paquetes como confiables y permitir postinstall
-RUN bun pm trust
+RUN bun pm trust --all
 
 # Construir proyecto Vite
 RUN bun run build
