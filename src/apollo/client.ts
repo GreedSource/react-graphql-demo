@@ -61,10 +61,10 @@ const errorLink = onError(
         forward,
         refreshToken,
         setAccessToken,
-        logout
+        logout,
       );
     }
-  }
+  },
 );
 
 function refreshTokenFlow(
@@ -72,7 +72,7 @@ function refreshTokenFlow(
   forward: NextLink,
   refreshToken: string,
   setAccessToken: (token: string) => void,
-  logout: () => void
+  logout: () => void,
 ): Observable<FetchResult> {
   const refreshClient = new ApolloClient({
     link: httpLink,
@@ -86,7 +86,7 @@ function refreshTokenFlow(
         variables: { refreshToken },
       })
       .then(({ data }) => {
-        const newToken = data?.refreshToken?.accessToken;
+        const newToken = data?.refreshToken.data?.accessToken;
         if (newToken) {
           setAccessToken(newToken);
           operation.setContext(({ headers = {} }) => ({

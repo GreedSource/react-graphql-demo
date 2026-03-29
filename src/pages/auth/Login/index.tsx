@@ -43,9 +43,9 @@ const Login = () => {
       const res = await login({
         variables: formState,
       });
-      setAccessToken(res.data.login.accessToken);
-      setRefreshToken(res.data.login.refreshToken);
-      setUser(res.data.login.user);
+      setAccessToken(res.data.login.data.accessToken);
+      setRefreshToken(res.data.login.data.refreshToken);
+      setUser(res.data.login.data.user);
       setFormState({ email: '', password: '' });
     } finally {
       setLoading(false); // Desactiva loader

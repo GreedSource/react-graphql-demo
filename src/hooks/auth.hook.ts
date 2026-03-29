@@ -17,8 +17,8 @@ export function useSessionCheck() {
       },
     },
     onCompleted: (data) => {
-      if (data?.profile) {
-        setUser(data.profile);
+      if (data?.profile?.data) {
+        setUser(data.profile.data);
       } else {
         handleLogout();
       }
