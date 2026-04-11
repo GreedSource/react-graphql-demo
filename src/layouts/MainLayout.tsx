@@ -6,7 +6,7 @@ import PageTransition from '../components/ui/PageTransition';
 
 const MainLayout = () => {
   return (
-    <div className="flex min-h-screen bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_24%),linear-gradient(180deg,_#f8fafc_0%,_#e2e8f0_100%)]">
+    <div className="flex min-h-screen bg-gradient-to-b from-surface-elevated to-surface transition-colors duration-300">
       <Sidebar />
       <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
         <Navbar />

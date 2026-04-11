@@ -35,6 +35,8 @@ export function FormDialog({
         sx: {
           borderRadius: 4,
           overflow: 'hidden',
+          bgcolor: 'var(--bg-card)',
+          color: 'var(--text-primary)',
           boxShadow:
             '0 30px 80px rgba(15, 23, 42, 0.22), 0 8px 24px rgba(15, 23, 42, 0.12)',
         },
@@ -47,13 +49,13 @@ export function FormDialog({
           pb: subtitle ? 1 : 2,
           fontSize: '1.125rem',
           fontWeight: 700,
-          color: '#0f172a',
+          color: 'var(--text-primary)',
         }}
       >
         <div className="space-y-1">
           <div>{title}</div>
           {subtitle ? (
-            <p className="text-sm font-normal text-slate-500">{subtitle}</p>
+            <p className="text-sm font-normal text-text-secondary">{subtitle}</p>
           ) : null}
         </div>
       </DialogTitle>
@@ -65,8 +67,8 @@ export function FormDialog({
           px: 3,
           py: 2,
           gap: 1,
-          borderTop: '1px solid rgba(148, 163, 184, 0.2)',
-          backgroundColor: 'rgba(248, 250, 252, 0.8)',
+          borderTop: '1px solid var(--border-primary)',
+          backgroundColor: 'var(--bg-secondary)',
         }}
       >
         {actions}

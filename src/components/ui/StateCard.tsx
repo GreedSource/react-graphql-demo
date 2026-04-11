@@ -19,14 +19,14 @@ export function StateCard({
   loading = false,
 }: StateCardProps) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+    <div className="rounded-3xl border border-border bg-surface-card/90 p-6 shadow-sm transition-colors duration-300">
       <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-elevated text-text">
           {loading ? <CircularProgress size={20} color="inherit" /> : icon}
         </div>
         <div className="flex-1 space-y-2">
-          <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-          <p className="text-sm text-slate-600">{description}</p>
+          <h3 className="text-lg font-semibold text-text">{title}</h3>
+          <p className="text-sm text-text-secondary">{description}</p>
           {actionLabel && onAction ? (
             <Button variant="outlined" onClick={onAction}>
               {actionLabel}

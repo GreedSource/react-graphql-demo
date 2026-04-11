@@ -95,18 +95,16 @@ export default function ModulesPage() {
             <DataTable
               rows={modules}
               getRowKey={(item) => item.id}
+              selectedRowKey={selectedId}
+              onRowClick={(item) => setSelectedId(item.id)}
               columns={[
                 {
                   key: 'name',
                   header: 'Modulo',
                   render: (item) => (
-                    <button
-                      type="button"
-                      className="font-medium text-slate-900 hover:text-sky-700"
-                      onClick={() => setSelectedId(item.id)}
-                    >
+                    <span className="font-medium">
                       {item.name}
-                    </button>
+                    </span>
                   ),
                 },
                 {
@@ -128,12 +126,12 @@ export default function ModulesPage() {
 
         <SectionCard title="Detalle">
           {selectedModule ? (
-            <div className="space-y-4 text-sm text-slate-600">
+            <div className="space-y-4 text-sm text-text-secondary">
               <div className="flex items-center gap-3">
                 <h3 className="text-xl font-semibold text-slate-950">{selectedModule.name}</h3>
                 <StatusChip active={selectedModule.active} />
               </div>
-              <p><span className="font-semibold text-slate-900">Key:</span> {selectedModule.key}</p>
+              <p><span className="font-semibold text-text">Key:</span> {selectedModule.key}</p>
               <p>{selectedModule.description || 'Sin descripcion para este modulo.'}</p>
               <Button variant="contained" onClick={openEdit}>Editar modulo</Button>
             </div>

@@ -51,7 +51,7 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col justify-between border-r border-slate-800 bg-slate-950 p-6 text-white transition-all lg:relative lg:z-auto lg:w-72 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col justify-between border-r border-slate-800 bg-slate-950 p-6 text-white transition-all lg:relative lg:z-auto lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{

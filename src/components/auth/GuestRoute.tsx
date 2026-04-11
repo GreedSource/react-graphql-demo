@@ -1,22 +1,12 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { CircularProgress } from '@mui/material';
-import { useAuthBootstrap } from '@/hooks/auth.hook';
-import { useUserStore } from '@/stores/user.store';
+import { Outlet } from 'react-router-dom';
+import { useGuestBootstrap } from '@/hooks/auth.hook';
 
 export function GuestRoute() {
-  const { isReady } = useAuthBootstrap();
-  const { user } = useUserStore();
+  const { isReady } = useGuestBootstrap();
 
+  // For guests without a token, resolve immediately — no loading spinner.
   if (!isReady) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950">
-        <CircularProgress sx={{ color: 'white' }} />
-      </div>
-    );
-  }
-
-  if (user) {
-    return <Navigate to="/" replace />;
+    return null;
   }
 
   return <Outlet />;

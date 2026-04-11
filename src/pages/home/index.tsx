@@ -128,22 +128,22 @@ export default function HomePage() {
         >
           <div className="grid gap-3">
             {hasAnyPermission(userPermissions, 'roles', ['read']) && (
-              <Link className="rounded-2xl border border-slate-200 px-4 py-4 hover:border-sky-400" to="/roles">
+              <Link className="rounded-2xl border border-border px-4 py-4 hover:border-accent" to="/roles">
                 Define roles base y asigna permisos a cada rol.
               </Link>
             )}
             {hasAnyPermission(userPermissions, 'permissions', ['read']) && (
-              <Link className="rounded-2xl border border-slate-200 px-4 py-4 hover:border-sky-400" to="/permissions">
+              <Link className="rounded-2xl border border-border px-4 py-4 hover:border-accent" to="/permissions">
                 Crea permisos a partir de combinaciones modulo + accion.
               </Link>
             )}
             {hasAnyPermission(userPermissions, 'users', ['read']) && (
-              <Link className="rounded-2xl border border-slate-200 px-4 py-4 hover:border-sky-400" to="/users">
+              <Link className="rounded-2xl border border-border px-4 py-4 hover:border-accent" to="/users">
                 Revisa usuarios existentes y ajusta sus roles.
               </Link>
             )}
             {cards.length === 0 && (
-              <p className="text-sm text-slate-600">No tienes acceso a ningún módulo. Contacta a un administrador.</p>
+              <p className="text-sm text-text-secondary">No tienes acceso a ningún módulo. Contacta a un administrador.</p>
             )}
           </div>
         </SectionCard>
@@ -155,7 +155,7 @@ export default function HomePage() {
           {hasError ? (
             <Alert severity="error">{getApolloErrorMessage(hasError)}</Alert>
           ) : (
-            <div className="space-y-3 text-sm text-slate-600">
+            <div className="space-y-3 text-sm text-text-secondary">
               <p>Auth, usuarios, roles, modulos, acciones y permisos ya tienen flujo de consumo desde GraphQL.</p>
               <p>La UI queda preparada para extender `deleteModule`, `updateAction` y `updatePermission` cuando el backend los publique.</p>
             </div>

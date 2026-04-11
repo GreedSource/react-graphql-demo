@@ -12,7 +12,7 @@ export default function AuthLayout() {
   }, []);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.16),_transparent_24%),linear-gradient(180deg,_#f8fafc_0%,_#e2e8f0_100%)] px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-surface-elevated to-surface px-4 py-12 transition-colors duration-300">
       <div
         className="w-full max-w-md"
         style={{
@@ -21,7 +21,7 @@ export default function AuthLayout() {
           transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), transform 400ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        <div className="rounded-3xl border border-slate-200/70 bg-white/80 p-8 shadow-xl backdrop-blur-xl">
+        <div className="rounded-3xl border border-border bg-surface-card/80 p-8 shadow-xl backdrop-blur-xl">
           <Outlet />
         </div>
       </div>

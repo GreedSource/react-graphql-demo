@@ -92,11 +92,11 @@ export default function ResetPassword() {
           transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
           Restablecer
         </p>
-        <h2 className="text-3xl font-semibold text-slate-950">Nueva contrasena</h2>
-        <p className="text-sm text-slate-500">
+        <h2 className="text-3xl font-semibold text-text">Nueva contrasena</h2>
+        <p className="text-sm text-text-secondary">
           Ingresa tu nueva contrasena para continuar.
         </p>
       </div>
@@ -179,7 +179,7 @@ export default function ResetPassword() {
       </div>
 
       <p
-        className="text-center text-sm text-slate-600"
+        className="text-center text-sm text-text-secondary"
         style={{
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
@@ -189,7 +189,7 @@ export default function ResetPassword() {
       >
         <Link
           to="/login"
-          className="font-medium text-sky-700 transition-all duration-200 hover:text-sky-900 hover:underline"
+          className="font-medium text-accent transition-all duration-200 hover:text-accent-hover hover:underline"
         >
           Volver al login
         </Link>

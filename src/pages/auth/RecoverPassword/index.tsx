@@ -54,11 +54,11 @@ export default function RecoverPassword() {
           transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
           Recuperacion
         </p>
-        <h2 className="text-3xl font-semibold text-slate-950">Recuperar contrasena</h2>
-        <p className="text-sm text-slate-500">
+        <h2 className="text-3xl font-semibold text-text">Recuperar contrasena</h2>
+        <p className="text-sm text-text-secondary">
           Te enviaremos los siguientes pasos al correo registrado.
         </p>
       </div>
@@ -134,7 +134,7 @@ export default function RecoverPassword() {
       </div>
 
       <p
-        className="text-center text-sm text-slate-600"
+        className="text-center text-sm text-text-secondary"
         style={{
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
@@ -144,7 +144,7 @@ export default function RecoverPassword() {
       >
         <Link
           to="/login"
-          className="font-medium text-sky-700 transition-all duration-200 hover:text-sky-900 hover:underline"
+          className="font-medium text-accent transition-all duration-200 hover:text-accent-hover hover:underline"
         >
           Volver al login
         </Link>

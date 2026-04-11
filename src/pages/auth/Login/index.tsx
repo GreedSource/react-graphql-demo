@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useAuthActions } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { isValidEmail } from '@/lib/validation';
+import { useUserStore } from '@/stores/user.store';
 
 interface LoginFormState {
   email: string;
@@ -16,6 +17,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, loginState } = useAuthActions();
+  const { user, accessToken } = useUserStore();
   const [formState, setFormState] = useState<LoginFormState>({
     email: '',
     password: '',
@@ -23,6 +25,14 @@ export default function Login() {
   const [errors, setErrors] = useState<Partial<LoginFormState>>({});
   const [isVisible, setIsVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect to dashboard if an active session is detected
+  useEffect(() => {
+    if (user && accessToken) {
+      const nextPath = location.state?.from?.pathname || '/';
+      navigate(nextPath, { replace: true });
+    }
+  }, [user, accessToken, navigate, location.state]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -82,11 +92,11 @@ export default function Login() {
           transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
           Acceso seguro
         </p>
-        <h2 className="text-3xl font-semibold text-slate-950">Iniciar sesion</h2>
-        <p className="text-sm text-slate-500">
+        <h2 className="text-3xl font-semibold text-text">Iniciar sesion</h2>
+        <p className="text-sm text-text-secondary">
           Entra al panel para administrar usuarios, roles y permisos.
         </p>
       </div>
@@ -206,7 +216,7 @@ export default function Login() {
       </div>
 
       <div
-        className="flex items-center justify-between text-sm text-slate-600"
+        className="flex items-center justify-between text-sm text-text-secondary"
         style={{
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
@@ -216,13 +226,13 @@ export default function Login() {
       >
         <Link
           to="/register"
-          className="font-medium text-sky-700 transition-all duration-200 hover:text-sky-900 hover:underline"
+          className="font-medium text-accent transition-all duration-200 hover:text-accent-hover hover:underline"
         >
           Crear cuenta
         </Link>
         <Link
           to="/recover-password"
-          className="font-medium text-slate-500 transition-all duration-200 hover:text-slate-800 hover:underline"
+          className="font-medium text-text-secondary transition-all duration-200 hover:text-text hover:underline"
         >
           Olvide mi contrasena
         </Link>

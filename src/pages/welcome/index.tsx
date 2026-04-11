@@ -49,7 +49,7 @@ export default function WelcomePage() {
     <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-4xl text-center">
         <h1
-          className="text-4xl font-bold text-white sm:text-5xl"
+          className="text-4xl font-bold text-text sm:text-5xl"
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateY(0)' : 'translateY(12px)',
@@ -59,7 +59,7 @@ export default function WelcomePage() {
           Welcome, {user?.name} {user?.lastname}
         </h1>
         <p
-          className="mt-4 text-lg text-slate-400"
+          className="mt-4 text-lg text-text-secondary"
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
@@ -76,7 +76,7 @@ export default function WelcomePage() {
               <Link
                 key={route.to}
                 to={route.to}
-                className="group flex flex-col items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 p-8 transition-all duration-300 hover:border-sky-500/50 hover:bg-slate-800/50 hover:shadow-lg hover:shadow-sky-500/10 hover:-translate-y-1"
+                className="group flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface-card/50 p-8 transition-all duration-300 hover:border-accent/50 hover:bg-surface-card-hover hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-1"
                 style={{
                   opacity: isVisible ? 1 : 0,
                   transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(16px) scale(0.96)',
@@ -84,12 +84,12 @@ export default function WelcomePage() {
                   transitionDelay: isVisible ? `${(index + 2) * 100}ms` : '0ms',
                 }}
               >
-                <span className="text-sky-400 transition-all duration-300 group-hover:text-sky-300 group-hover:scale-110">
+                <span className="text-accent transition-all duration-300 group-hover:text-accent-hover group-hover:scale-110">
                   {route.icon || moduleIcons[route.permissionType!] || <Bolt fontSize="large" />}
                 </span>
                 <div>
-                  <h3 className="text-xl font-semibold text-white">{route.label}</h3>
-                  <p className="mt-2 flex items-center justify-center gap-1 text-sm text-slate-400">
+                  <h3 className="text-xl font-semibold text-text">{route.label}</h3>
+                  <p className="mt-2 flex items-center justify-center gap-1 text-sm text-text-secondary">
                     Open module
                     <ArrowForward
                       fontSize="small"
@@ -101,19 +101,19 @@ export default function WelcomePage() {
             ))}
           </div>
         ) : (
-          <div
-            className="mt-12 rounded-2xl border border-slate-800 bg-slate-900/50 p-12"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'translateY(0)' : 'translateY(12px)',
-              transition: 'all 500ms cubic-bezier(0.4, 0, 0.2, 1)',
-              transitionDelay: isVisible ? '300ms' : '0ms',
-            }}
-          >
-            <p className="text-lg text-slate-400">
-              You don't have access to any modules yet. Please contact an administrator.
-            </p>
-          </div>
+            <div
+              className="mt-12 rounded-2xl border border-border bg-surface-card/50 p-12"
+              style={{
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0)' : 'translateY(12px)',
+                transition: 'all 500ms cubic-bezier(0.4, 0, 0.2, 1)',
+                transitionDelay: isVisible ? '300ms' : '0ms',
+              }}
+            >
+              <p className="text-lg text-text-secondary">
+                You don't have access to any modules yet. Please contact an administrator.
+              </p>
+            </div>
         )}
       </div>
     </div>

@@ -33,7 +33,7 @@ export function ConfirmDialog({
     <Dialog open={open} onClose={loading ? undefined : onClose} fullWidth maxWidth="xs">
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <p className="text-sm text-slate-600">{description}</p>
+        <p className="text-sm text-text-secondary">{description}</p>
       </DialogContent>
       <DialogActions sx={{ padding: 2 }}>
         <Button onClick={onClose} disabled={loading}>

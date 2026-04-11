@@ -96,7 +96,7 @@ export default function PasswordInput({
       {/* Password strength bar */}
       {value.length > 0 && showValidation && (
         <div className="space-y-1">
-          <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+          <div className="h-1.5 overflow-hidden rounded-full bg-surface-elevated">
             <div
               className="h-full rounded-full transition-all duration-300"
               style={{
@@ -131,7 +131,7 @@ export default function PasswordInput({
               <div
                 key={rule.label}
                 className={`flex items-center gap-2 transition-all duration-200 ${
-                  rule.met ? 'text-green-400' : 'text-slate-500'
+                  rule.met ? 'text-green-400' : 'text-text-muted'
                 }`}
               >
                 {rule.met ? (

@@ -184,6 +184,29 @@ export function useAuthBootstrap() {
   };
 }
 
+/**
+ * Lightweight bootstrap for guest routes.
+ * Only checks if there's an existing session; does NOT fire a profile query
+ * when the user is unauthenticated, avoiding unnecessary network calls and
+ * expensive IndexedDB cleanup on first visit.
+ */
+export function useGuestBootstrap() {
+  const { user, sessionChecked, accessToken } = useUserStore();
+
+  // If there's no token at all, resolve immediately — no network call needed.
+  if (!accessToken) {
+    return { isReady: true, user: null };
+  }
+
+  // If we already checked and found no valid role, resolve immediately.
+  if (sessionChecked && !user) {
+    return { isReady: true, user: null };
+  }
+
+  // Still waiting — let useAuthBootstrap (on ProtectedRoute side) handle it.
+  return { isReady: sessionChecked, user };
+}
+
 export function useSessionCheck() {
   return useAuthBootstrap();
 }
