@@ -81,9 +81,6 @@ export default function RolesPage() {
         const matches =
           item.type === permission.moduleKey &&
           item.action === permission.actionKey;
-        if (matches) {
-          console.log('Match found:', permission, 'matches role perm:', item);
-        }
         return matches;
       }),
     );

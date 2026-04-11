@@ -114,3 +114,9 @@ export interface CreatePermissionInput {
   actionId: string;
   description?: string;
 }
+
+export interface ResetPasswordInput {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}

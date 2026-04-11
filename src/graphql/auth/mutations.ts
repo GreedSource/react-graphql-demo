@@ -71,6 +71,16 @@ export const RECOVER_PASSWORD = gql`
   }
 `;
 
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword($input: ResetPasswordInput!) {
+    resetPassword(input: $input) {
+      status
+      message
+      data
+    }
+  }
+`;
+
 export const LOGOUT = gql`
   mutation Logout {
     logout {

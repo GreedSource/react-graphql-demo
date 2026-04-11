@@ -1,25 +1,23 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Alert, Button, CircularProgress, TextField } from '@mui/material';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Alert, Button, CircularProgress } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useAuthActions } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
-import { isValidEmail } from '@/lib/validation';
 import { validatePassword } from '@/lib/password-validation';
 import PasswordInput from '@/components/ui/PasswordInput';
-import type { RegisterInput } from '@/types/admin';
+import type { ResetPasswordInput } from '@/types/admin';
 
-export default function Register() {
+export default function ResetPassword() {
   const navigate = useNavigate();
-  const { register, registerState } = useAuthActions();
-  const [formState, setFormState] = useState<RegisterInput>({
-    name: '',
-    lastname: '',
-    email: '',
+  const { token } = useParams<{ token: string }>();
+  const { resetPassword, resetPasswordState } = useAuthActions();
+  const [formState, setFormState] = useState<ResetPasswordInput>({
+    token: token ?? '',
     password: '',
     confirmPassword: '',
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof RegisterInput, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof ResetPasswordInput, string>>>({});
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -29,21 +27,25 @@ export default function Register() {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const submitError = useMemo(() => {
-    return registerState.error ? getApolloErrorMessage(registerState.error) : null;
-  }, [registerState.error]);
+  useEffect(() => {
+    if (token) {
+      setFormState((current) => ({ ...current, token }));
+    }
+  }, [token]);
 
-  const handleChange = (field: keyof RegisterInput, value: string) => {
+  const submitError = useMemo(() => {
+    return resetPasswordState.error
+      ? getApolloErrorMessage(resetPasswordState.error)
+      : null;
+  }, [resetPasswordState.error]);
+
+  const handleChange = (field: keyof ResetPasswordInput, value: string) => {
     setFormState((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   };
 
   const validate = () => {
-    const nextErrors: Partial<Record<keyof RegisterInput, string>> = {};
-
-    if (!formState.name.trim()) nextErrors.name = 'El nombre es obligatorio.';
-    if (!formState.lastname.trim()) nextErrors.lastname = 'El apellido es obligatorio.';
-    if (!isValidEmail(formState.email)) nextErrors.email = 'Ingresa un correo valido.';
+    const nextErrors: Partial<Record<keyof ResetPasswordInput, string>> = {};
 
     const passwordValidation = validatePassword(formState.password);
     if (!passwordValidation.isValid) {
@@ -60,9 +62,6 @@ export default function Register() {
   const isFormValid = useMemo(() => {
     const passwordValidation = validatePassword(formState.password);
     return (
-      formState.name.trim() &&
-      formState.lastname.trim() &&
-      isValidEmail(formState.email) &&
       passwordValidation.isValid &&
       formState.password === formState.confirmPassword &&
       formState.confirmPassword.length > 0
@@ -75,21 +74,12 @@ export default function Register() {
     if (!validate()) return;
 
     try {
-      const response = await register(formState);
-      toast.success(response.message || 'Cuenta creada correctamente.');
-      navigate('/', { replace: true });
+      const response = await resetPassword(formState);
+      toast.success(response.message || 'Contrasena restablecida correctamente.');
+      navigate('/login', { replace: true });
     } catch (error) {
       toast.error(getApolloErrorMessage(error));
     }
-  };
-
-  const fieldSx = {
-    '& .MuiOutlinedInput-root': {
-      transition: 'all 200ms',
-      '&:hover fieldset': {
-        borderColor: 'sky.500',
-      },
-    },
   };
 
   return (
@@ -103,11 +93,11 @@ export default function Register() {
         }}
       >
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
-          Nuevo acceso
+          Restablecer
         </p>
-        <h2 className="text-3xl font-semibold text-slate-950">Crear cuenta</h2>
+        <h2 className="text-3xl font-semibold text-slate-950">Nueva contrasena</h2>
         <p className="text-sm text-slate-500">
-          Registra un usuario inicial para entrar al panel administrativo.
+          Ingresa tu nueva contrasena para continuar.
         </p>
       </div>
 
@@ -123,35 +113,6 @@ export default function Register() {
       </div>
 
       <div
-        className="grid gap-6 sm:grid-cols-2"
-        style={{
-          opacity: isVisible ? 1 : 0,
-          transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
-          transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
-          transitionDelay: isVisible ? '150ms' : '0ms',
-        }}
-      >
-        <TextField
-          label="Nombre"
-          value={formState.name}
-          onChange={(event) => handleChange('name', event.target.value)}
-          error={Boolean(errors.name)}
-          helperText={errors.name}
-          fullWidth
-          sx={fieldSx}
-        />
-        <TextField
-          label="Apellido"
-          value={formState.lastname}
-          onChange={(event) => handleChange('lastname', event.target.value)}
-          error={Boolean(errors.lastname)}
-          helperText={errors.lastname}
-          fullWidth
-          sx={fieldSx}
-        />
-      </div>
-
-      <div
         style={{
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
@@ -159,28 +120,8 @@ export default function Register() {
           transitionDelay: isVisible ? '200ms' : '0ms',
         }}
       >
-        <TextField
-          label="Correo electronico"
-          type="email"
-          value={formState.email}
-          onChange={(event) => handleChange('email', event.target.value)}
-          error={Boolean(errors.email)}
-          helperText={errors.email}
-          fullWidth
-          sx={fieldSx}
-        />
-      </div>
-
-      <div
-        style={{
-          opacity: isVisible ? 1 : 0,
-          transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
-          transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
-          transitionDelay: isVisible ? '250ms' : '0ms',
-        }}
-      >
         <PasswordInput
-          label="Contrasena"
+          label="Nueva contrasena"
           value={formState.password}
           onChange={(value) => handleChange('password', value)}
           error={errors.password}
@@ -217,7 +158,7 @@ export default function Register() {
           type="submit"
           fullWidth
           variant="contained"
-          disabled={registerState.loading || !isFormValid}
+          disabled={resetPasswordState.loading || !isFormValid}
           sx={{
             transition: 'all 200ms',
             '&:hover': {
@@ -229,10 +170,10 @@ export default function Register() {
             },
           }}
         >
-          {registerState.loading ? (
+          {resetPasswordState.loading ? (
             <CircularProgress size={22} color="inherit" />
           ) : (
-            'Crear cuenta'
+            'Restablecer contrasena'
           )}
         </Button>
       </div>
@@ -246,12 +187,11 @@ export default function Register() {
           transitionDelay: isVisible ? '400ms' : '0ms',
         }}
       >
-        ¿Ya tienes acceso?{' '}
         <Link
           to="/login"
           className="font-medium text-sky-700 transition-all duration-200 hover:text-sky-900 hover:underline"
         >
-          Inicia sesion
+          Volver al login
         </Link>
       </p>
     </form>

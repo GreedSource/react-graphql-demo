@@ -13,6 +13,7 @@ import {
   RECOVER_PASSWORD,
   REFRESH_TOKEN,
   REGISTER,
+  RESET_PASSWORD,
 } from '@/graphql/auth/mutations';
 import { PROFILE } from '@/graphql/auth/queries';
 import { USER_UPDATED } from '@/graphql/auth/subscriptions';
@@ -23,6 +24,7 @@ import type {
   AuthPayload,
   LoginInput,
   RegisterInput,
+  ResetPasswordInput,
   User,
 } from '@/types/admin';
 import { logoutAll } from '@/utils/global';
@@ -41,6 +43,10 @@ interface RegisterMutationResult {
 
 interface RecoverPasswordResult {
   recoverPassword: ApiResponse<boolean>;
+}
+
+interface ResetPasswordResult {
+  resetPassword: ApiResponse<boolean>;
 }
 
 interface LogoutResult {
@@ -71,6 +77,8 @@ export function useAuthActions() {
     useMutation<RegisterMutationResult>(REGISTER);
   const [recoverPasswordMutation, recoverPasswordState] =
     useMutation<RecoverPasswordResult>(RECOVER_PASSWORD);
+  const [resetPasswordMutation, resetPasswordState] =
+    useMutation<ResetPasswordResult>(RESET_PASSWORD);
   const [logoutMutation] = useMutation<LogoutResult>(LOGOUT);
 
   const login = async (input: LoginInput) => {
@@ -103,6 +111,14 @@ export function useAuthActions() {
     );
   };
 
+  const resetPassword = async (input: ResetPasswordInput) => {
+    const { data } = await resetPasswordMutation({ variables: { input } });
+    return ensureSuccess(
+      data?.resetPassword,
+      'No se pudo restablecer la contrasena.',
+    );
+  };
+
   const performLogout = async () => {
     try {
       await logoutMutation();
@@ -120,17 +136,19 @@ export function useAuthActions() {
     login,
     register,
     recoverPassword,
+    resetPassword,
     performLogout,
     loginState,
     registerState,
     recoverPasswordState,
+    resetPasswordState,
   };
 }
 
 export function useAuthBootstrap() {
   const { user, sessionChecked, setSession, setSessionChecked, logout } =
     useUserStore();
-  const [hasResolved, setHasResolved] = useState(sessionChecked);
+  const [hasResolved, setHasResolved] = useState(false);
   const [fetchProfile, profileState] = useLazyQuery<ProfileQueryResult>(PROFILE, {
     fetchPolicy: 'network-only',
     onCompleted: (data) => {
@@ -151,13 +169,13 @@ export function useAuthBootstrap() {
   });
 
   useEffect(() => {
-    if (sessionChecked) {
+    if (sessionChecked && user?.role?.permissions) {
       setHasResolved(true);
       return;
     }
 
     fetchProfile();
-  }, [fetchProfile, sessionChecked]);
+  }, [fetchProfile, sessionChecked, user]);
 
   return {
     isReady: hasResolved && !profileState.loading,
