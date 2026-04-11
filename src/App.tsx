@@ -1,36 +1,45 @@
-import { Routes, Route } from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
-import AuthLayout from './layouts/AuthLayout';
-import Dashboard from './pages/Dashboard';
-import Home from './pages/home';
-
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import RecoverPassword from './pages/auth/RecoverPassword';
-import ChangePassword from './pages/auth/ChangePassword';
+import { Suspense, lazy } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { NotFound } from './pages/not-found';
+
+const MainLayout = lazy(() => import('./layouts/MainLayout'));
+const AuthLayout = lazy(() => import('./layouts/AuthLayout'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Home = lazy(() => import('./pages/home'));
+const Login = lazy(() => import('./pages/auth/Login'));
+const Register = lazy(() => import('./pages/auth/Register'));
+const RecoverPassword = lazy(() => import('./pages/auth/RecoverPassword'));
+const ChangePassword = lazy(() => import('./pages/auth/ChangePassword'));
+const NotFound = lazy(() =>
+  import('./pages/not-found').then((module) => ({ default: module.NotFound }))
+);
+
+const RouteFallback = () => (
+  <div className="flex min-h-[40vh] items-center justify-center text-sm text-gray-500">
+    Loading...
+  </div>
+);
 
 const App = () => {
   return (
     <>
       <ToastContainer />
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" index element={<Home />} />
-          <Route path="/dashboard" index element={<Dashboard />} />
-        </Route>
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/recover-password" element={<RecoverPassword />} />
-          <Route path="/change-password" element={<ChangePassword />} />
-        </Route>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/" index element={<Home />} />
+            <Route path="/dashboard" index element={<Dashboard />} />
+          </Route>
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/recover-password" element={<RecoverPassword />} />
+            <Route path="/change-password" element={<ChangePassword />} />
+          </Route>
 
-        {/* otras rutas */}
-        {/* Ruta catch-all */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </>
   );
 };
