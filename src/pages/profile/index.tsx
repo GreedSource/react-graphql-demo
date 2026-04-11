@@ -29,7 +29,7 @@ export default function ProfilePage() {
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <SectionCard title="Datos del usuario">
           {profile ? (
-            <dl className="grid gap-4 text-sm text-slate-600">
+            <dl className="grid gap-4 text-sm text-text-secondary">
               <div>
                 <dt className="font-semibold text-slate-950">Nombre</dt>
                 <dd>{profile.name} {profile.lastname}</dd>
@@ -44,7 +44,7 @@ export default function ProfilePage() {
               </div>
             </dl>
           ) : (
-            <p className="text-sm text-slate-500">No hay informacion de perfil disponible.</p>
+            <p className="text-sm text-text-muted">No hay informacion de perfil disponible.</p>
           )}
         </SectionCard>
 
@@ -64,7 +64,7 @@ export default function ProfilePage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-text-muted">
               Este usuario aun no recibe permisos desde su rol.
             </p>
           )}

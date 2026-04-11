@@ -121,18 +121,16 @@ export default function UsersPage() {
             <DataTable
               rows={users}
               getRowKey={(item) => item.id}
+              selectedRowKey={selectedId}
+              onRowClick={(user) => setSelectedId(user.id)}
               columns={[
                 {
                   key: 'name',
                   header: 'Usuario',
                   render: (user) => (
-                    <button
-                      className="text-left font-medium text-slate-900 hover:text-sky-700"
-                      onClick={() => setSelectedId(user.id)}
-                      type="button"
-                    >
+                    <span className="font-medium">
                       {user.name} {user.lastname}
-                    </button>
+                    </span>
                   ),
                 },
                 {
@@ -157,7 +155,7 @@ export default function UsersPage() {
 
         <SectionCard title="Detalle" description="Selecciona un usuario para ver y editar su informacion.">
           {selectedUser ? (
-            <div className="space-y-4 text-sm text-slate-600">
+            <div className="space-y-4 text-sm text-text-secondary">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
                   Nombre completo

@@ -18,12 +18,16 @@ interface DataTableProps<T> {
   columns: TableColumn<T>[];
   rows: T[];
   getRowKey: (item: T) => string;
+  onRowClick?: (item: T) => void;
+  selectedRowKey?: string;
 }
 
 export function DataTable<T>({
   columns,
   rows,
   getRowKey,
+  onRowClick,
+  selectedRowKey,
 }: DataTableProps<T>) {
   return (
     <TableContainer>
@@ -38,7 +42,7 @@ export function DataTable<T>({
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  color: '#475569',
+                  color: 'var(--text-secondary)',
                 }}
               >
                 {column.header}
@@ -47,13 +51,40 @@ export function DataTable<T>({
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow hover key={getRowKey(row)}>
-              {columns.map((column) => (
-                <TableCell key={column.key}>{column.render(row)}</TableCell>
-              ))}
-            </TableRow>
-          ))}
+          {rows.map((row) => {
+            const rowKey = getRowKey(row);
+            const isSelected = rowKey === selectedRowKey;
+            const isClickable = typeof onRowClick === 'function';
+
+            return (
+              <TableRow
+                key={rowKey}
+                hover={isClickable}
+                onClick={isClickable ? () => onRowClick(row) : undefined}
+                sx={{
+                  cursor: isClickable ? 'pointer' : 'default',
+                  bgcolor: isSelected
+                    ? 'var(--accent-soft)'
+                    : 'transparent',
+                  '&:hover': isClickable
+                    ? {
+                        bgcolor: 'var(--accent-soft)',
+                      }
+                    : {},
+                  '& .MuiTableCell-root': {
+                    color: isSelected
+                      ? 'var(--text-primary) !important'
+                      : undefined,
+                  },
+                  transition: 'background-color 150ms ease',
+                }}
+              >
+                {columns.map((column) => (
+                  <TableCell key={column.key}>{column.render(row)}</TableCell>
+                ))}
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </TableContainer>

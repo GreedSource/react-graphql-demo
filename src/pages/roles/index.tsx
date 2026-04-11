@@ -81,9 +81,6 @@ export default function RolesPage() {
         const matches =
           item.type === permission.moduleKey &&
           item.action === permission.actionKey;
-        if (matches) {
-          console.log('Match found:', permission, 'matches role perm:', item);
-        }
         return matches;
       }),
     );
@@ -205,18 +202,16 @@ export default function RolesPage() {
             <DataTable
               rows={roles}
               getRowKey={(role) => role.id}
+              selectedRowKey={selectedId}
+              onRowClick={(role) => setSelectedId(role.id)}
               columns={[
                 {
                   key: 'name',
                   header: 'Rol',
                   render: (role) => (
-                    <button
-                      type="button"
-                      className="text-left font-medium text-slate-900 hover:text-sky-700"
-                      onClick={() => setSelectedId(role.id)}
-                    >
+                    <span className="font-medium">
                       {role.name}
-                    </button>
+                    </span>
                   ),
                 },
                 {
@@ -249,7 +244,7 @@ export default function RolesPage() {
                   </h3>
                   <StatusChip active={selectedRole.active} />
                 </div>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-text-secondary">
                   {selectedRole.description || 'Este rol no tiene descripcion.'}
                 </p>
               </div>
@@ -268,7 +263,7 @@ export default function RolesPage() {
               </div>
 
               <div>
-                <p className="mb-2 text-sm font-semibold text-slate-900">
+                <p className="mb-2 text-sm font-semibold text-text">
                   Permisos actuales
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -288,7 +283,7 @@ export default function RolesPage() {
                       />
                     ))
                   ) : (
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-text-muted">
                       No hay permisos asignados.
                     </p>
                   )}
