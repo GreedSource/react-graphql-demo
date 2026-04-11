@@ -5,21 +5,48 @@ import {
   ApolloLink,
   from,
   Observable,
+  split,
   type FetchResult,
   type Operation,
   type NextLink,
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import { useUserStore } from '@/stores/user.store'; // o tu store de tokens
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { createClient } from 'graphql-ws';
+import { useUserStore } from '@/stores/user.store';
 import { REFRESH_TOKEN } from '@/graphql/auth/mutations';
 import { toast } from 'react-toastify';
 
-// Http link para enviar las peticiones al servidor
+function getGraphQlWsEndpoint(httpEndpoint: string) {
+  try {
+    const url = new URL(httpEndpoint, window.location.origin);
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    return url.toString();
+  } catch {
+    return httpEndpoint.replace(/^http/i, 'ws');
+  }
+}
+
 const httpLink = new HttpLink({
   uri: import.meta.env.VITE_GRAPHQL_ENDPOINT,
 });
 
-// Link para agregar el token de acceso a cada request
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: getGraphQlWsEndpoint(import.meta.env.VITE_GRAPHQL_ENDPOINT),
+    connectionParams: async () => {
+      const { accessToken } = useUserStore.getState();
+
+      return {
+        authorization: accessToken ? `Bearer ${accessToken}` : '',
+      };
+    },
+    lazy: true,
+    retryAttempts: 3,
+  }),
+);
+
 const authLink = new ApolloLink((operation, forward) => {
   const { accessToken } = useUserStore.getState();
 
@@ -32,8 +59,6 @@ const authLink = new ApolloLink((operation, forward) => {
 
   return forward(operation);
 });
-
-// Link para manejar errores, detectar 401, refrescar token y reintentar la petición
 
 const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
@@ -108,7 +133,22 @@ function refreshTokenFlow(
   });
 }
 
+const httpTransportLink = from([errorLink, authLink, httpLink]);
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  httpTransportLink,
+);
+
 export const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
-  link: from([errorLink, authLink, httpLink]),
+  link: splitLink,
 });
