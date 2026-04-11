@@ -7,8 +7,8 @@ export const PERMISSIONS = gql`
       message
       data {
         id
-        moduleId
-        actionId
+        moduleKey
+        actionKey
         description
       }
     }

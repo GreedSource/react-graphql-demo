@@ -79,8 +79,8 @@ export default function PermissionsPage() {
             rows={permissions}
             getRowKey={(item) => item.id}
             columns={[
-              { key: 'module', header: 'Modulo', render: (item) => item.moduleId },
-              { key: 'action', header: 'Accion', render: (item) => item.actionId },
+              { key: 'module', header: 'Modulo', render: (item) => item.moduleKey },
+              { key: 'action', header: 'Accion', render: (item) => item.actionKey },
               { key: 'description', header: 'Descripcion', render: (item) => item.description || 'Sin descripcion' },
               {
                 key: 'actions',
@@ -158,7 +158,7 @@ export default function PermissionsPage() {
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Eliminar permiso"
-        description={`Se eliminara el permiso ${deleteTarget?.moduleId || ''}:${deleteTarget?.actionId || ''}.`}
+        description={`Se eliminara el permiso ${deleteTarget?.moduleKey || ''}:${deleteTarget?.actionKey || ''}.`}
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => void handleDelete()}
         destructive

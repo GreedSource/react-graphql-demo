@@ -43,8 +43,8 @@ export interface ActionEntity {
 
 export interface Permission {
   id: string;
-  moduleId: string;
-  actionId: string;
+  moduleKey: string;
+  actionKey: string;
   description?: string | null;
 }
 

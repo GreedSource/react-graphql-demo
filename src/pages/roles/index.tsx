@@ -75,12 +75,17 @@ export default function RolesPage() {
 
   const assignedPermissions = useMemo(() => {
     if (!selectedRole) return [];
+
     return permissions.filter((permission) =>
-      selectedRole.permissions.some(
-        (item) =>
-          item.type === permission.moduleId &&
-          item.action === permission.actionId,
-      ),
+      selectedRole.permissions.some((item) => {
+        const matches =
+          item.type === permission.moduleKey &&
+          item.action === permission.actionKey;
+        if (matches) {
+          console.log('Match found:', permission, 'matches role perm:', item);
+        }
+        return matches;
+      }),
     );
   }, [permissions, selectedRole]);
 
@@ -305,8 +310,8 @@ export default function RolesPage() {
                   {availablePermissions.map((permission) => (
                     <MenuItem key={permission.id} value={permission.id}>
                       {/* {formatRolePermissionLabel(
-                        permission.moduleId,
-                        permission.actionId,
+                        permission.moduleKey,
+                        permission.actionKey,
                       )} */}
                       {permission.description}
                     </MenuItem>
@@ -333,7 +338,7 @@ export default function RolesPage() {
                 >
                   {assignedPermissions.map((permission) => (
                     <MenuItem key={permission.id} value={permission.id}>
-                      {/* {formatRolePermissionLabel(permission.moduleId, permission.actionId)} */}
+                      {/* {formatRolePermissionLabel(permission.moduleKey, permission.actionKey)} */}
                       {permission.description}
                     </MenuItem>
                   ))}
