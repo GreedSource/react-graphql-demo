@@ -1,35 +1,140 @@
-import { useSubscription } from '@apollo/client';
-import { HELLO_STREAM_SUBSCRIPTION } from '@/graphql/hello/subscriptions';
+import {
+  Bolt,
+  DatasetLinked,
+  Extension,
+  Groups,
+  Shield,
+} from '@mui/icons-material';
+import { Alert, Button } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { useProfileQuery } from '@/hooks/auth.hook';
+import { useActions } from '@/hooks/action.hook';
+import { useModules } from '@/hooks/module.hook';
+import { usePermissions } from '@/hooks/permission.hook';
+import { useRoles } from '@/hooks/role.hook';
+import { useUsers } from '@/hooks/user.hook';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { SectionCard } from '@/components/ui/SectionCard';
+import { StateCard } from '@/components/ui/StateCard';
+import { getApolloErrorMessage } from '@/lib/graphql';
 
-interface HelloStreamSubscriptionData {
-  helloStream: string;
-}
+export default function HomePage() {
+  const profileQuery = useProfileQuery();
+  const usersQuery = useUsers();
+  const rolesQuery = useRoles();
+  const modulesQuery = useModules();
+  const actionsQuery = useActions();
+  const permissionsQuery = usePermissions();
 
-export const HomePage = () => {
-  const { data, loading, error } =
-    useSubscription<HelloStreamSubscriptionData>(HELLO_STREAM_SUBSCRIPTION);
+  const profile = profileQuery.data?.profile?.data;
+  const cards = [
+    {
+      label: 'Usuarios',
+      count: usersQuery.data?.users?.data.length ?? 0,
+      icon: <Groups />,
+      to: '/users',
+    },
+    {
+      label: 'Roles',
+      count: rolesQuery.data?.roles?.data.length ?? 0,
+      icon: <Shield />,
+      to: '/roles',
+    },
+    {
+      label: 'Modulos',
+      count: modulesQuery.data?.modules?.data.length ?? 0,
+      icon: <DatasetLinked />,
+      to: '/modules',
+    },
+    {
+      label: 'Acciones',
+      count: actionsQuery.data?.actions?.data.length ?? 0,
+      icon: <Bolt />,
+      to: '/actions',
+    },
+    {
+      label: 'Permisos',
+      count: permissionsQuery.data?.permissions?.data.length ?? 0,
+      icon: <Extension />,
+      to: '/permissions',
+    },
+  ];
+
+  const hasError =
+    usersQuery.error ||
+    rolesQuery.error ||
+    modulesQuery.error ||
+    actionsQuery.error ||
+    permissionsQuery.error;
 
   return (
-    <section className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold">Home</h1>
-        <p className="text-sm text-gray-600">
-          La subscription `helloStream` queda conectada por WebSocket usando
-          `graphql-transport-ws`.
-        </p>
+    <div className="space-y-6">
+      <PageHeader
+        eyebrow="Resumen"
+        title={`Hola${profile ? `, ${profile.name}` : ''}`}
+        description="Monitorea el estado general del panel administrativo y entra directo a cada CRUD."
+        actions={
+          <Button component={Link} to="/users" variant="contained">
+            Gestionar usuarios
+          </Button>
+        }
+      />
+
+      {profileQuery.error ? (
+        <Alert severity="warning">{getApolloErrorMessage(profileQuery.error)}</Alert>
+      ) : null}
+
+      <div className="grid gap-4 xl:grid-cols-5 md:grid-cols-2">
+        {cards.map((card) => (
+          <Link key={card.label} to={card.to} className="block">
+            <StateCard
+              title={String(card.count)}
+              description={card.label}
+              icon={card.icon}
+              loading={
+                usersQuery.loading ||
+                rolesQuery.loading ||
+                modulesQuery.loading ||
+                actionsQuery.loading ||
+                permissionsQuery.loading
+              }
+            />
+          </Link>
+        ))}
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-sm font-medium text-slate-500">Estado del stream</p>
-        <p className="mt-2 text-lg font-semibold text-slate-900">
-          {loading ? 'Conectando...' : data?.helloStream ?? 'Sin eventos aun'}
-        </p>
-        {error ? (
-          <p className="mt-2 text-sm text-red-600">{error.message}</p>
-        ) : null}
+      <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+        <SectionCard
+          title="Siguientes tareas"
+          description="Atajos sugeridos para continuar la configuracion del panel."
+        >
+          <div className="grid gap-3">
+            <Link className="rounded-2xl border border-slate-200 px-4 py-4 hover:border-sky-400" to="/roles">
+              Define roles base y asigna permisos a cada rol.
+            </Link>
+            <Link className="rounded-2xl border border-slate-200 px-4 py-4 hover:border-sky-400" to="/permissions">
+              Crea permisos a partir de combinaciones modulo + accion.
+            </Link>
+            <Link className="rounded-2xl border border-slate-200 px-4 py-4 hover:border-sky-400" to="/users">
+              Revisa usuarios existentes y ajusta sus roles.
+            </Link>
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Estado de integracion"
+          description="Visibilidad sobre la disponibilidad actual del backend."
+        >
+          {hasError ? (
+            <Alert severity="error">{getApolloErrorMessage(hasError)}</Alert>
+          ) : (
+            <div className="space-y-3 text-sm text-slate-600">
+              <p>Auth, usuarios, roles, modulos, acciones y permisos ya tienen flujo de consumo desde GraphQL.</p>
+              <p>La UI queda preparada para extender `deleteModule`, `updateAction` y `updatePermission` cuando el backend los publique.</p>
+            </div>
+          )}
+        </SectionCard>
       </div>
-    </section>
+    </div>
   );
-};
-
-export default HomePage;
+}

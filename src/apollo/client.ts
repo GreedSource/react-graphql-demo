@@ -1,22 +1,22 @@
 import {
   ApolloClient,
-  InMemoryCache,
-  HttpLink,
   ApolloLink,
-  from,
+  HttpLink,
+  InMemoryCache,
   Observable,
+  from,
   split,
   type FetchResult,
-  type Operation,
   type NextLink,
+  type Operation,
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
-import { useUserStore } from '@/stores/user.store';
-import { REFRESH_TOKEN } from '@/graphql/auth/mutations';
 import { toast } from 'react-toastify';
+import { REFRESH_TOKEN } from '@/graphql/auth/mutations';
+import { useUserStore } from '@/stores/user.store';
 
 function getGraphQlWsEndpoint(httpEndpoint: string) {
   try {
@@ -29,12 +29,15 @@ function getGraphQlWsEndpoint(httpEndpoint: string) {
 }
 
 const httpLink = new HttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT,
+  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || '/graphql',
+  credentials: 'include',
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: getGraphQlWsEndpoint(import.meta.env.VITE_GRAPHQL_ENDPOINT),
+    url: getGraphQlWsEndpoint(import.meta.env.VITE_GRAPHQL_ENDPOINT || '/graphql'),
+    lazy: true,
+    retryAttempts: 3,
     connectionParams: async () => {
       const { accessToken } = useUserStore.getState();
 
@@ -42,8 +45,6 @@ const wsLink = new GraphQLWsLink(
         authorization: accessToken ? `Bearer ${accessToken}` : '',
       };
     },
-    lazy: true,
-    retryAttempts: 3,
   }),
 );
 
@@ -53,102 +54,109 @@ const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
-      Authorization: accessToken ? `Bearer ${accessToken}` : '',
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    fetchOptions: {
+      credentials: 'include',
     },
   }));
 
   return forward(operation);
 });
 
-const errorLink = onError(
-  ({ graphQLErrors, networkError, operation, forward }) => {
-    const { refreshToken, setAccessToken, logout } = useUserStore.getState();
-    if (graphQLErrors && graphQLErrors.length > 0) {
-      graphQLErrors.forEach(({ message, extensions }) => {
-        const code = extensions?.code || 'UNKNOWN_ERROR';
-        if (code !== 'UNAUTHORIZED') {
-          toast.error(`${code}: ${message}`);
-        }
-      });
-    }
-    if (
-      networkError &&
-      'statusCode' in networkError &&
-      networkError.statusCode === 401
-    ) {
-      if (!refreshToken) {
-        logout();
-        return;
-      }
-
-      return refreshTokenFlow(
-        operation,
-        forward,
-        refreshToken,
-        setAccessToken,
-        logout,
-      );
-    }
-  },
-);
-
 function refreshTokenFlow(
   operation: Operation,
   forward: NextLink,
   refreshToken: string,
-  setAccessToken: (token: string) => void,
-  logout: () => void,
-): Observable<FetchResult> {
-  const refreshClient = new ApolloClient({
-    link: httpLink,
-    cache: new InMemoryCache(),
-  });
-
+) {
   return new Observable<FetchResult>((observer) => {
-    refreshClient
+    apolloClient
       .mutate({
         mutation: REFRESH_TOKEN,
         variables: { refreshToken },
+        context: {
+          skipAuthRefresh: true,
+          fetchOptions: { credentials: 'include' },
+        },
       })
       .then(({ data }) => {
-        const newToken = data?.refreshToken.data?.accessToken;
-        if (newToken) {
-          setAccessToken(newToken);
-          operation.setContext(({ headers = {} }) => ({
-            headers: {
-              ...headers,
-              Authorization: `Bearer ${newToken}`,
-            },
-          }));
-          forward(operation).subscribe(observer);
-        } else {
-          logout();
-          observer.error(new Error('No se pudo refrescar el token'));
+        const payload = data?.refreshToken?.data;
+
+        if (!payload?.accessToken) {
+          throw new Error(data?.refreshToken?.message || 'Sesion expirada.');
         }
+
+        useUserStore.getState().setSession({
+          user: payload.user ?? useUserStore.getState().user,
+          accessToken: payload.accessToken,
+          refreshToken: payload.refreshToken ?? refreshToken,
+        });
+
+        operation.setContext(({ headers = {} }) => ({
+          headers: {
+            ...headers,
+            Authorization: `Bearer ${payload.accessToken}`,
+          },
+          fetchOptions: {
+            credentials: 'include',
+          },
+        }));
+
+        forward(operation).subscribe(observer);
       })
-      .catch((err) => {
-        logout();
-        observer.error(err);
+      .catch((error) => {
+        useUserStore.getState().logout();
+        observer.error(error);
       });
   });
 }
 
-const httpTransportLink = from([errorLink, authLink, httpLink]);
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+  if (graphQLErrors?.length) {
+    graphQLErrors.forEach(({ message, extensions }) => {
+      if (extensions?.code !== 'UNAUTHORIZED') {
+        toast.error(message);
+      }
+    });
+  }
 
-const splitLink = split(
-  ({ query }) => {
-    const definition = getMainDefinition(query);
+  const context = operation.getContext();
 
-    return (
-      definition.kind === 'OperationDefinition' &&
-      definition.operation === 'subscription'
-    );
-  },
-  wsLink,
-  httpTransportLink,
-);
+  if (context?.skipAuthRefresh) {
+    return;
+  }
+
+  const statusCode =
+    networkError && 'statusCode' in networkError
+      ? networkError.statusCode
+      : undefined;
+
+  if (statusCode !== 401) {
+    return;
+  }
+
+  const { refreshToken } = useUserStore.getState();
+
+  if (!refreshToken) {
+    useUserStore.getState().logout();
+    return;
+  }
+
+  return refreshTokenFlow(operation, forward, refreshToken);
+});
 
 export const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
-  link: splitLink,
+  link: split(
+    ({ query }) => {
+      const definition = getMainDefinition(query);
+
+      return (
+        definition.kind === 'OperationDefinition' &&
+        definition.operation === 'subscription'
+      );
+    },
+    wsLink,
+    from([errorLink, authLink, httpLink]),
+  ),
 });

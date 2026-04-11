@@ -1,49 +1,213 @@
-import { useEffect } from 'react';
+import {
+  useApolloClient,
+  useLazyQuery,
+  useMutation,
+  useQuery,
+  useSubscription,
+} from '@apollo/client';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLazyQuery } from '@apollo/client';
+import {
+  LOGIN,
+  LOGOUT,
+  RECOVER_PASSWORD,
+  REFRESH_TOKEN,
+  REGISTER,
+} from '@/graphql/auth/mutations';
 import { PROFILE } from '@/graphql/auth/queries';
+import { USER_UPDATED } from '@/graphql/auth/subscriptions';
+import { ensureSuccess, getApolloErrorMessage } from '@/lib/graphql';
 import { useUserStore } from '@/stores/user.store';
+import type {
+  ApiResponse,
+  AuthPayload,
+  LoginInput,
+  RegisterInput,
+  User,
+} from '@/types/admin';
 import { logoutAll } from '@/utils/global';
 
-export function useSessionCheck() {
-  const navigate = useNavigate();
-  const { accessToken, refreshToken, setUser, logout } = useUserStore();
+interface ProfileQueryResult {
+  profile: ApiResponse<User>;
+}
 
-  const [getProfile] = useLazyQuery(PROFILE, {
+interface AuthMutationResult {
+  login: ApiResponse<AuthPayload>;
+}
+
+interface RegisterMutationResult {
+  register: ApiResponse<AuthPayload>;
+}
+
+interface RecoverPasswordResult {
+  recoverPassword: ApiResponse<boolean>;
+}
+
+interface LogoutResult {
+  logout: ApiResponse<boolean>;
+}
+
+interface RefreshMutationResult {
+  refreshToken: ApiResponse<AuthPayload>;
+}
+
+interface UserUpdatedSubscriptionResult {
+  userUpdated: User;
+}
+
+export function useProfileQuery(enabled = true) {
+  return useQuery<ProfileQueryResult>(PROFILE, {
+    skip: !enabled,
+    fetchPolicy: 'cache-and-network',
+  });
+}
+
+export function useAuthActions() {
+  const client = useApolloClient();
+  const navigate = useNavigate();
+  const { setSession, logout } = useUserStore();
+  const [loginMutation, loginState] = useMutation<AuthMutationResult>(LOGIN);
+  const [registerMutation, registerState] =
+    useMutation<RegisterMutationResult>(REGISTER);
+  const [recoverPasswordMutation, recoverPasswordState] =
+    useMutation<RecoverPasswordResult>(RECOVER_PASSWORD);
+  const [logoutMutation] = useMutation<LogoutResult>(LOGOUT);
+
+  const login = async (input: LoginInput) => {
+    const { data } = await loginMutation({ variables: { input } });
+    const response = ensureSuccess(data?.login, 'No se pudo iniciar sesion.');
+    setSession({
+      user: response.data.user,
+      accessToken: response.data.accessToken,
+      refreshToken: response.data.refreshToken,
+    });
+    return response;
+  };
+
+  const register = async (input: RegisterInput) => {
+    const { data } = await registerMutation({ variables: { input } });
+    const response = ensureSuccess(data?.register, 'No se pudo crear la cuenta.');
+    setSession({
+      user: response.data.user,
+      accessToken: response.data.accessToken,
+      refreshToken: response.data.refreshToken,
+    });
+    return response;
+  };
+
+  const recoverPassword = async (email: string) => {
+    const { data } = await recoverPasswordMutation({ variables: { email } });
+    return ensureSuccess(
+      data?.recoverPassword,
+      'No se pudo enviar la solicitud de recuperacion.',
+    );
+  };
+
+  const performLogout = async () => {
+    try {
+      await logoutMutation();
+    } catch {
+      // Si el backend falla igualmente limpiamos la sesion local.
+    }
+
+    await logoutAll();
+    await client.clearStore();
+    logout();
+    navigate('/login', { replace: true });
+  };
+
+  return {
+    login,
+    register,
+    recoverPassword,
+    performLogout,
+    loginState,
+    registerState,
+    recoverPasswordState,
+  };
+}
+
+export function useAuthBootstrap() {
+  const { user, sessionChecked, setSession, setSessionChecked, logout } =
+    useUserStore();
+  const [hasResolved, setHasResolved] = useState(sessionChecked);
+  const [fetchProfile, profileState] = useLazyQuery<ProfileQueryResult>(PROFILE, {
     fetchPolicy: 'network-only',
-    context: {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
     onCompleted: (data) => {
-      if (data?.profile?.data) {
-        setUser(data.profile.data);
-      } else {
-        handleLogout();
-      }
+      const response = ensureSuccess(
+        data?.profile,
+        'No se pudo validar la sesion.',
+      );
+      setSession({ user: response.data });
+      setSessionChecked(true);
+      setHasResolved(true);
     },
-    onError: () => {
-      // Si da error, la sesión no es válida
-      handleLogout();
+    onError: async () => {
+      await logoutAll();
+      logout();
+      setSessionChecked(true);
+      setHasResolved(true);
     },
   });
 
-  function handleLogout() {
-    logoutAll().then(() => {
-      logout(); // limpiar store
-      navigate('/login');
-    });
-  }
-
   useEffect(() => {
-    if (!accessToken || !refreshToken) {
-      handleLogout();
+    if (sessionChecked) {
+      setHasResolved(true);
       return;
     }
-    getProfile();
-    //eslint-disable-next-line
-  }, [accessToken, refreshToken]);
 
-  // No retorna nada, solo valida sesión
+    fetchProfile();
+  }, [fetchProfile, sessionChecked]);
+
+  return {
+    isReady: hasResolved && !profileState.loading,
+    user,
+    error: profileState.error ? getApolloErrorMessage(profileState.error) : null,
+  };
+}
+
+export function useSessionCheck() {
+  return useAuthBootstrap();
+}
+
+export function useAuthenticatedUserSubscription() {
+  const { user, setUser } = useUserStore();
+
+  useSubscription<UserUpdatedSubscriptionResult>(USER_UPDATED, {
+    skip: !user?.id,
+    variables: {
+      userId: user?.id,
+    },
+    onData: ({ data }) => {
+      const nextUser = data.data?.userUpdated;
+
+      if (!nextUser) {
+        return;
+      }
+
+      setUser(nextUser);
+    },
+    onError: () => {
+      // Evitamos romper la UI si la suscripcion falla temporalmente.
+    },
+  });
+}
+
+export function useRefreshTokenAction() {
+  const [refreshMutation] = useMutation<RefreshMutationResult>(REFRESH_TOKEN);
+  const { setSession } = useUserStore();
+
+  return async (refreshToken: string) => {
+    const { data } = await refreshMutation({ variables: { refreshToken } });
+    const response = ensureSuccess(
+      data?.refreshToken,
+      'No se pudo refrescar la sesion.',
+    );
+    setSession({
+      user: response.data.user,
+      accessToken: response.data.accessToken,
+      refreshToken: response.data.refreshToken,
+    });
+    return response;
+  };
 }

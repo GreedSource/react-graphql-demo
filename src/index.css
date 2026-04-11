@@ -1,9 +1,28 @@
 @import 'tailwindcss';
 
+:root {
+  color: #0f172a;
+  background: #e2e8f0;
+  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 html,
 body,
 #root {
   height: 100%;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+}
+
+body {
+  min-height: 100%;
+  background: #e2e8f0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }

@@ -1,16 +1,23 @@
-import { TextField, Button } from '@mui/material';
+import { Alert, Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
-const ChangePassword = () => {
+export default function ChangePassword() {
   return (
-    <form className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold text-center">Change Password</h2>
-      <TextField label="New Password" type="password" fullWidth />
-      <TextField label="Confirm Password" type="password" fullWidth />
-      <Button variant="contained" color="primary" fullWidth>
-        Change
+    <div className="space-y-5">
+      <div className="space-y-2 text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
+          Proximo flujo
+        </p>
+        <h2 className="text-3xl font-semibold text-slate-950">Cambio de contrasena</h2>
+      </div>
+      <Alert severity="info">
+        El backend actual no expone aun un mutation para cambio de contrasena.
+        La pantalla queda reservada para conectar ese flujo cuando el endpoint
+        este disponible.
+      </Alert>
+      <Button component={Link} to="/login" variant="contained" fullWidth>
+        Volver al acceso
       </Button>
-    </form>
+    </div>
   );
-};
-
-export default ChangePassword;
+}

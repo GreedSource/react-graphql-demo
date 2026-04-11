@@ -1,105 +1,115 @@
-import { useLogin } from '@/hooks/user.hook';
-import { useUserStore } from '@/stores/user.store';
-import { TextField, Button, CircularProgress } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Alert, Button, CircularProgress, TextField } from '@mui/material';
+import { toast } from 'react-toastify';
+import { useAuthActions } from '@/hooks/auth.hook';
+import { getApolloErrorMessage } from '@/lib/graphql';
+import { isValidEmail } from '@/lib/validation';
 
-interface LoginInterface {
+interface LoginFormState {
   email: string;
   password: string;
 }
 
-interface Errors {
-  email?: string;
-  password?: string;
-}
-
-const Login = () => {
-  const { setAccessToken, setRefreshToken, setUser } = useUserStore();
-  // Estado loading
-  const [loading, setLoading] = useState(false);
-  const [formState, setFormState] = useState<LoginInterface>({
-    password: '',
+export default function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, loginState } = useAuthActions();
+  const [formState, setFormState] = useState<LoginFormState>({
     email: '',
+    password: '',
   });
-  const [errors, setErrors] = useState<Errors>({});
-  const { login } = useLogin();
+  const [errors, setErrors] = useState<Partial<LoginFormState>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Limpiar error al escribir
-    setErrors((prev) => ({ ...prev, [name]: undefined }));
+  const submitError = useMemo(() => {
+    return loginState.error ? getApolloErrorMessage(loginState.error) : null;
+  }, [loginState.error]);
+
+  const handleChange = (field: keyof LoginFormState, value: string) => {
+    setFormState((current) => ({ ...current, [field]: value }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setLoading(true); // Activa loader
-    // Aquí puedes manejar el submit (validación, API, etc)
-    try {
-      const res = await login({
-        variables: formState,
-      });
-      setAccessToken(res.data.login.data.accessToken);
-      setRefreshToken(res.data.login.data.refreshToken);
-      setUser(res.data.login.data.user);
-      setFormState({ email: '', password: '' });
-    } finally {
-      setLoading(false); // Desactiva loader
-    }
-  };
+  const validate = () => {
+    const nextErrors: Partial<LoginFormState> = {};
 
-  const validate = (): boolean => {
-    const newErrors: Errors = {};
-    if (!formState.email.trim()) {
-      newErrors.email = 'El usuario es requerido';
+    if (!isValidEmail(formState.email)) {
+      nextErrors.email = 'Ingresa un correo valido.';
     }
+
     if (!formState.password.trim()) {
-      newErrors.password = 'La contraseña es requerida';
+      nextErrors.password = 'La contrasena es obligatoria.';
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!validate()) {
+      return;
+    }
+
+    try {
+      const response = await login(formState);
+      toast.success(response.message || 'Sesion iniciada correctamente.');
+      const nextPath = location.state?.from?.pathname || '/';
+      navigate(nextPath, { replace: true });
+    } catch (error) {
+      toast.error(getApolloErrorMessage(error));
+    }
   };
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-      <h2 className="text-2xl font-bold text-center">Login</h2>
+    <form className="space-y-6" onSubmit={handleSubmit}>
+      <div className="space-y-2 text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
+          Acceso seguro
+        </p>
+        <h2 className="text-3xl font-semibold text-slate-950">Iniciar sesion</h2>
+        <p className="text-sm text-slate-500">
+          Entra al panel para administrar usuarios, roles y permisos.
+        </p>
+      </div>
+
+      {submitError ? <Alert severity="error">{submitError}</Alert> : null}
+
       <TextField
-        value={formState.email}
-        name="email"
-        label="Correo electrónico"
+        label="Correo electronico"
         type="email"
-        autoComplete="email"
-        onChange={handleChange}
-        error={!!errors.email}
+        value={formState.email}
+        onChange={(event) => handleChange('email', event.target.value)}
+        error={Boolean(errors.email)}
         helperText={errors.email}
         fullWidth
       />
       <TextField
-        value={formState.password}
-        label="Contraseña"
+        label="Contrasena"
         type="password"
-        name="password"
-        autoComplete="current-password"
-        error={!!errors.password}
+        value={formState.password}
+        onChange={(event) => handleChange('password', event.target.value)}
+        error={Boolean(errors.password)}
         helperText={errors.password}
-        onChange={handleChange}
         fullWidth
       />
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        fullWidth
-        disabled={loading}
-      >
-        {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
+
+      <Button type="submit" fullWidth variant="contained" disabled={loginState.loading}>
+        {loginState.loading ? <CircularProgress size={22} color="inherit" /> : 'Entrar'}
       </Button>
+
+      <div className="flex items-center justify-between text-sm text-slate-600">
+        <Link to="/register" className="font-medium text-sky-700 hover:text-sky-900">
+          Crear cuenta
+        </Link>
+        <Link
+          to="/recover-password"
+          className="font-medium text-slate-500 hover:text-slate-800"
+        >
+          Olvide mi contrasena
+        </Link>
+      </div>
     </form>
   );
-};
-
-export default Login;
+}
