@@ -1,28 +1,69 @@
-import { LOGIN } from '@/graphql/auth/mutations';
-import { GET_USER, GET_USERS } from '@/graphql/user/queries';
-import { useQuery, useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
+import { DELETE_USER, UPDATE_USER } from '@/graphql/user/mutations';
+import { USER, USERS } from '@/graphql/user/queries';
+import { ensureSuccess } from '@/lib/graphql';
+import type { ApiResponse, UpdateUserInput, User } from '@/types/admin';
 
-// Hook para obtener usuarios
+interface UsersQueryResult {
+  users: ApiResponse<User[]>;
+}
+
+interface UserQueryResult {
+  user: ApiResponse<User>;
+}
+
+interface UpdateUserMutationResult {
+  updateUser: ApiResponse<User>;
+}
+
+interface DeleteUserMutationResult {
+  deleteUser: ApiResponse<boolean>;
+}
+
 export function useUsers() {
-  return useQuery(GET_USERS);
+  return useQuery<UsersQueryResult>(USERS, {
+    fetchPolicy: 'cache-and-network',
+  });
 }
 
-export function useUser() {
-  return useQuery(GET_USER);
+export function useUser(id?: string) {
+  return useQuery<UserQueryResult>(USER, {
+    variables: { id },
+    skip: !id,
+    fetchPolicy: 'cache-and-network',
+  });
 }
 
-// Hook para agregar usuario
-export function useAddUser() {
-  return useMutation(GET_USER);
-}
+export function useUserMutations() {
+  const [updateUserMutation, updateState] =
+    useMutation<UpdateUserMutationResult>(UPDATE_USER);
+  const [deleteUserMutation, deleteState] =
+    useMutation<DeleteUserMutationResult>(DELETE_USER);
 
-export const useLogin = () => {
-  const [login, { data, loading, error }] = useMutation(LOGIN);
+  const updateUser = async (input: UpdateUserInput) => {
+    const { data } = await updateUserMutation({
+      variables: { input },
+      refetchQueries: [{ query: USERS }, { query: USER, variables: { id: input.id } }],
+      awaitRefetchQueries: true,
+    });
+
+    return ensureSuccess(data?.updateUser, 'No se pudo actualizar el usuario.');
+  };
+
+  const deleteUser = async (id: string) => {
+    const { data } = await deleteUserMutation({
+      variables: { id },
+      refetchQueries: [{ query: USERS }],
+      awaitRefetchQueries: true,
+    });
+
+    return ensureSuccess(data?.deleteUser, 'No se pudo eliminar el usuario.');
+  };
 
   return {
-    login, // login({ variables: { username, password } })
-    data,
-    loading,
-    error,
+    updateUser,
+    deleteUser,
+    updateState,
+    deleteState,
   };
-};
+}

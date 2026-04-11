@@ -1,28 +1,17 @@
+import { useAuthActions } from '@/hooks/auth.hook';
 import { useUserStore } from '@/stores/user.store';
-import { Notifications as NotificationsIcon } from '@mui/icons-material';
+import {
+  LogoutRounded,
+  Notifications as NotificationsIcon,
+  PersonRounded,
+} from '@mui/icons-material';
 import { Avatar, IconButton, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// const Navbar = () => {
-//   const { user } = useUserStore();
-//   return (
-//     <header className="bg-[#1E293B] text-white flex justify-end items-center px-6 py-3 shadow">
-//       <div className="flex items-center gap-4">
-//         <IconButton>
-//           <NotificationsNone sx={{ color: 'white' }} />
-//         </IconButton>
-//         <Avatar
-//           alt="User"
-//           src={`https://ui-avatars.com/api/?name=${user?.name}+${user?.lastname}`}
-//         />
-//       </div>
-//     </header>
-//   );
-// };
-
 export default function Navbar() {
-  const { user, logout } = useUserStore();
+  const { user } = useUserStore();
+  const { performLogout } = useAuthActions();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -31,31 +20,27 @@ export default function Navbar() {
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   return (
-    <nav className="bg-gray-800">
-      <div className="mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="relative flex h-16 items-center justify-end">
-          {/* Right side: notifications + profile */}
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <IconButton
-              className="text-white hover:text-gray-300"
-              aria-label="view notifications"
-              size="large"
-              sx={{ color: 'white', bgcolor: 'gray.800' }}
-            >
+    <nav className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative flex h-20 items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">
+              Plataforma administrativa
+            </p>
+            <h1 className="text-lg font-semibold text-slate-950">
+              Gestion de acceso y catalogos
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <IconButton aria-label="view notifications" size="large" sx={{ color: '#0f172a', bgcolor: '#e2e8f0' }}>
               <NotificationsIcon />
             </IconButton>
-
-            {/* Profile dropdown */}
             <IconButton
               size="large"
               edge="end"
@@ -63,12 +48,12 @@ export default function Navbar() {
               aria-controls="profile-menu"
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
-              className="ml-3 rounded-full bg-white text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-800"
+              className="rounded-full bg-white text-sm"
             >
               <Avatar
                 alt="User Avatar"
                 src={`https://ui-avatars.com/api/?name=${user?.name}+${user?.lastname}`}
-                sx={{ width: 32, height: 32 }}
+                sx={{ width: 36, height: 36 }}
               />
             </IconButton>
 
@@ -87,12 +72,27 @@ export default function Navbar() {
               }}
               PaperProps={{
                 className:
-                  'w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5',
+                  'w-52 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5',
               }}
             >
-              <MenuItem onClick={handleProfileMenuClose}>Your Profile</MenuItem>
-              <MenuItem onClick={handleProfileMenuClose}>Settings</MenuItem>
-              <MenuItem onClick={handleLogout}>Sign out</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleProfileMenuClose();
+                  navigate('/profile');
+                }}
+              >
+                <PersonRounded fontSize="small" sx={{ mr: 1 }} />
+                Perfil
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleProfileMenuClose();
+                  void performLogout();
+                }}
+              >
+                <LogoutRounded fontSize="small" sx={{ mr: 1 }} />
+                Cerrar sesion
+              </MenuItem>
             </Menu>
           </div>
         </div>

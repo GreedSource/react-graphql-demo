@@ -1,56 +1,46 @@
-import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  Home,
-  Folder,
-  CalendarToday,
-  Description,
-  BarChart,
-  Dashboard,
+  AdminPanelSettings,
+  Badge,
+  Bolt,
+  DatasetLinked,
+  Extension,
+  Groups,
+  Shield,
 } from '@mui/icons-material';
 
 interface SidebarItemProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
-  badge?: string;
   active?: boolean;
   to: string;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({
-  icon,
-  label,
-  badge,
-  active,
-  to,
-}) => {
+function SidebarItem({ icon, label, active, to }: SidebarItemProps) {
   return (
     <Link
       to={to}
-      className={`flex items-center justify-center md:justify-start px-0 md:px-3 md:py-3 rounded-md text-sm font-medium space-x-0 md:space-x-3 transition-colors duration-200 ${
+      className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors ${
         active
-          ? 'bg-gray-900 text-white'
-          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+          ? 'bg-sky-500/15 text-white'
+          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
       }`}
     >
       <span className="text-lg">{icon}</span>
-      <span className="hidden md:inline">{label}</span>
-      {badge && (
-        <span className="ml-auto rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-semibold text-white hidden md:inline">
-          {badge}
-        </span>
-      )}
+      <span>{label}</span>
     </Link>
   );
-};
+}
 
 const routes = [
-  { label: 'Home', to: '/', icon: <Home /> },
-  { label: 'Dashboard', to: '/dashboard', icon: <Dashboard /> },
-  { label: 'Projects', to: '/projects', icon: <Folder />, badge: '12' },
-  { label: 'Calendar', to: '/calendar', icon: <CalendarToday />, badge: '20+' },
-  { label: 'Documents', to: '/documents', icon: <Description /> },
-  { label: 'Reports', to: '/reports', icon: <BarChart /> },
+  { label: 'Resumen', to: '/', icon: <AdminPanelSettings /> },
+  { label: 'Perfil', to: '/profile', icon: <Badge /> },
+  { label: 'Usuarios', to: '/users', icon: <Groups /> },
+  { label: 'Roles', to: '/roles', icon: <Shield /> },
+  { label: 'Modulos', to: '/modules', icon: <DatasetLinked /> },
+  { label: 'Acciones', to: '/actions', icon: <Bolt /> },
+  { label: 'Permisos', to: '/permissions', icon: <Extension /> },
 ];
 
 export default function SidebarRoutes() {
@@ -58,13 +48,12 @@ export default function SidebarRoutes() {
 
   return (
     <nav className="space-y-2">
-      {routes.map(({ label, to, icon, badge }) => (
+      {routes.map(({ label, to, icon }) => (
         <SidebarItem
           key={to}
           to={to}
           icon={icon}
           label={label}
-          badge={badge}
           active={location.pathname === to}
         />
       ))}
