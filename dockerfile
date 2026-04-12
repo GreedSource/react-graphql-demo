@@ -29,10 +29,6 @@ RUN bun run build
 # ──────────────────────────────────────────────
 FROM nginx:stable-alpine AS production
 
-# Usuario no-root para producción segura
-RUN addgroup -g 1001 -S nginx-nonroot && \
-    adduser -S -D -H -u 1001 -G nginx-nonroot nginx-nonroot
-
 # Config SPA
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -40,20 +36,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Build estático
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Permisos
-RUN chown -R nginx-nonroot:nginx-nonroot \
-    /usr/share/nginx/html \
-    /var/cache/nginx \
-    /var/log/nginx \
-    /etc/nginx/conf.d && \
-    touch /run/nginx.pid && \
-    chown nginx-nonroot:nginx-nonroot /run/nginx.pid
-
-USER nginx-nonroot
-
-EXPOSE 8080
-
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget -qO- http://localhost:8080/ || exit 1
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
