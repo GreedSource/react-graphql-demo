@@ -209,9 +209,7 @@ export default function RolesPage() {
                   key: 'name',
                   header: 'Rol',
                   render: (role) => (
-                    <span className="font-medium">
-                      {role.name}
-                    </span>
+                    <span className="font-medium">{role.name}</span>
                   ),
                 },
                 {
@@ -239,7 +237,7 @@ export default function RolesPage() {
             <div className="space-y-5">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-xl font-semibold text-slate-950">
+                  <h3 className="text-xl font-semibold text-text">
                     {selectedRole.name}
                   </h3>
                   <StatusChip active={selectedRole.active} />

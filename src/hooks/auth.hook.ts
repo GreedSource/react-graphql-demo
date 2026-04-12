@@ -94,7 +94,10 @@ export function useAuthActions() {
 
   const register = async (input: RegisterInput) => {
     const { data } = await registerMutation({ variables: { input } });
-    const response = ensureSuccess(data?.register, 'No se pudo crear la cuenta.');
+    const response = ensureSuccess(
+      data?.register,
+      'No se pudo crear la cuenta.',
+    );
     setSession({
       user: response.data.user,
       accessToken: response.data.accessToken,
@@ -149,24 +152,27 @@ export function useAuthBootstrap() {
   const { user, sessionChecked, setSession, setSessionChecked, logout } =
     useUserStore();
   const [hasResolved, setHasResolved] = useState(false);
-  const [fetchProfile, profileState] = useLazyQuery<ProfileQueryResult>(PROFILE, {
-    fetchPolicy: 'network-only',
-    onCompleted: (data) => {
-      const response = ensureSuccess(
-        data?.profile,
-        'No se pudo validar la sesion.',
-      );
-      setSession({ user: response.data });
-      setSessionChecked(true);
-      setHasResolved(true);
+  const [fetchProfile, profileState] = useLazyQuery<ProfileQueryResult>(
+    PROFILE,
+    {
+      fetchPolicy: 'network-only',
+      onCompleted: (data) => {
+        const response = ensureSuccess(
+          data?.profile,
+          'No se pudo validar la sesion.',
+        );
+        setSession({ user: response.data });
+        setSessionChecked(true);
+        setHasResolved(true);
+      },
+      onError: async () => {
+        await logoutAll();
+        logout();
+        setSessionChecked(true);
+        setHasResolved(true);
+      },
     },
-    onError: async () => {
-      await logoutAll();
-      logout();
-      setSessionChecked(true);
-      setHasResolved(true);
-    },
-  });
+  );
 
   useEffect(() => {
     if (sessionChecked && user?.role?.permissions) {
@@ -180,7 +186,9 @@ export function useAuthBootstrap() {
   return {
     isReady: hasResolved && !profileState.loading,
     user,
-    error: profileState.error ? getApolloErrorMessage(profileState.error) : null,
+    error: profileState.error
+      ? getApolloErrorMessage(profileState.error)
+      : null,
   };
 }
 
@@ -213,6 +221,8 @@ export function useSessionCheck() {
 
 export function useAuthenticatedUserSubscription() {
   const { user, setUser } = useUserStore();
+  const client = useApolloClient();
+  const { refetch: refetchProfile } = useProfileQuery(false);
 
   useSubscription<UserUpdatedSubscriptionResult>(USER_UPDATED, {
     skip: !user?.id,
@@ -227,6 +237,23 @@ export function useAuthenticatedUserSubscription() {
       }
 
       setUser(nextUser);
+
+      // Update Apollo cache with the new profile data so components using
+      // useProfileQuery() immediately reflect the updated permissions
+      client.cache.writeQuery({
+        query: PROFILE,
+        data: {
+          profile: {
+            __typename: 'ApiResponse',
+            status: 200,
+            message: 'Perfil actualizado',
+            data: nextUser,
+          },
+        },
+      });
+
+      // Refetch profile to sync with backend
+      void refetchProfile();
     },
     onError: () => {
       // Evitamos romper la UI si la suscripcion falla temporalmente.

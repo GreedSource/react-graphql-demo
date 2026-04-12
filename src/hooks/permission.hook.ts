@@ -1,5 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { CREATE_PERMISSION, DELETE_PERMISSION } from '@/graphql/permission/mutations';
+import {
+  CREATE_PERMISSION,
+  DELETE_PERMISSION,
+} from '@/graphql/permission/mutations';
 import { PERMISSIONS } from '@/graphql/permission/queries';
 import { ensureSuccess } from '@/lib/graphql';
 import type {
@@ -20,8 +23,9 @@ interface DeletePermissionResult {
   deletePermission: boolean;
 }
 
-export function usePermissions() {
+export function usePermissions(skip = false) {
   return useQuery<PermissionsQueryResult>(PERMISSIONS, {
+    skip,
     fetchPolicy: 'cache-and-network',
   });
 }
@@ -39,7 +43,10 @@ export function usePermissionMutations() {
       awaitRefetchQueries: true,
     });
 
-    return ensureSuccess(data?.createPermission, 'No se pudo crear el permiso.');
+    return ensureSuccess(
+      data?.createPermission,
+      'No se pudo crear el permiso.',
+    );
   };
 
   const deletePermission = async (id: string) => {

@@ -16,8 +16,9 @@ interface ActionMutationResult {
   createAction: ApiResponse<ActionEntity>;
 }
 
-export function useActions() {
+export function useActions(skip = false) {
   return useQuery<ActionsQueryResult>(ACTIONS, {
+    skip,
     fetchPolicy: 'cache-and-network',
   });
 }

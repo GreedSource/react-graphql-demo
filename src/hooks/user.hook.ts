@@ -20,8 +20,9 @@ interface DeleteUserMutationResult {
   deleteUser: ApiResponse<boolean>;
 }
 
-export function useUsers() {
+export function useUsers(skip = false) {
   return useQuery<UsersQueryResult>(USERS, {
+    skip,
     fetchPolicy: 'cache-and-network',
   });
 }
@@ -43,7 +44,10 @@ export function useUserMutations() {
   const updateUser = async (input: UpdateUserInput) => {
     const { data } = await updateUserMutation({
       variables: { input },
-      refetchQueries: [{ query: USERS }, { query: USER, variables: { id: input.id } }],
+      refetchQueries: [
+        { query: USERS },
+        { query: USER, variables: { id: input.id } },
+      ],
       awaitRefetchQueries: true,
     });
 

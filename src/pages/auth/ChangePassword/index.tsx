@@ -8,7 +8,9 @@ export default function ChangePassword() {
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
           Proximo flujo
         </p>
-        <h2 className="text-3xl font-semibold text-slate-950">Cambio de contrasena</h2>
+        <h2 className="text-3xl font-semibold text-text">
+          Cambio de contrasena
+        </h2>
       </div>
       <Alert severity="info">
         El backend actual no expone aun un mutation para cambio de contrasena.

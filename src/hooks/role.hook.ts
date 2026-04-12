@@ -34,8 +34,9 @@ interface BooleanMutationResult {
   removePermissionsFromRole: ApiResponse<boolean>;
 }
 
-export function useRoles() {
+export function useRoles(skip = false) {
   return useQuery<RolesQueryResult>(ROLES, {
+    skip,
     fetchPolicy: 'cache-and-network',
   });
 }
@@ -73,7 +74,10 @@ export function useRoleMutations() {
   const updateRole = async (input: UpdateRoleInput) => {
     const { data } = await updateRoleMutation({
       variables: { input },
-      refetchQueries: [{ query: ROLES }, { query: ROLE, variables: { id: input.id } }],
+      refetchQueries: [
+        { query: ROLES },
+        { query: ROLE, variables: { id: input.id } },
+      ],
       awaitRefetchQueries: true,
     });
 
@@ -90,10 +94,16 @@ export function useRoleMutations() {
     return ensureSuccess(data?.deleteRole, 'No se pudo eliminar el rol.');
   };
 
-  const addPermissionsToRole = async (roleId: string, permissionIds: string[]) => {
+  const addPermissionsToRole = async (
+    roleId: string,
+    permissionIds: string[],
+  ) => {
     const { data } = await addPermissionsMutation({
       variables: { roleId, permissionIds },
-      refetchQueries: [{ query: ROLES }, { query: ROLE, variables: { id: roleId } }],
+      refetchQueries: [
+        { query: ROLES },
+        { query: ROLE, variables: { id: roleId } },
+      ],
       awaitRefetchQueries: true,
     });
 
@@ -109,7 +119,10 @@ export function useRoleMutations() {
   ) => {
     const { data } = await removePermissionsMutation({
       variables: { roleId, permissionIds },
-      refetchQueries: [{ query: ROLES }, { query: ROLE, variables: { id: roleId } }],
+      refetchQueries: [
+        { query: ROLES },
+        { query: ROLE, variables: { id: roleId } },
+      ],
       awaitRefetchQueries: true,
     });
 

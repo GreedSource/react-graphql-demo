@@ -1,10 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Alert,
-  Button,
-  MenuItem,
-  TextField,
-} from '@mui/material';
+import { Alert, Button, MenuItem, TextField } from '@mui/material';
 import { FormDialog } from '@/components/ui/FormDialog';
 import { toast } from 'react-toastify';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -27,14 +22,23 @@ const emptyForm: UpdateUserInput = {
 export default function UsersPage() {
   const usersQuery = useUsers();
   const rolesQuery = useRoles();
-  const { updateUser, deleteUser, updateState, deleteState } = useUserMutations();
-  const users = useMemo(() => usersQuery.data?.users?.data ?? [], [usersQuery.data]);
-  const roles = useMemo(() => rolesQuery.data?.roles?.data ?? [], [rolesQuery.data]);
+  const { updateUser, deleteUser, updateState, deleteState } =
+    useUserMutations();
+  const users = useMemo(
+    () => usersQuery.data?.users?.data ?? [],
+    [usersQuery.data],
+  );
+  const roles = useMemo(
+    () => rolesQuery.data?.roles?.data ?? [],
+    [rolesQuery.data],
+  );
   const [selectedId, setSelectedId] = useState<string>('');
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [formState, setFormState] = useState<UpdateUserInput>(emptyForm);
-  const [formErrors, setFormErrors] = useState<Partial<Record<'name' | 'lastname', string>>>({});
+  const [formErrors, setFormErrors] = useState<
+    Partial<Record<'name' | 'lastname', string>>
+  >({});
   const userDetailQuery = useUser(selectedId);
 
   useEffect(() => {
@@ -44,7 +48,10 @@ export default function UsersPage() {
   }, [selectedId, users]);
 
   const selectedUser = useMemo(() => {
-    return userDetailQuery.data?.user?.data ?? users.find((user) => user.id === selectedId);
+    return (
+      userDetailQuery.data?.user?.data ??
+      users.find((user) => user.id === selectedId)
+    );
   }, [selectedId, userDetailQuery.data?.user?.data, users]);
 
   const openEdit = () => {
@@ -62,7 +69,8 @@ export default function UsersPage() {
   const validate = () => {
     const errors: Partial<Record<'name' | 'lastname', string>> = {};
     if (!formState.name?.trim()) errors.name = 'El nombre es obligatorio.';
-    if (!formState.lastname?.trim()) errors.lastname = 'El apellido es obligatorio.';
+    if (!formState.lastname?.trim())
+      errors.lastname = 'El apellido es obligatorio.';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -106,7 +114,9 @@ export default function UsersPage() {
       />
 
       {usersQuery.error ? (
-        <Alert severity="error">{getApolloErrorMessage(usersQuery.error)}</Alert>
+        <Alert severity="error">
+          {getApolloErrorMessage(usersQuery.error)}
+        </Alert>
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
@@ -153,34 +163,43 @@ export default function UsersPage() {
           )}
         </SectionCard>
 
-        <SectionCard title="Detalle" description="Selecciona un usuario para ver y editar su informacion.">
+        <SectionCard
+          title="Detalle"
+          description="Selecciona un usuario para ver y editar su informacion."
+        >
           {selectedUser ? (
             <div className="space-y-4 text-sm text-text-secondary">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
                   Nombre completo
                 </p>
-                <p className="mt-1 text-lg font-semibold text-slate-950">
+                <p className="mt-1 text-lg font-semibold text-text">
                   {selectedUser.name} {selectedUser.lastname}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
                   Correo
                 </p>
                 <p className="mt-1">{selectedUser.email}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
                   Rol actual
                 </p>
-                <p className="mt-1">{selectedUser.role?.name || 'Sin rol asignado'}</p>
+                <p className="mt-1">
+                  {selectedUser.role?.name || 'Sin rol asignado'}
+                </p>
               </div>
               <div className="flex gap-3">
                 <Button variant="contained" onClick={openEdit}>
                   Editar
                 </Button>
-                <Button color="error" variant="outlined" onClick={() => setDeleteOpen(true)}>
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => setDeleteOpen(true)}
+                >
                   Eliminar
                 </Button>
               </div>
@@ -212,39 +231,54 @@ export default function UsersPage() {
           </>
         }
       >
-          <TextField
-            label="Nombre"
-            value={formState.name ?? ''}
-            onChange={(event) => setFormState((current) => ({ ...current, name: event.target.value }))}
-            error={Boolean(formErrors.name)}
-            helperText={formErrors.name}
-            size="small"
-            fullWidth
-          />
-          <TextField
-            label="Apellido"
-            value={formState.lastname ?? ''}
-            onChange={(event) => setFormState((current) => ({ ...current, lastname: event.target.value }))}
-            error={Boolean(formErrors.lastname)}
-            helperText={formErrors.lastname}
-            size="small"
-            fullWidth
-          />
-          <TextField
-            label="Rol"
-            value={formState.roleId ?? ''}
-            onChange={(event) => setFormState((current) => ({ ...current, roleId: event.target.value }))}
-            select
-            size="small"
-            fullWidth
-          >
-            <MenuItem value="">Sin rol</MenuItem>
-            {roles.map((role) => (
-              <MenuItem key={role.id} value={role.id}>
-                {role.name}
-              </MenuItem>
-            ))}
-          </TextField>
+        <TextField
+          label="Nombre"
+          value={formState.name ?? ''}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              name: event.target.value,
+            }))
+          }
+          error={Boolean(formErrors.name)}
+          helperText={formErrors.name}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Apellido"
+          value={formState.lastname ?? ''}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              lastname: event.target.value,
+            }))
+          }
+          error={Boolean(formErrors.lastname)}
+          helperText={formErrors.lastname}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Rol"
+          value={formState.roleId ?? ''}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              roleId: event.target.value,
+            }))
+          }
+          select
+          size="small"
+          fullWidth
+        >
+          <MenuItem value="">Sin rol</MenuItem>
+          {roles.map((role) => (
+            <MenuItem key={role.id} value={role.id}>
+              {role.name}
+            </MenuItem>
+          ))}
+        </TextField>
       </FormDialog>
 
       <ConfirmDialog

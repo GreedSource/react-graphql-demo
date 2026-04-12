@@ -21,17 +21,26 @@ import { getApolloErrorMessage } from '@/lib/graphql';
 
 export default function HomePage() {
   const profileQuery = useProfileQuery();
-  const usersQuery = useUsers();
-  const rolesQuery = useRoles();
-  const modulesQuery = useModules();
-  const actionsQuery = useActions();
-  const permissionsQuery = usePermissions();
   const { user } = usePermission();
 
   const profile = profileQuery.data?.profile?.data;
-  
   const userPermissions = user?.role?.permissions ?? [];
-  
+
+  // Only fetch data if user has the corresponding read permission
+  const canReadUsers = hasAnyPermission(userPermissions, 'users', ['read']);
+  const canReadRoles = hasAnyPermission(userPermissions, 'roles', ['read']);
+  const canReadModules = hasAnyPermission(userPermissions, 'modules', ['read']);
+  const canReadActions = hasAnyPermission(userPermissions, 'actions', ['read']);
+  const canReadPermissions = hasAnyPermission(userPermissions, 'permissions', [
+    'read',
+  ]);
+
+  const usersQuery = useUsers(!canReadUsers);
+  const rolesQuery = useRoles(!canReadRoles);
+  const modulesQuery = useModules(!canReadModules);
+  const actionsQuery = useActions(!canReadActions);
+  const permissionsQuery = usePermissions(!canReadPermissions);
+
   // Filter cards based on user permissions
   const cards = [
     {
@@ -74,14 +83,26 @@ export default function HomePage() {
       permissionType: 'permissions',
       permissionActions: ['read'],
     },
-  ].filter((card) => hasAnyPermission(userPermissions, card.permissionType, card.permissionActions));
+  ].filter((card) =>
+    hasAnyPermission(
+      userPermissions,
+      card.permissionType,
+      card.permissionActions,
+    ),
+  );
 
-  const hasError =
-    usersQuery.error ||
-    rolesQuery.error ||
-    modulesQuery.error ||
-    actionsQuery.error ||
-    permissionsQuery.error;
+  // Build integration status message based on permissions
+  const integrations = [
+    { name: 'Auth', enabled: true }, // Auth is always available
+    { name: 'Usuarios', enabled: canReadUsers },
+    { name: 'Roles', enabled: canReadRoles },
+    { name: 'Módulos', enabled: canReadModules },
+    { name: 'Acciones', enabled: canReadActions },
+    { name: 'Permisos', enabled: canReadPermissions },
+  ];
+
+  const activeIntegrations = integrations.filter((i) => i.enabled);
+  const pendingIntegrations = integrations.filter((i) => !i.enabled);
 
   return (
     <div className="space-y-6">
@@ -99,7 +120,9 @@ export default function HomePage() {
       />
 
       {profileQuery.error ? (
-        <Alert severity="warning">{getApolloErrorMessage(profileQuery.error)}</Alert>
+        <Alert severity="warning">
+          {getApolloErrorMessage(profileQuery.error)}
+        </Alert>
       ) : null}
 
       <div className="grid gap-4 xl:grid-cols-5 md:grid-cols-2">
@@ -128,22 +151,33 @@ export default function HomePage() {
         >
           <div className="grid gap-3">
             {hasAnyPermission(userPermissions, 'roles', ['read']) && (
-              <Link className="rounded-2xl border border-border px-4 py-4 hover:border-accent" to="/roles">
+              <Link
+                className="rounded-2xl border border-border px-4 py-4 hover:border-accent"
+                to="/roles"
+              >
                 Define roles base y asigna permisos a cada rol.
               </Link>
             )}
             {hasAnyPermission(userPermissions, 'permissions', ['read']) && (
-              <Link className="rounded-2xl border border-border px-4 py-4 hover:border-accent" to="/permissions">
+              <Link
+                className="rounded-2xl border border-border px-4 py-4 hover:border-accent"
+                to="/permissions"
+              >
                 Crea permisos a partir de combinaciones modulo + accion.
               </Link>
             )}
             {hasAnyPermission(userPermissions, 'users', ['read']) && (
-              <Link className="rounded-2xl border border-border px-4 py-4 hover:border-accent" to="/users">
+              <Link
+                className="rounded-2xl border border-border px-4 py-4 hover:border-accent"
+                to="/users"
+              >
                 Revisa usuarios existentes y ajusta sus roles.
               </Link>
             )}
             {cards.length === 0 && (
-              <p className="text-sm text-text-secondary">No tienes acceso a ningún módulo. Contacta a un administrador.</p>
+              <p className="text-sm text-text-secondary">
+                No tienes acceso a ningún módulo. Contacta a un administrador.
+              </p>
             )}
           </div>
         </SectionCard>
@@ -152,12 +186,45 @@ export default function HomePage() {
           title="Estado de integracion"
           description="Visibilidad sobre la disponibilidad actual del backend."
         >
-          {hasError ? (
-            <Alert severity="error">{getApolloErrorMessage(hasError)}</Alert>
+          {userPermissions.length === 0 ? (
+            <p className="text-sm text-text-secondary">
+              No tienes acceso a ningún módulo. Contacta a un administrador.
+            </p>
           ) : (
             <div className="space-y-3 text-sm text-text-secondary">
-              <p>Auth, usuarios, roles, modulos, acciones y permisos ya tienen flujo de consumo desde GraphQL.</p>
-              <p>La UI queda preparada para extender `deleteModule`, `updateAction` y `updatePermission` cuando el backend los publique.</p>
+              <ul className="space-y-2">
+                {activeIntegrations.map((integration) => (
+                  <li
+                    key={integration.name}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    {integration.name} conectado a GraphQL
+                  </li>
+                ))}
+                {pendingIntegrations.length > 0 && (
+                  <>
+                    <li className="mt-3 border-t border-border pt-3 text-text-muted">
+                      Permisos faltantes:
+                    </li>
+                    {pendingIntegrations.map((integration) => (
+                      <li
+                        key={integration.name}
+                        className="flex items-center gap-2"
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                        {integration.name} sin acceso
+                      </li>
+                    ))}
+                  </>
+                )}
+              </ul>
+              {pendingIntegrations.length > 0 && (
+                <p className="text-xs text-text-muted">
+                  Contacta a un administrador para solicitar acceso a estos
+                  módulos.
+                </p>
+              )}
             </div>
           )}
         </SectionCard>

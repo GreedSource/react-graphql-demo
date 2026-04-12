@@ -1,7 +1,15 @@
 import { useState, useMemo } from 'react';
-import { TextField, InputAdornment, IconButton, FormHelperText } from '@mui/material';
+import {
+  TextField,
+  InputAdornment,
+  IconButton,
+  FormHelperText,
+} from '@mui/material';
 import { Visibility, VisibilityOff, Check, Close } from '@mui/icons-material';
-import { validatePassword, getPasswordStrength } from '@/lib/password-validation';
+import {
+  validatePassword,
+  getPasswordStrength,
+} from '@/lib/password-validation';
 
 interface PasswordInputProps {
   label: string;
@@ -35,11 +43,11 @@ export default function PasswordInput({
   const strength = useMemo(() => getPasswordStrength(value), [value]);
   const strengthInfo = strengthConfig[strength];
 
-  const passwordsMatch = matchValue !== undefined
-    ? value === matchValue && value.length > 0
-    : null;
+  const passwordsMatch =
+    matchValue !== undefined ? value === matchValue && value.length > 0 : null;
 
-  const hasValidationErrors = showValidation && value.length > 0 && !validation.isValid;
+  const hasValidationErrors =
+    showValidation && value.length > 0 && !validation.isValid;
 
   return (
     <div className="space-y-2">
@@ -63,7 +71,11 @@ export default function PasswordInput({
                   '&:hover': { color: '#e2e8f0' },
                 }}
               >
-                {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                {showPassword ? (
+                  <VisibilityOff fontSize="small" />
+                ) : (
+                  <Visibility fontSize="small" />
+                )}
               </IconButton>
               {matchValue !== undefined && value.length > 0 && (
                 <span className="ml-1 text-base">
@@ -119,14 +131,26 @@ export default function PasswordInput({
       {/* Validation rules checklist */}
       {showValidation && value.length > 0 && !validation.isValid && (
         <div className="space-y-1 rounded-lg bg-slate-900/50 p-3 text-xs">
-          <p className="font-medium text-slate-400">Requisitos:</p>
+          <p className="font-medium text-text-muted">Requisitos:</p>
           <div className="space-y-0.5">
             {[
-              { met: validation.rules.minLength, label: 'Al menos 8 caracteres' },
-              { met: validation.rules.hasUppercase, label: 'Una letra mayuscula' },
-              { met: validation.rules.hasLowercase, label: 'Una letra minuscula' },
+              {
+                met: validation.rules.minLength,
+                label: 'Al menos 8 caracteres',
+              },
+              {
+                met: validation.rules.hasUppercase,
+                label: 'Una letra mayuscula',
+              },
+              {
+                met: validation.rules.hasLowercase,
+                label: 'Una letra minuscula',
+              },
               { met: validation.rules.hasNumber, label: 'Un numero' },
-              { met: validation.rules.hasSpecialChar, label: 'Un caracter especial (@$!%*?&)' },
+              {
+                met: validation.rules.hasSpecialChar,
+                label: 'Un caracter especial (@$!%*?&)',
+              },
             ].map((rule) => (
               <div
                 key={rule.label}

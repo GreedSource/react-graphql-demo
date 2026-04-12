@@ -22,8 +22,9 @@ interface ModuleMutationResult {
   updateModule: ApiResponse<ModuleEntity>;
 }
 
-export function useModules() {
+export function useModules(skip = false) {
   return useQuery<ModulesQueryResult>(MODULES, {
+    skip,
     fetchPolicy: 'cache-and-network',
   });
 }
@@ -55,11 +56,17 @@ export function useModuleMutations() {
   const updateModule = async (input: UpdateModuleInput) => {
     const { data } = await updateModuleMutation({
       variables: { input },
-      refetchQueries: [{ query: MODULES }, { query: MODULE, variables: { id: input.id } }],
+      refetchQueries: [
+        { query: MODULES },
+        { query: MODULE, variables: { id: input.id } },
+      ],
       awaitRefetchQueries: true,
     });
 
-    return ensureSuccess(data?.updateModule, 'No se pudo actualizar el modulo.');
+    return ensureSuccess(
+      data?.updateModule,
+      'No se pudo actualizar el modulo.',
+    );
   };
 
   return {

@@ -40,11 +40,25 @@ const Sidebar = () => {
         className="fixed left-4 top-4 z-50 rounded-xl bg-slate-900 p-2 text-white shadow-lg transition-all duration-200 hover:bg-slate-800 active:scale-95 lg:hidden"
         aria-label="Toggle sidebar"
       >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           {isOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           )}
         </svg>
       </button>
@@ -70,13 +84,11 @@ const Sidebar = () => {
           }}
         >
           <div className="mb-8 flex items-center gap-3">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/20 text-lg font-bold text-sky-300 transition-all duration-200 hover:scale-105 hover:bg-sky-500/30"
-            >
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/20 text-lg font-bold text-sky-300 transition-all duration-200 hover:scale-105 hover:bg-sky-500/30">
               GA
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+              <p className="text-xs uppercase tracking-[0.24em] text-text-muted">
                 Control center
               </p>
               <span className="text-xl font-semibold text-white">
@@ -106,7 +118,7 @@ const Sidebar = () => {
             <p className="text-sm font-medium">
               {user?.name} {user?.lastname}
             </p>
-            <p className="text-xs text-slate-400">{user?.email}</p>
+            <p className="text-xs text-text-muted">{user?.email}</p>
           </div>
         </div>
       </aside>
