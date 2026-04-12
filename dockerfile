@@ -16,47 +16,44 @@ ENV VITE_APP_NAME=$VITE_APP_NAME \
 
 WORKDIR /app
 
-# 1. Copiar solo lockfile + package.json para aprovechar cache de layers
+# 1. Copiar lockfile + package.json (cache de dependencias)
 COPY bun.lock package.json ./
+RUN bun install
 
-# 2. Instalar solo dependencias (cacheable si package.json no cambia)
-RUN bun install --frozen-lockfile --production=false
-
-# 3. Copiar resto de archivos fuente
+# 2. Copiar fuentes y construir
 COPY . .
-
-# 4. Build con TypeScript + Vite
 RUN bun run build
 
 # ──────────────────────────────────────────────
-# Etapa 2: Producción con Nginx optimizado
+# Etapa 2: Producción con Nginx
 # ──────────────────────────────────────────────
 FROM nginx:stable-alpine AS production
 
-# Seguridad: ejecutar como usuario no-root
+# Usuario no-root para producción segura
 RUN addgroup -g 1001 -S nginx-nonroot && \
     adduser -S -D -H -u 1001 -G nginx-nonroot nginx-nonroot
 
-# Config Nginx
+# Config SPA
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copiar build estático
+# Build estático
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Ajustar permisos
-RUN chown -R nginx-nonroot:nginx-nonroot /usr/share/nginx/html && \
-    chown -R nginx-nonroot:nginx-nonroot /var/cache/nginx && \
-    chown -R nginx-nonroot:nginx-nonroot /var/log/nginx && \
-    chown -R nginx-nonroot:nginx-nonroot /etc/nginx/conf.d && \
+# Permisos
+RUN chown -R nginx-nonroot:nginx-nonroot \
+    /usr/share/nginx/html \
+    /var/cache/nginx \
+    /var/log/nginx \
+    /etc/nginx/conf.d && \
     touch /run/nginx.pid && \
-    chown -R nginx-nonroot:nginx-nonroot /run/nginx.pid
+    chown nginx-nonroot:nginx-nonroot /run/nginx.pid
 
 USER nginx-nonroot
 
-EXPOSE 80
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget -qO- http://localhost:80/ || exit 1
+    CMD wget -qO- http://localhost:8080/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
