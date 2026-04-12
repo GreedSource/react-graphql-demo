@@ -1,9 +1,31 @@
-# Evita copiar archivos innecesarios al contenedor
+# Build artifacts
 node_modules
 dist
+.bun
+
+# IDE / Editor
 .vscode
+.idea
+*.swp
+*.swo
+
+# Docker
 Dockerfile
 docker-compose.yml
-bun.lockb (opcional si deseas forzar bun a resolver fresh)
 *.log
-*.env
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Git / CI
+.git
+.gitignore
+.github
+
+# Documentation / misc
+README.md
+.qwen
+.codex
+*.md

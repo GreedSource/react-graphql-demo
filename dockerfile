@@ -1,46 +1,62 @@
+# ──────────────────────────────────────────────
 # Etapa 1: Build con Bun
-FROM oven/bun:1.1.13 as builder
+# ──────────────────────────────────────────────
+FROM oven/bun:1.1.13-slim AS builder
 
-# Recibir args
 ARG VITE_APP_NAME
 ARG VITE_INDEXED_DB_NAME
 ARG VITE_CRYPTO_SECRET
 ARG VITE_GRAPHQL_ENDPOINT
 
-# Pasar args como variables de entorno para Vite
-ENV VITE_APP_NAME=$VITE_APP_NAME
-ENV VITE_INDEXED_DB_NAME=$VITE_INDEXED_DB_NAME
-ENV VITE_CRYPTO_SECRET=$VITE_CRYPTO_SECRET
-ENV VITE_GRAPHQL_ENDPOINT=$VITE_GRAPHQL_ENDPOINT
+ENV VITE_APP_NAME=$VITE_APP_NAME \
+    VITE_INDEXED_DB_NAME=$VITE_INDEXED_DB_NAME \
+    VITE_CRYPTO_SECRET=$VITE_CRYPTO_SECRET \
+    VITE_GRAPHQL_ENDPOINT=$VITE_GRAPHQL_ENDPOINT \
+    NODE_ENV=production
 
-# Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos del proyecto
+# 1. Copiar solo lockfile + package.json para aprovechar cache de layers
+COPY bun.lock package.json ./
+
+# 2. Instalar solo dependencias (cacheable si package.json no cambia)
+RUN bun install --frozen-lockfile --production=false
+
+# 3. Copiar resto de archivos fuente
 COPY . .
 
-# Instalar dependencias
-RUN bun install
-
-# Construir proyecto Vite
+# 4. Build con TypeScript + Vite
 RUN bun run build
 
-# Etapa 2: Servir con un servidor estático como nginx o Bun (opcional)
-# Usaremos nginx para producción
+# ──────────────────────────────────────────────
+# Etapa 2: Producción con Nginx optimizado
+# ──────────────────────────────────────────────
+FROM nginx:stable-alpine AS production
 
-FROM nginx:stable-alpine as production
+# Seguridad: ejecutar como usuario no-root
+RUN addgroup -g 1001 -S nginx-nonroot && \
+    adduser -S -D -H -u 1001 -G nginx-nonroot nginx-nonroot
 
-# Copiar archivos estáticos de Vite
+# Config Nginx
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copiar build estático
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Eliminar configuración por defecto
-RUN rm /etc/nginx/conf.d/default.conf
+# Ajustar permisos
+RUN chown -R nginx-nonroot:nginx-nonroot /usr/share/nginx/html && \
+    chown -R nginx-nonroot:nginx-nonroot /var/cache/nginx && \
+    chown -R nginx-nonroot:nginx-nonroot /var/log/nginx && \
+    chown -R nginx-nonroot:nginx-nonroot /etc/nginx/conf.d && \
+    touch /run/nginx.pid && \
+    chown -R nginx-nonroot:nginx-nonroot /run/nginx.pid
 
-# Agregar configuración custom para SPA
-COPY nginx.conf /etc/nginx/conf.d
+USER nginx-nonroot
 
-# Exponer puerto
 EXPOSE 80
 
-# Iniciar nginx
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget -qO- http://localhost:80/ || exit 1
+
 CMD ["nginx", "-g", "daemon off;"]
