@@ -1,10 +1,5 @@
 import { useState } from 'react';
-import {
-  Alert,
-  Button,
-  MenuItem,
-  TextField,
-} from '@mui/material';
+import { Alert, Button, MenuItem, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
@@ -14,7 +9,10 @@ import { SectionCard } from '@/components/ui/SectionCard';
 import { StateCard } from '@/components/ui/StateCard';
 import { useActions } from '@/hooks/action.hook';
 import { useModules } from '@/hooks/module.hook';
-import { usePermissionMutations, usePermissions } from '@/hooks/permission.hook';
+import {
+  usePermissionMutations,
+  usePermissions,
+} from '@/hooks/permission.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import type { CreatePermissionInput, Permission } from '@/types/admin';
 
@@ -35,7 +33,8 @@ export default function PermissionsPage() {
   const actions = actionsQuery.data?.actions?.data ?? [];
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Permission | null>(null);
-  const [formState, setFormState] = useState<CreatePermissionInput>(emptyPermission);
+  const [formState, setFormState] =
+    useState<CreatePermissionInput>(emptyPermission);
 
   const handleCreate = async () => {
     try {
@@ -66,27 +65,56 @@ export default function PermissionsPage() {
         eyebrow="Permisos"
         title="Catalogo de permisos"
         description="Crea permisos a partir de modulo + accion y eliminalos cuando ya no apliquen."
-        actions={<Button variant="contained" onClick={() => setDialogOpen(true)}>Nuevo permiso</Button>}
+        actions={
+          <Button variant="contained" onClick={() => setDialogOpen(true)}>
+            Nuevo permiso
+          </Button>
+        }
       />
 
       {permissionsQuery.error ? (
-        <Alert severity="error">{getApolloErrorMessage(permissionsQuery.error)}</Alert>
+        <Alert severity="error">
+          {getApolloErrorMessage(permissionsQuery.error)}
+        </Alert>
       ) : null}
 
-      <SectionCard title="Listado de permisos">
+      <SectionCard title="Listado de permisos" badge={permissions.length}>
         {permissions.length ? (
           <DataTable
             rows={permissions}
             getRowKey={(item) => item.id}
+            searchable
+            searchPlaceholder="Buscar por modulo o accion..."
+            searchableFields={[
+              (item) => item.moduleKey,
+              (item) => item.actionKey,
+              (item) => item.description || '',
+            ]}
             columns={[
-              { key: 'module', header: 'Modulo', render: (item) => item.moduleKey },
-              { key: 'action', header: 'Accion', render: (item) => item.actionKey },
-              { key: 'description', header: 'Descripcion', render: (item) => item.description || 'Sin descripcion' },
+              {
+                key: 'module',
+                header: 'Modulo',
+                render: (item) => item.moduleKey,
+              },
+              {
+                key: 'action',
+                header: 'Accion',
+                render: (item) => item.actionKey,
+              },
+              {
+                key: 'description',
+                header: 'Descripcion',
+                render: (item) => item.description || 'Sin descripcion',
+              },
               {
                 key: 'actions',
                 header: 'Acciones',
                 render: (item) => (
-                  <Button color="error" size="small" onClick={() => setDeleteTarget(item)}>
+                  <Button
+                    color="error"
+                    size="small"
+                    onClick={() => setDeleteTarget(item)}
+                  >
                     Eliminar
                   </Button>
                 ),
@@ -94,7 +122,10 @@ export default function PermissionsPage() {
             ]}
           />
         ) : (
-          <StateCard title="Sin permisos" description="Primero crea permisos para luego asignarlos a roles." />
+          <StateCard
+            title="Sin permisos"
+            description="Primero crea permisos para luego asignarlos a roles."
+          />
         )}
       </SectionCard>
 
@@ -116,43 +147,58 @@ export default function PermissionsPage() {
           </>
         }
       >
-          <TextField
-            label="Modulo"
-            select
-            value={formState.moduleId}
-            onChange={(event) => setFormState((current) => ({ ...current, moduleId: event.target.value }))}
-            size="small"
-            fullWidth
-          >
-            {modules.map((module) => (
-              <MenuItem key={module.id} value={module.key}>
-                {module.name} ({module.key})
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            label="Accion"
-            select
-            value={formState.actionId}
-            onChange={(event) => setFormState((current) => ({ ...current, actionId: event.target.value }))}
-            size="small"
-            fullWidth
-          >
-            {actions.map((action) => (
-              <MenuItem key={action.id} value={action.key}>
-                {action.name} ({action.key})
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            label="Descripcion"
-            value={formState.description ?? ''}
-            onChange={(event) => setFormState((current) => ({ ...current, description: event.target.value }))}
-            multiline
-            minRows={3}
-            size="small"
-            fullWidth
-          />
+        <TextField
+          label="Modulo"
+          select
+          value={formState.moduleId}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              moduleId: event.target.value,
+            }))
+          }
+          size="small"
+          fullWidth
+        >
+          {modules.map((module) => (
+            <MenuItem key={module.id} value={module.key}>
+              {module.name} ({module.key})
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          label="Accion"
+          select
+          value={formState.actionId}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              actionId: event.target.value,
+            }))
+          }
+          size="small"
+          fullWidth
+        >
+          {actions.map((action) => (
+            <MenuItem key={action.id} value={action.key}>
+              {action.name} ({action.key})
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          label="Descripcion"
+          value={formState.description ?? ''}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              description: event.target.value,
+            }))
+          }
+          multiline
+          minRows={3}
+          size="small"
+          fullWidth
+        />
       </FormDialog>
 
       <ConfirmDialog

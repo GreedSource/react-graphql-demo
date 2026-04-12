@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:is(.dark *));
+
 /* Light mode (default) */
 :root {
   color: #0f172a;
@@ -53,7 +55,9 @@ body {
   min-height: 100%;
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background 300ms cubic-bezier(0.4, 0, 0.2, 1), color 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 a {
@@ -136,7 +140,11 @@ a {
   }
 
   /* Button text */
-  .MuiButton-root:not(.MuiButton-containedPrimary):not(.MuiButton-containedSuccess):not(.MuiButton-containedError):not(.MuiButton-containedWarning):not(.MuiButton-containedInfo) {
+  .MuiButton-root:not(.MuiButton-containedPrimary):not(
+      .MuiButton-containedSuccess
+    ):not(.MuiButton-containedError):not(.MuiButton-containedWarning):not(
+      .MuiButton-containedInfo
+    ) {
     color: var(--text-primary);
   }
   .MuiButton-outlinedPrimary {

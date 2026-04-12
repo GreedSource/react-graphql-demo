@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, MenuItem, TextField } from '@mui/material';
+import { Alert, Button } from '@mui/material';
 import { toast } from 'react-toastify';
 import { DataTable } from '@/components/ui/DataTable';
 import { FormDialog } from '@/components/ui/FormDialog';
@@ -9,8 +9,9 @@ import { StateCard } from '@/components/ui/StateCard';
 import { StatusChip } from '@/components/ui/StatusChip';
 import { useModule, useModuleMutations, useModules } from '@/hooks/module.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
-import { slugifyKey } from '@/lib/validation';
 import type { CreateModuleInput, UpdateModuleInput } from '@/types/admin';
+import ModuleDetailPanel from './module-detail-panel';
+import ModuleFormFields from './module-form-fields';
 
 const emptyModule: CreateModuleInput = {
   name: '',
@@ -100,13 +101,16 @@ export default function ModulesPage() {
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-        <SectionCard title="Listado de modulos">
+        <SectionCard title="Listado de modulos" badge={modules.length}>
           {modules.length ? (
             <DataTable
               rows={modules}
               getRowKey={(item) => item.id}
               selectedRowKey={selectedId}
               onRowClick={(item) => setSelectedId(item.id)}
+              searchable
+              searchPlaceholder="Buscar por nombre o clave..."
+              searchableFields={[(item) => item.name, (item) => item.key]}
               columns={[
                 {
                   key: 'name',
@@ -136,32 +140,10 @@ export default function ModulesPage() {
         </SectionCard>
 
         <SectionCard title="Detalle">
-          {selectedModule ? (
-            <div className="space-y-4 text-sm text-text-secondary">
-              <div className="flex items-center gap-3">
-                <h3 className="text-xl font-semibold text-text">
-                  {selectedModule.name}
-                </h3>
-                <StatusChip active={selectedModule.active} />
-              </div>
-              <p>
-                <span className="font-semibold text-text">Key:</span>{' '}
-                {selectedModule.key}
-              </p>
-              <p>
-                {selectedModule.description ||
-                  'Sin descripcion para este modulo.'}
-              </p>
-              <Button variant="contained" onClick={openEdit}>
-                Editar modulo
-              </Button>
-            </div>
-          ) : (
-            <StateCard
-              title="Sin seleccion"
-              description="Selecciona un modulo de la tabla."
-            />
-          )}
+          <ModuleDetailPanel
+            selectedModule={selectedModule}
+            onEdit={openEdit}
+          />
         </SectionCard>
       </div>
 
@@ -183,62 +165,11 @@ export default function ModulesPage() {
           </>
         }
       >
-        <TextField
-          label="Nombre"
-          value={formState.name}
-          onChange={(event) => {
-            const name = event.target.value;
-            setFormState((current) => ({
-              ...current,
-              name,
-              key: dialogMode === 'create' ? slugifyKey(name) : current.key,
-            }));
-          }}
-          size="small"
-          fullWidth
+        <ModuleFormFields
+          formState={formState}
+          dialogMode={dialogMode}
+          onChange={setFormState}
         />
-        <TextField
-          label="Key"
-          value={formState.key}
-          onChange={(event) =>
-            setFormState((current) => ({
-              ...current,
-              key: slugifyKey(event.target.value),
-            }))
-          }
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="Descripcion"
-          value={formState.description ?? ''}
-          onChange={(event) =>
-            setFormState((current) => ({
-              ...current,
-              description: event.target.value,
-            }))
-          }
-          multiline
-          minRows={3}
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="Estado"
-          select
-          value={String(formState.active ?? true)}
-          onChange={(event) =>
-            setFormState((current) => ({
-              ...current,
-              active: event.target.value === 'true',
-            }))
-          }
-          size="small"
-          fullWidth
-        >
-          <MenuItem value="true">Activo</MenuItem>
-          <MenuItem value="false">Inactivo</MenuItem>
-        </TextField>
       </FormDialog>
     </div>
   );

@@ -30,11 +30,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      className="sticky top-0 z-20 border-b border-border bg-surface-card/80 backdrop-blur transition-all duration-300"
-    >
+    <nav className="sticky top-0 z-20 border-b border-border bg-surface-card/80 backdrop-blur transition-all duration-300">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex h-20 items-center justify-between">
+        <div className="relative flex h-auto flex-col-reverse justify-center gap-3 py-3 sm:h-20 sm:flex-row sm:items-center sm:justify-between sm:py-0">
           <div className="transition-transform duration-200 hover:translate-x-0.5">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
               Plataforma administrativa
@@ -43,7 +41,7 @@ export default function Navbar() {
               Gestion de acceso y catalogos
             </h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 self-end sm:self-auto">
             <ThemeToggle />
             <IconButton
               aria-label="view notifications"
@@ -70,7 +68,7 @@ export default function Navbar() {
               aria-controls="profile-menu"
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
-              className="rounded-full bg-surface-card text-sm"
+              className="rounded-lg bg-surface-card text-sm"
               sx={{
                 transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {

@@ -59,49 +59,51 @@ export default function PasswordInput({
         error={Boolean(error) || hasValidationErrors}
         helperText={error}
         fullWidth={fullWidth}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                onClick={() => setShowPassword(!showPassword)}
-                edge="end"
-                sx={{
-                  color: '#94a3b8',
-                  transition: 'all 200ms',
-                  '&:hover': { color: '#e2e8f0' },
-                }}
-              >
-                {showPassword ? (
-                  <VisibilityOff fontSize="small" />
-                ) : (
-                  <Visibility fontSize="small" />
-                )}
-              </IconButton>
-              {matchValue !== undefined && value.length > 0 && (
-                <span className="ml-1 text-base">
-                  {passwordsMatch ? (
-                    <Check sx={{ color: '#22c55e', fontSize: 18 }} />
+        slotProps={{
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                  sx={{
+                    color: '#94a3b8',
+                    transition: 'all 200ms',
+                    '&:hover': { color: '#e2e8f0' },
+                  }}
+                >
+                  {showPassword ? (
+                    <VisibilityOff fontSize="small" />
                   ) : (
-                    <Close sx={{ color: '#ef4444', fontSize: 18 }} />
+                    <Visibility fontSize="small" />
                   )}
-                </span>
-              )}
-            </InputAdornment>
-          ),
-          sx: {
-            '& .MuiOutlinedInput-root': {
-              transition: 'all 200ms',
-              '&:hover fieldset': {
-                borderColor: validation.isValid ? '#22c55e' : '#38bdf8',
+                </IconButton>
+                {matchValue !== undefined && value.length > 0 && (
+                  <span className="ml-1 text-base">
+                    {passwordsMatch ? (
+                      <Check sx={{ color: '#22c55e', fontSize: 18 }} />
+                    ) : (
+                      <Close sx={{ color: '#ef4444', fontSize: 18 }} />
+                    )}
+                  </span>
+                )}
+              </InputAdornment>
+            ),
+            sx: {
+              '& .MuiOutlinedInput-root': {
+                transition: 'all 200ms',
+                '&:hover fieldset': {
+                  borderColor: validation.isValid ? '#22c55e' : '#38bdf8',
+                },
+                ...(validation.isValid && {
+                  '& fieldset': { borderColor: '#22c55e' },
+                }),
               },
-              ...(validation.isValid && {
-                '& fieldset': { borderColor: '#22c55e' },
-              }),
             },
           },
-        }}
-        inputProps={{
-          autoComplete: 'new-password',
+          htmlInput: {
+            autoComplete: 'new-password',
+          },
         }}
       />
 

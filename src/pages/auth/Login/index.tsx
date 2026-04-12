@@ -1,6 +1,13 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Alert, Button, CircularProgress, TextField, InputAdornment, IconButton } from '@mui/material';
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  TextField,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { useAuthActions } from '@/hooks/auth.hook';
@@ -155,26 +162,32 @@ export default function Login() {
           error={Boolean(errors.password)}
           helperText={errors.password}
           fullWidth
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                  tabIndex={-1}
-                  sx={{
-                    color: '#94a3b8',
-                    transition: 'all 200ms',
-                    '&:hover': { color: '#e2e8f0' },
-                  }}
-                >
-                  {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-          inputProps={{
-            autoComplete: 'current-password',
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                    tabIndex={-1}
+                    sx={{
+                      color: '#94a3b8',
+                      transition: 'all 200ms',
+                      '&:hover': { color: '#e2e8f0' },
+                    }}
+                  >
+                    {showPassword ? (
+                      <VisibilityOff fontSize="small" />
+                    ) : (
+                      <Visibility fontSize="small" />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+            htmlInput: {
+              autoComplete: 'current-password',
+            },
           }}
           sx={{
             '& .MuiOutlinedInput-root': {
@@ -190,7 +203,9 @@ export default function Login() {
       <div
         style={{
           opacity: isVisible ? 1 : 0,
-          transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(8px) scale(0.98)',
+          transform: isVisible
+            ? 'translateY(0) scale(1)'
+            : 'translateY(8px) scale(0.98)',
           transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
           transitionDelay: isVisible ? '250ms' : '0ms',
         }}
@@ -211,7 +226,11 @@ export default function Login() {
             },
           }}
         >
-          {loginState.loading ? <CircularProgress size={22} color="inherit" /> : 'Entrar'}
+          {loginState.loading ? (
+            <CircularProgress size={22} color="inherit" />
+          ) : (
+            'Entrar'
+          )}
         </Button>
       </div>
 

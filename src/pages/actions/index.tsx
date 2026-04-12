@@ -1,10 +1,5 @@
 import { useState } from 'react';
-import {
-  Alert,
-  Button,
-  MenuItem,
-  TextField,
-} from '@mui/material';
+import { Alert, Button, MenuItem, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
 import { DataTable } from '@/components/ui/DataTable';
 import { FormDialog } from '@/components/ui/FormDialog';
@@ -48,27 +43,51 @@ export default function ActionsPage() {
         eyebrow="Acciones"
         title="Catalogo de acciones"
         description="Administra acciones reutilizables para combinarlas despues en permisos."
-        actions={<Button variant="contained" onClick={() => setDialogOpen(true)}>Nueva accion</Button>}
+        actions={
+          <Button variant="contained" onClick={() => setDialogOpen(true)}>
+            Nueva accion
+          </Button>
+        }
       />
 
       {actionsQuery.error ? (
-        <Alert severity="error">{getApolloErrorMessage(actionsQuery.error)}</Alert>
+        <Alert severity="error">
+          {getApolloErrorMessage(actionsQuery.error)}
+        </Alert>
       ) : null}
 
-      <SectionCard title="Listado de acciones">
+      <SectionCard title="Listado de acciones" badge={actions.length}>
         {actions.length ? (
           <DataTable
             rows={actions}
             getRowKey={(item) => item.id}
+            searchable
+            searchPlaceholder="Buscar por nombre, clave o descripcion..."
+            searchableFields={[
+              (item) => item.name,
+              (item) => item.key,
+              (item) => item.description || '',
+            ]}
             columns={[
               { key: 'name', header: 'Accion', render: (item) => item.name },
               { key: 'key', header: 'Key', render: (item) => item.key },
-              { key: 'description', header: 'Descripcion', render: (item) => item.description || 'Sin descripcion' },
-              { key: 'status', header: 'Estado', render: (item) => <StatusChip active={item.active} /> },
+              {
+                key: 'description',
+                header: 'Descripcion',
+                render: (item) => item.description || 'Sin descripcion',
+              },
+              {
+                key: 'status',
+                header: 'Estado',
+                render: (item) => <StatusChip active={item.active} />,
+              },
             ]}
           />
         ) : (
-          <StateCard title="Sin acciones" description="Crea la primera accion del sistema." />
+          <StateCard
+            title="Sin acciones"
+            description="Crea la primera accion del sistema."
+          />
         )}
       </SectionCard>
 
@@ -90,47 +109,62 @@ export default function ActionsPage() {
           </>
         }
       >
-          <TextField
-            label="Nombre"
-            value={formState.name}
-            onChange={(event) => {
-              const name = event.target.value;
-              setFormState((current) => ({
-                ...current,
-                name,
-                key: slugifyKey(name),
-              }));
-            }}
-            size="small"
-            fullWidth
-          />
-          <TextField
-            label="Key"
-            value={formState.key}
-            onChange={(event) => setFormState((current) => ({ ...current, key: slugifyKey(event.target.value) }))}
-            size="small"
-            fullWidth
-          />
-          <TextField
-            label="Descripcion"
-            value={formState.description ?? ''}
-            onChange={(event) => setFormState((current) => ({ ...current, description: event.target.value }))}
-            multiline
-            minRows={3}
-            size="small"
-            fullWidth
-          />
-          <TextField
-            label="Estado"
-            select
-            value={String(formState.active ?? true)}
-            onChange={(event) => setFormState((current) => ({ ...current, active: event.target.value === 'true' }))}
-            size="small"
-            fullWidth
-          >
-            <MenuItem value="true">Activo</MenuItem>
-            <MenuItem value="false">Inactivo</MenuItem>
-          </TextField>
+        <TextField
+          label="Nombre"
+          value={formState.name}
+          onChange={(event) => {
+            const name = event.target.value;
+            setFormState((current) => ({
+              ...current,
+              name,
+              key: slugifyKey(name),
+            }));
+          }}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Key"
+          value={formState.key}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              key: slugifyKey(event.target.value),
+            }))
+          }
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Descripcion"
+          value={formState.description ?? ''}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              description: event.target.value,
+            }))
+          }
+          multiline
+          minRows={3}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Estado"
+          select
+          value={String(formState.active ?? true)}
+          onChange={(event) =>
+            setFormState((current) => ({
+              ...current,
+              active: event.target.value === 'true',
+            }))
+          }
+          size="small"
+          fullWidth
+        >
+          <MenuItem value="true">Activo</MenuItem>
+          <MenuItem value="false">Inactivo</MenuItem>
+        </TextField>
       </FormDialog>
     </div>
   );
