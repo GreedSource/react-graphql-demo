@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button } from '@mui/material';
 import { toast } from 'react-toastify';
@@ -20,7 +21,7 @@ const emptyModule: CreateModuleInput = {
   active: true,
 };
 
-export default function ModulesPage() {
+const ModulesPageContent: React.FC = () => {
   const modulesQuery = useModules();
   const { createModule, updateModule, createState, updateState } =
     useModuleMutations();
@@ -173,4 +174,12 @@ export default function ModulesPage() {
       </FormDialog>
     </div>
   );
+};
+
+class ModulesPage extends React.Component {
+  render() {
+    return <ModulesPageContent />;
+  }
 }
+
+export default ModulesPage;

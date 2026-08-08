@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import type { ReactNode } from 'react';
 
 interface PageHeaderProps {
@@ -7,12 +8,12 @@ interface PageHeaderProps {
   actions?: ReactNode;
 }
 
-export function PageHeader({
+export const PageHeader: React.FC<PageHeaderProps> = ({
   eyebrow,
   title,
   description,
   actions,
-}: PageHeaderProps) {
+}) => {
   return (
     <div className="flex flex-col gap-4 rounded-[32px] border border-border bg-surface-card/85 p-6 shadow-sm lg:flex-row lg:items-end lg:justify-between transition-colors duration-300">
       <div className="space-y-2">
@@ -27,4 +28,4 @@ export function PageHeader({
       {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
     </div>
   );
-}
+};

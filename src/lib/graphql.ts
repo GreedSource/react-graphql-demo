@@ -1,6 +1,17 @@
 import type { ApolloError } from '@apollo/client';
 import type { ApiResponse } from '@/types/admin';
 
+interface NetworkErrorWithStatus {
+  status?: number;
+  statusCode?: number;
+  message?: string;
+  result?: {
+    errors?: Array<{
+      message?: string;
+    }>;
+  };
+}
+
 export function isSuccessStatus(status: number) {
   return status >= 200 && status < 300;
 }
@@ -35,10 +46,16 @@ export function getApolloErrorMessage(error: unknown) {
   }
 
   if (apolloError?.networkError) {
-    const networkError = apolloError.networkError as any;
+    const networkError = apolloError.networkError as NetworkErrorWithStatus;
     const statusCode = networkError?.statusCode || networkError?.status;
+    const responseMessages = networkError.result?.errors
+      ?.map((item) => item.message)
+      .filter(Boolean);
 
-    // Handle HTTP status codes with user-friendly messages
+    if (responseMessages?.length) {
+      return responseMessages.join(', ');
+    }
+
     if (statusCode === 403) {
       return 'No tienes permisos para realizar esta acción. Contacta a un administrador.';
     }
@@ -48,11 +65,17 @@ export function getApolloErrorMessage(error: unknown) {
     if (statusCode === 404) {
       return 'El recurso solicitado no fue encontrado.';
     }
+    if (statusCode === 400) {
+      return 'La solicitud no pudo completarse. Revisa la informacion enviada.';
+    }
     if (statusCode === 500) {
       return 'Error del servidor. Por favor, intenta más tarde.';
     }
-    if (statusCode) {
+    if (statusCode === 502 || statusCode === 503 || statusCode === 504) {
       return `Error de conexión (código ${statusCode}). Por favor, verifica tu conexión e intenta de nuevo.`;
+    }
+    if (statusCode) {
+      return networkError.message || `La operacion fallo con codigo ${statusCode}.`;
     }
 
     return (

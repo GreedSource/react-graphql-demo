@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { usePermission } from '@/lib/permissions';
 import { hasAnyPermission } from '@/lib/permissions';
@@ -12,11 +13,11 @@ interface PermissionRouteGuardProps {
  * A route guard that checks if the user has the required permission.
  * If not, redirects to the fallback path (default: /welcome).
  */
-export default function PermissionRouteGuard({
+const PermissionRouteGuard: React.FC<PermissionRouteGuardProps> = ({
   permissionType,
   permissionActions,
   fallbackPath = '/welcome',
-}: PermissionRouteGuardProps) {
+}) => {
   const { user } = usePermission();
   const userPermissions = user?.role?.permissions ?? [];
 
@@ -27,4 +28,6 @@ export default function PermissionRouteGuard({
   }
 
   return <Outlet />;
-}
+};
+
+export default PermissionRouteGuard;

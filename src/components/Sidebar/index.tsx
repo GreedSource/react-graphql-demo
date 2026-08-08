@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { useState, useEffect } from 'react';
 import MobileOverlay from './mobile-overlay';
 import MobileToggle from './mobile-toggle';
@@ -8,7 +9,7 @@ const SIDEBAR_WIDTH = '18rem';
 const TRANSITION_DURATION = '300ms';
 const TRANSITION_TIMING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
-const Sidebar = () => {
+const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 

@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { type CSSProperties } from 'react';
 import SidebarRoutes from './item';
 import { APP_CONFIG } from '@/constants/config';
@@ -8,11 +9,11 @@ interface SidebarHeaderProps {
   transitionTiming: string;
 }
 
-export default function SidebarHeader({
+const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   isMounted,
   transitionDuration,
   transitionTiming,
-}: SidebarHeaderProps) {
+}) => {
   const animationStyle: CSSProperties = {
     opacity: isMounted ? 1 : 0,
     transform: isMounted ? 'translateY(0)' : 'translateY(-8px)',
@@ -38,4 +39,6 @@ export default function SidebarHeader({
       <SidebarRoutes />
     </div>
   );
-}
+};
+
+export default SidebarHeader;

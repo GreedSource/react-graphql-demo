@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { useState, useMemo } from 'react';
 import {
   TextField,
@@ -28,7 +29,7 @@ const strengthConfig = {
   strong: { color: '#22c55e', width: '100%', label: 'Fuerte' },
 };
 
-export default function PasswordInput({
+const PasswordInput: React.FC<PasswordInputProps> = ({
   label,
   value,
   onChange,
@@ -36,7 +37,7 @@ export default function PasswordInput({
   showValidation = false,
   matchValue,
   fullWidth = true,
-}: PasswordInputProps) {
+}) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const validation = useMemo(() => validatePassword(value), [value]);
@@ -187,4 +188,6 @@ export default function PasswordInput({
       )}
     </div>
   );
-}
+};
+
+export default PasswordInput;

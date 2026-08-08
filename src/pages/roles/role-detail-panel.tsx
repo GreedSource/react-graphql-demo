@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { Button, Chip, MenuItem, TextField } from '@mui/material';
 import { StateCard } from '@/components/ui/StateCard';
 import { StatusChip } from '@/components/ui/StatusChip';
@@ -36,7 +37,7 @@ interface RoleDetailPanelProps {
   removePermissionsLoading: boolean;
 }
 
-export default function RoleDetailPanel({
+const RoleDetailPanel: React.FC<RoleDetailPanelProps> = ({
   selectedRole,
   assignedPermissions,
   availablePermissions,
@@ -50,7 +51,7 @@ export default function RoleDetailPanel({
   onRemovePermissions,
   addPermissionsLoading,
   removePermissionsLoading,
-}: RoleDetailPanelProps) {
+}) => {
   const normalizeMultiValue = (value: string | string[]) => {
     return Array.isArray(value) ? value : value.split(',');
   };
@@ -169,4 +170,6 @@ export default function RoleDetailPanel({
       </div>
     </div>
   );
-}
+};
+
+export default RoleDetailPanel;

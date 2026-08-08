@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
@@ -21,7 +22,7 @@ const moduleIcons: Record<string, React.ReactNode> = {
   permissions: <Extension fontSize="large" />,
 };
 
-export default function WelcomePage() {
+const WelcomePageContent: React.FC = () => {
   const { user } = usePermission();
   const userPermissions = user?.role?.permissions ?? [];
   const [isVisible, setIsVisible] = useState(false);
@@ -118,4 +119,12 @@ export default function WelcomePage() {
       </div>
     </div>
   );
+};
+
+class WelcomePage extends React.Component {
+  render() {
+    return <WelcomePageContent />;
+  }
 }
+
+export default WelcomePage;

@@ -1,7 +1,8 @@
+import * as React from 'react';
 import { Alert, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-export default function ChangePassword() {
+const ChangePasswordContent: React.FC = () => {
   return (
     <div className="space-y-5">
       <div className="space-y-2 text-center">
@@ -22,4 +23,12 @@ export default function ChangePassword() {
       </Button>
     </div>
   );
+};
+
+class ChangePassword extends React.Component {
+  render() {
+    return <ChangePasswordContent />;
+  }
 }
+
+export default ChangePassword;

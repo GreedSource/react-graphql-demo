@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import {
@@ -43,7 +44,11 @@ interface DataTableProps<T> {
   onSelectionChange?: (selectedKeys: Set<string>) => void;
 }
 
-export function DataTable<T>({
+type DataTableComponent = <T>(
+  props: DataTableProps<T>,
+) => ReturnType<React.FC<DataTableProps<T>>>;
+
+export const DataTable: DataTableComponent = <T,>({
   columns,
   rows,
   getRowKey,
@@ -58,7 +63,7 @@ export function DataTable<T>({
   defaultRowsPerPage = 10,
   enableRowSelection = false,
   onSelectionChange,
-}: DataTableProps<T>) {
+}: DataTableProps<T>) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
@@ -78,7 +83,7 @@ export function DataTable<T>({
         getField(row).toLowerCase().includes(query),
       ),
     );
-  }, [rows, searchQuery, searchable, searchableFields]);
+  }, [rows, searchQuery, searchableFields]);
 
   const paginatedRows = useMemo(() => {
     const start = page * rowsPerPage;
@@ -402,4 +407,4 @@ export function DataTable<T>({
       </Paper>
     </div>
   );
-}
+};

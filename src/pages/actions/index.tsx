@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useState } from 'react';
 import { Alert, Button, MenuItem, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
@@ -19,7 +20,7 @@ const emptyAction: CreateActionInput = {
   active: true,
 };
 
-export default function ActionsPage() {
+const ActionsPageContent: React.FC = () => {
   const actionsQuery = useActions();
   const { createAction, createState } = useActionMutations();
   const actions = actionsQuery.data?.actions?.data ?? [];
@@ -168,4 +169,12 @@ export default function ActionsPage() {
       </FormDialog>
     </div>
   );
+};
+
+class ActionsPage extends React.Component {
+  render() {
+    return <ActionsPageContent />;
+  }
 }
+
+export default ActionsPage;

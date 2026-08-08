@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { useState, useEffect, type ReactNode, type CSSProperties } from 'react';
 
 interface AnimatedSectionProps {
@@ -20,7 +21,7 @@ const DIRECTION_MAP: Record<string, string> = {
 
 const DEFAULT_DURATION = 400;
 
-export default function AnimatedSection({
+const AnimatedSection: React.FC<AnimatedSectionProps> = ({
   children,
   delay = 0,
   duration = DEFAULT_DURATION,
@@ -28,7 +29,7 @@ export default function AnimatedSection({
   scale = false,
   style,
   className = '',
-}: AnimatedSectionProps) {
+}) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -53,4 +54,6 @@ export default function AnimatedSection({
       {children}
     </div>
   );
-}
+};
+
+export default AnimatedSection;

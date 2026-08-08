@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { Button } from '@mui/material';
 import { StateCard } from '@/components/ui/StateCard';
 import { StatusChip } from '@/components/ui/StatusChip';
@@ -15,10 +16,10 @@ interface ModuleDetailPanelProps {
   onEdit: () => void;
 }
 
-export default function ModuleDetailPanel({
+const ModuleDetailPanel: React.FC<ModuleDetailPanelProps> = ({
   selectedModule,
   onEdit,
-}: ModuleDetailPanelProps) {
+}) => {
   if (!selectedModule) {
     return (
       <StateCard
@@ -48,4 +49,6 @@ export default function ModuleDetailPanel({
       </Button>
     </div>
   );
-}
+};
+
+export default ModuleDetailPanel;

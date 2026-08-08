@@ -1,10 +1,11 @@
+import type * as React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PageTransition from '../components/ui/PageTransition';
 
-const MainLayout = () => {
+const MainLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-gradient-to-b from-surface-elevated to-surface transition-colors duration-300">
       <Sidebar />

@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { Chip } from '@mui/material';
 
 interface StatusChipProps {
@@ -6,11 +7,11 @@ interface StatusChipProps {
   inactiveLabel?: string;
 }
 
-export function StatusChip({
+export const StatusChip: React.FC<StatusChipProps> = ({
   active,
   activeLabel = 'Activo',
   inactiveLabel = 'Inactivo',
-}: StatusChipProps) {
+}) => {
   return (
     <Chip
       label={active ? activeLabel : inactiveLabel}
@@ -19,4 +20,4 @@ export function StatusChip({
       variant={active ? 'filled' : 'outlined'}
     />
   );
-}
+};

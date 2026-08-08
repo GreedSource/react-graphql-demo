@@ -16,6 +16,19 @@ export function hasPermission(
   );
 }
 
+export function canPermission(
+  permissions: Array<{ type: string; action: string }>,
+  permission: string
+): boolean {
+  const [type, action] = permission.split('.');
+
+  if (!type || !action) {
+    return false;
+  }
+
+  return hasPermission(permissions, type, action);
+}
+
 /**
  * Check if a user has ANY of the specified actions for a module type
  * @param permissions - Array of permissions from user.role.permissions
@@ -51,6 +64,8 @@ export function usePermission() {
   const checkPermission = (type: string, action: string) =>
     hasPermission(permissions, type, action);
 
+  const can = (permission: string) => canPermission(permissions, permission);
+
   const checkAnyPermission = (type: string, actions: string[]) =>
     hasAnyPermission(permissions, type, actions);
 
@@ -61,6 +76,7 @@ export function usePermission() {
     hasPermission: checkPermission,
     hasAnyPermission: checkAnyPermission,
     hasAllPermissions: checkAllPermissions,
+    can,
     permissions,
     user,
   };

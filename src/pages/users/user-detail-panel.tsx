@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { Button } from '@mui/material';
 import { StateCard } from '@/components/ui/StateCard';
 
@@ -15,11 +16,11 @@ interface UserDetailPanelProps {
   onDelete: () => void;
 }
 
-export default function UserDetailPanel({
+const UserDetailPanel: React.FC<UserDetailPanelProps> = ({
   selectedUser,
   onEdit,
   onDelete,
-}: UserDetailPanelProps) {
+}) => {
   if (!selectedUser) {
     return (
       <StateCard
@@ -63,4 +64,6 @@ export default function UserDetailPanel({
       </div>
     </div>
   );
-}
+};
+
+export default UserDetailPanel;

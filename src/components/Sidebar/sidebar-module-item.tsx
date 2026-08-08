@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ExpandMore } from '@mui/icons-material';
@@ -10,10 +11,10 @@ interface SidebarModuleItemProps {
   delay?: number;
 }
 
-export default function SidebarModuleItem({
+const SidebarModuleItem: React.FC<SidebarModuleItemProps> = ({
   module,
   delay = 0,
-}: SidebarModuleItemProps) {
+}) => {
   const location = useLocation();
   const { user } = usePermission();
   const userPermissions = user?.role?.permissions ?? [];
@@ -117,4 +118,6 @@ export default function SidebarModuleItem({
       </div>
     </div>
   );
-}
+};
+
+export default SidebarModuleItem;

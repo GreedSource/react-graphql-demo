@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { type CSSProperties } from 'react';
 import { Avatar } from '@mui/material';
 import { useUserStore } from '@/stores/user.store';
@@ -8,11 +9,11 @@ interface SidebarFooterProps {
   transitionTiming: string;
 }
 
-export default function SidebarFooter({
+const SidebarFooter: React.FC<SidebarFooterProps> = ({
   isMounted,
   transitionDuration,
   transitionTiming,
-}: SidebarFooterProps) {
+}) => {
   const { user } = useUserStore();
 
   const animationStyle: CSSProperties = {
@@ -41,4 +42,6 @@ export default function SidebarFooter({
       </div>
     </div>
   );
-}
+};
+
+export default SidebarFooter;

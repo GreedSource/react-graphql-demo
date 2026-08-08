@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Alert, Button, CircularProgress, TextField } from '@mui/material';
@@ -9,7 +10,7 @@ import { validatePassword } from '@/lib/password-validation';
 import PasswordInput from '@/components/ui/PasswordInput';
 import type { RegisterInput } from '@/types/admin';
 
-export default function Register() {
+const RegisterContent: React.FC = () => {
   const navigate = useNavigate();
   const { register, registerState } = useAuthActions();
   const [formState, setFormState] = useState<RegisterInput>({
@@ -256,4 +257,12 @@ export default function Register() {
       </p>
     </form>
   );
+};
+
+class Register extends React.Component {
+  render() {
+    return <RegisterContent />;
+  }
 }
+
+export default Register;

@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import {
   Button,
   Dialog,
@@ -18,7 +19,7 @@ interface ConfirmDialogProps {
   loading?: boolean;
 }
 
-export function ConfirmDialog({
+export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   open,
   title,
   description,
@@ -28,7 +29,7 @@ export function ConfirmDialog({
   onConfirm,
   destructive = false,
   loading = false,
-}: ConfirmDialogProps) {
+}) => {
   return (
     <Dialog open={open} onClose={loading ? undefined : onClose} fullWidth maxWidth="xs">
       <DialogTitle>{title}</DialogTitle>
@@ -50,4 +51,4 @@ export function ConfirmDialog({
       </DialogActions>
     </Dialog>
   );
-}
+};

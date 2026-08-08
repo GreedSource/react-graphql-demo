@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import {
@@ -6,7 +7,7 @@ import {
 } from '@/hooks/auth.hook';
 import { useUserStore } from '@/stores/user.store';
 
-export function ProtectedRoute() {
+export const ProtectedRoute: React.FC = () => {
   const location = useLocation();
   const { isReady } = useAuthBootstrap();
   const { user } = useUserStore();
@@ -26,4 +27,4 @@ export function ProtectedRoute() {
   }
 
   return <Outlet />;
-}
+};

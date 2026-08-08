@@ -1,7 +1,8 @@
+import type * as React from 'react';
 import { Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-export default function AuthLayout() {
+const AuthLayout: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -27,4 +28,6 @@ export default function AuthLayout() {
       </div>
     </div>
   );
-}
+};
+
+export default AuthLayout;

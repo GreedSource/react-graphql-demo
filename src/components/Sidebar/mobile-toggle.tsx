@@ -1,9 +1,11 @@
+import type * as React from 'react';
+
 interface MobileToggleProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-export default function MobileToggle({ isOpen, onToggle }: MobileToggleProps) {
+const MobileToggle: React.FC<MobileToggleProps> = ({ isOpen, onToggle }) => {
   return (
     <button
       onClick={onToggle}
@@ -33,4 +35,6 @@ export default function MobileToggle({ isOpen, onToggle }: MobileToggleProps) {
       </svg>
     </button>
   );
-}
+};
+
+export default MobileToggle;

@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { MenuItem, TextField } from '@mui/material';
 import type { UpdateUserInput } from '@/types/admin';
 
@@ -8,12 +9,12 @@ interface UserFormFieldsProps {
   onChange: (state: UpdateUserInput) => void;
 }
 
-export default function UserFormFields({
+const UserFormFields: React.FC<UserFormFieldsProps> = ({
   formState,
   formErrors,
   roles,
   onChange,
-}: UserFormFieldsProps) {
+}) => {
   return (
     <>
       <TextField
@@ -51,4 +52,6 @@ export default function UserFormFields({
       </TextField>
     </>
   );
-}
+};
+
+export default UserFormFields;

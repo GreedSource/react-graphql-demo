@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button } from '@mui/material';
 import { FormDialog } from '@/components/ui/FormDialog';
@@ -21,7 +22,7 @@ const emptyForm: UpdateUserInput = {
   roleId: '',
 };
 
-export default function UsersPage() {
+const UsersPageContent: React.FC = () => {
   const usersQuery = useUsers();
   const rolesQuery = useRoles();
   const { updateUser, deleteUser, updateState, deleteState } =
@@ -221,4 +222,12 @@ export default function UsersPage() {
       />
     </div>
   );
+};
+
+class UsersPage extends React.Component {
+  render() {
+    return <UsersPageContent />;
+  }
 }
+
+export default UsersPage;

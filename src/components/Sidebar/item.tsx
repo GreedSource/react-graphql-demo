@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePermission, hasAnyPermission } from '@/lib/permissions';
 import { SIDEBAR_ROUTES } from '@/config/sidebar-routes.config';
@@ -8,7 +9,7 @@ import type {
 import SidebarItem from './sidebar-item';
 import SidebarModuleItem from './sidebar-module-item';
 
-export default function SidebarRoutes() {
+const SidebarRoutes: React.FC = () => {
   const location = useLocation();
   const { user } = usePermission();
   const userPermissions = user?.role?.permissions ?? [];
@@ -72,4 +73,6 @@ export default function SidebarRoutes() {
       })}
     </nav>
   );
-}
+};
+
+export default SidebarRoutes;

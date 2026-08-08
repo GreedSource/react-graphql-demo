@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, CircularProgress } from '@mui/material';
@@ -8,7 +9,7 @@ import { validatePassword } from '@/lib/password-validation';
 import PasswordInput from '@/components/ui/PasswordInput';
 import type { ResetPasswordInput } from '@/types/admin';
 
-export default function ResetPassword() {
+const ResetPasswordContent: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useParams<{ token: string }>();
   const { resetPassword, resetPasswordState } = useAuthActions();
@@ -196,4 +197,12 @@ export default function ResetPassword() {
       </p>
     </form>
   );
+};
+
+class ResetPassword extends React.Component {
+  render() {
+    return <ResetPasswordContent />;
+  }
 }
+
+export default ResetPassword;

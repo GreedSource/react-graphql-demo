@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { MenuItem, TextField } from '@mui/material';
 import type { CreateRoleInput } from '@/types/admin';
 
@@ -6,10 +7,10 @@ interface RoleFormFieldsProps {
   onChange: (state: CreateRoleInput & { id?: string }) => void;
 }
 
-export default function RoleFormFields({
+const RoleFormFields: React.FC<RoleFormFieldsProps> = ({
   formState,
   onChange,
-}: RoleFormFieldsProps) {
+}) => {
   return (
     <>
       <TextField
@@ -47,4 +48,6 @@ export default function RoleFormFields({
       </TextField>
     </>
   );
-}
+};
+
+export default RoleFormFields;

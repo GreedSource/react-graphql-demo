@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import type { ReactNode } from 'react';
 import { Button, CircularProgress } from '@mui/material';
 
@@ -10,14 +11,14 @@ interface StateCardProps {
   loading?: boolean;
 }
 
-export function StateCard({
+export const StateCard: React.FC<StateCardProps> = ({
   title,
   description,
   actionLabel,
   onAction,
   icon,
   loading = false,
-}: StateCardProps) {
+}) => {
   return (
     <div className="rounded-3xl border border-border bg-surface-card/90 p-6 shadow-sm transition-colors duration-300">
       <div className="flex items-start gap-4">
@@ -36,4 +37,4 @@ export function StateCard({
       </div>
     </div>
   );
-}
+};

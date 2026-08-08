@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { MenuItem, TextField } from '@mui/material';
 import { slugifyKey } from '@/lib/validation';
 import type { CreateModuleInput } from '@/types/admin';
@@ -8,11 +9,11 @@ interface ModuleFormFieldsProps {
   onChange: (state: CreateModuleInput & { id?: string }) => void;
 }
 
-export default function ModuleFormFields({
+const ModuleFormFields: React.FC<ModuleFormFieldsProps> = ({
   formState,
   dialogMode,
   onChange,
-}: ModuleFormFieldsProps) {
+}) => {
   return (
     <>
       <TextField
@@ -64,4 +65,6 @@ export default function ModuleFormFields({
       </TextField>
     </>
   );
-}
+};
+
+export default ModuleFormFields;

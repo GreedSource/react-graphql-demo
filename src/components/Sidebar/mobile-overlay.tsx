@@ -1,14 +1,16 @@
+import type * as React from 'react';
+
 interface MobileOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   transitionDuration: string;
 }
 
-export default function MobileOverlay({
+const MobileOverlay: React.FC<MobileOverlayProps> = ({
   isOpen,
   onClose,
   transitionDuration,
-}: MobileOverlayProps) {
+}) => {
   return (
     <div
       onClick={onClose}
@@ -18,4 +20,6 @@ export default function MobileOverlay({
       aria-hidden="true"
     />
   );
-}
+};
+
+export default MobileOverlay;

@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import type { ReactNode } from 'react';
 
 interface SectionCardProps {
@@ -11,7 +12,7 @@ interface SectionCardProps {
   className?: string;
 }
 
-export function SectionCard({
+export const SectionCard: React.FC<SectionCardProps> = ({
   title,
   description,
   children,
@@ -20,7 +21,7 @@ export function SectionCard({
   action,
   variant = 'default',
   className = '',
-}: SectionCardProps) {
+}) => {
   const variantStyles: Record<string, string> = {
     default: 'border-border bg-surface-card/90 shadow-sm',
     outlined: 'border-border/60 bg-transparent shadow-none',
@@ -65,4 +66,4 @@ export function SectionCard({
       <div>{children}</div>
     </section>
   );
-}
+};

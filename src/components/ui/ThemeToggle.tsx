@@ -1,8 +1,9 @@
+import type * as React from 'react';
 import { DarkMode, LightMode } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { useThemeStore } from '@/stores/theme.store';
 
-export default function ThemeToggle() {
+const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useThemeStore();
 
   return (
@@ -30,4 +31,6 @@ export default function ThemeToggle() {
       )}
     </IconButton>
   );
-}
+};
+
+export default ThemeToggle;

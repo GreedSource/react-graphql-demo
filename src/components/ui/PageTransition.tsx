@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 
@@ -5,7 +6,7 @@ interface PageTransitionProps {
   children: ReactNode;
 }
 
-export default function PageTransition({ children }: PageTransitionProps) {
+const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -27,4 +28,6 @@ export default function PageTransition({ children }: PageTransitionProps) {
       {children}
     </div>
   );
-}
+};
+
+export default PageTransition;

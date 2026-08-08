@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button } from '@mui/material';
 import { toast } from 'react-toastify';
@@ -21,7 +22,7 @@ const createRoleForm: CreateRoleInput = {
   active: true,
 };
 
-export default function RolesPage() {
+const RolesPageContent: React.FC = () => {
   const rolesQuery = useRoles();
   const permissionsQuery = usePermissions();
   const {
@@ -282,4 +283,12 @@ export default function RolesPage() {
       />
     </div>
   );
+};
+
+class RolesPage extends React.Component {
+  render() {
+    return <RolesPageContent />;
+  }
 }
+
+export default RolesPage;

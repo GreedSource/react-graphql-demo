@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import type { ReactNode } from 'react';
 import {
   Dialog,
@@ -16,7 +17,7 @@ interface FormDialogProps {
   maxWidth?: 'xs' | 'sm' | 'md';
 }
 
-export function FormDialog({
+export const FormDialog: React.FC<FormDialogProps> = ({
   open,
   title,
   subtitle,
@@ -24,7 +25,7 @@ export function FormDialog({
   children,
   actions,
   maxWidth = 'sm',
-}: FormDialogProps) {
+}) => {
   return (
     <Dialog
       open={open}
@@ -75,4 +76,4 @@ export function FormDialog({
       </DialogActions>
     </Dialog>
   );
-}
+};

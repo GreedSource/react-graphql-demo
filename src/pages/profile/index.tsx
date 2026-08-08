@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Alert, Button, Chip } from '@mui/material';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionCard } from '@/components/ui/SectionCard';
@@ -7,7 +8,7 @@ import {
   getApolloErrorMessage,
 } from '@/lib/graphql';
 
-export default function ProfilePage() {
+const ProfilePageContent: React.FC = () => {
   const { performLogout } = useAuthActions();
   const profileQuery = useProfileQuery();
   const profile = profileQuery.data?.profile?.data;
@@ -91,4 +92,12 @@ export default function ProfilePage() {
       </div>
     </div>
   );
+};
+
+class ProfilePage extends React.Component {
+  render() {
+    return <ProfilePageContent />;
+  }
 }
+
+export default ProfilePage;

@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -20,7 +21,7 @@ interface LoginFormState {
   password: string;
 }
 
-export default function Login() {
+const LoginContent: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, loginState } = useAuthActions();
@@ -258,4 +259,12 @@ export default function Login() {
       </div>
     </form>
   );
+};
+
+class Login extends React.Component {
+  render() {
+    return <LoginContent />;
+  }
 }
+
+export default Login;

@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useState } from 'react';
 import { Alert, Button, MenuItem, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
@@ -22,7 +23,7 @@ const emptyPermission: CreatePermissionInput = {
   description: '',
 };
 
-export default function PermissionsPage() {
+const PermissionsPageContent: React.FC = () => {
   const permissionsQuery = usePermissions();
   const modulesQuery = useModules();
   const actionsQuery = useActions();
@@ -212,4 +213,12 @@ export default function PermissionsPage() {
       />
     </div>
   );
+};
+
+class PermissionsPage extends React.Component {
+  render() {
+    return <PermissionsPageContent />;
+  }
 }
+
+export default PermissionsPage;

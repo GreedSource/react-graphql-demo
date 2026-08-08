@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { useState, useEffect, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -9,13 +10,13 @@ interface SidebarItemProps {
   delay?: number;
 }
 
-export default function SidebarItem({
+const SidebarItem: React.FC<SidebarItemProps> = ({
   icon,
   label,
   active,
   to,
   delay = 0,
-}: SidebarItemProps) {
+}) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -47,4 +48,6 @@ export default function SidebarItem({
       </span>
     </Link>
   );
-}
+};
+
+export default SidebarItem;

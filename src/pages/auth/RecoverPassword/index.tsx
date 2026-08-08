@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Alert, Button, CircularProgress, TextField } from '@mui/material';
@@ -6,7 +7,7 @@ import { useAuthActions } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { isValidEmail } from '@/lib/validation';
 
-export default function RecoverPassword() {
+const RecoverPasswordContent: React.FC = () => {
   const { recoverPassword, recoverPasswordState } = useAuthActions();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -151,4 +152,12 @@ export default function RecoverPassword() {
       </p>
     </form>
   );
+};
+
+class RecoverPassword extends React.Component {
+  render() {
+    return <RecoverPasswordContent />;
+  }
 }
+
+export default RecoverPassword;

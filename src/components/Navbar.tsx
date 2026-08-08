@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { useAuthActions } from '@/hooks/auth.hook';
 import { useUserStore } from '@/stores/user.store';
 import { useThemeStore } from '@/stores/theme.store';
@@ -11,7 +12,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 
-export default function Navbar() {
+const Navbar: React.FC = () => {
   const { user } = useUserStore();
   const { theme } = useThemeStore();
   const { performLogout } = useAuthActions();
@@ -146,4 +147,6 @@ export default function Navbar() {
       </div>
     </nav>
   );
-}
+};
+
+export default Navbar;
