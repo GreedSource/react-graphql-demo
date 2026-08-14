@@ -23,28 +23,28 @@ export const SectionCard: React.FC<SectionCardProps> = ({
   className = '',
 }) => {
   const variantStyles: Record<string, string> = {
-    default: 'border-border bg-surface-card/90 shadow-sm',
+    default: 'workspace-card',
     outlined: 'border-border/60 bg-transparent shadow-none',
-    elevated: 'border-transparent bg-surface-card shadow-lg',
+    elevated: 'workspace-card shadow-lg shadow-black/[0.06]',
   };
 
   return (
     <section
-      className={`group rounded-xl border p-6 transition-all duration-300 hover:shadow-md ${variantStyles[variant]} ${className}`}
+      className={`group rounded-lg border p-5 transition-colors duration-200 ${variantStyles[variant]} ${className}`}
     >
       {/* Header */}
-      <div className="mb-5 flex items-start justify-between gap-3">
+      <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           {icon && (
-            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent transition-transform duration-200 group-hover:scale-105">
+            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
               {icon}
             </div>
           )}
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-text">{title}</h2>
+              <h2 className="text-base font-semibold text-text">{title}</h2>
               {badge !== undefined && (
-                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded px-1.5 text-[11px] font-semibold text-accent bg-accent/15">
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded px-1.5 text-[11px] font-semibold text-accent bg-accent-soft">
                   {badge}
                 </span>
               )}
@@ -60,7 +60,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
       </div>
 
       {/* Divider */}
-      <div className="-mx-6 mb-5 h-px border-t border-border/50" />
+      <div className="-mx-5 mb-4 h-px border-t border-border/60" />
 
       {/* Content */}
       <div>{children}</div>

@@ -1,4 +1,4 @@
-# QWEN.md — React GraphQL Demo
+# AGENTS.md — React GraphQL Demo
 
 ## Project Overview
 
@@ -111,6 +111,24 @@ These are also passed as build args in the Docker configuration.
 
 ## Development Conventions
 
+### React Components and Interfaces
+
+- Always implement React components as function components typed with `React.FC`.
+- Define component props with a named TypeScript `interface`; do not use inline object types or `type` aliases for props.
+- Use the `Props` suffix for props interfaces (for example, `UserCardProps`).
+- Components without props must still use `React.FC`.
+
+```tsx
+interface UserCardProps {
+  name: string;
+  isActive?: boolean;
+}
+
+const UserCard: React.FC<UserCardProps> = ({ name, isActive = false }) => {
+  return <div>{name}</div>;
+};
+```
+
 ### Path Aliases
 
 The project uses `@/*` as a path alias for `src/*` (configured in `tsconfig.json` and resolved via `vite-tsconfig-paths`).
@@ -121,6 +139,13 @@ The project uses `@/*` as a path alias for `src/*` (configured in `tsconfig.json
 - **Zustand stores** are in `src/stores/` with an `init.ts` bootstrap file that loads persisted state before app render
 - **Auth guards** are in `src/components/auth/` (`GuestRoute`, `ProtectedRoute`, `PermissionRouteGuard`)
 - **Pages** are lazy-loaded in `App.tsx` using `React.lazy` with a loading fallback
+- Keep each page entry file focused on the route-level page component.
+- Place components used by only one page in `src/pages/<page>/components/`.
+- Place page-specific interfaces, props, and state contracts in `src/pages/<page>/types.ts`.
+- Extract non-trivial page behavior into custom hooks under `src/pages/<page>/hooks/` (for example, `useTasksPage.ts`).
+- Page components should focus on rendering: keep state orchestration, effects, derived data, GraphQL coordination, validation, and event handlers in the page hook.
+- Do not create a custom hook for a purely presentational component that has no reusable or non-trivial behavior.
+- Promote a component to `src/components/` only when it is shared or designed for reuse across multiple pages.
 
 ### State Management
 

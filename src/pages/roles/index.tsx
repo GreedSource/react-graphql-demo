@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button } from '@mui/material';
-import { toast } from 'react-toastify';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
 import { FormDialog } from '@/components/ui/FormDialog';
@@ -9,169 +7,19 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { StateCard } from '@/components/ui/StateCard';
 import { StatusChip } from '@/components/ui/StatusChip';
-import { usePermissions } from '@/hooks/permission.hook';
-import { useRole, useRoleMutations, useRoles } from '@/hooks/role.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
-import type { CreateRoleInput, UpdateRoleInput } from '@/types/admin';
-import RoleDetailPanel from './role-detail-panel';
-import RoleFormFields from './role-form-fields';
-
-const createRoleForm: CreateRoleInput = {
-  name: '',
-  description: '',
-  active: true,
-};
+import RoleDetailPanel from './components/RoleDetailPanel';
+import RoleFormFields from './components/RoleFormFields';
+import { useRolesPage } from './hooks/useRolesPage';
 
 const RolesPageContent: React.FC = () => {
-  const rolesQuery = useRoles();
-  const permissionsQuery = usePermissions();
   const {
-    createRole,
-    updateRole,
-    deleteRole,
-    addPermissionsToRole,
-    removePermissionsFromRole,
-    createState,
-    updateState,
-    deleteState,
-    addPermissionsState,
-    removePermissionsState,
-  } = useRoleMutations();
-  const roles = useMemo(
-    () => rolesQuery.data?.roles?.data ?? [],
-    [rolesQuery.data],
-  );
-  const permissions = useMemo(
-    () => permissionsQuery.data?.permissions?.data ?? [],
-    [permissionsQuery.data],
-  );
-  const [selectedId, setSelectedId] = useState('');
-  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [assignIds, setAssignIds] = useState<string[]>([]);
-  const [removeIds, setRemoveIds] = useState<string[]>([]);
-  const [formState, setFormState] = useState<CreateRoleInput & { id?: string }>(
-    createRoleForm,
-  );
-  const roleDetailQuery = useRole(selectedId);
-
-  useEffect(() => {
-    if (!selectedId && roles.length > 0) {
-      setSelectedId(roles[0].id);
-    }
-  }, [roles, selectedId]);
-
-  const selectedRole = useMemo(() => {
-    return (
-      roleDetailQuery.data?.role?.data ??
-      roles.find((role) => role.id === selectedId)
-    );
-  }, [roleDetailQuery.data?.role?.data, roles, selectedId]);
-
-  const assignedPermissions = useMemo(() => {
-    if (!selectedRole) return [];
-
-    return permissions.filter((permission) =>
-      selectedRole.permissions.some((item) => {
-        const matches =
-          item.type === permission.moduleKey &&
-          item.action === permission.actionKey;
-        return matches;
-      }),
-    );
-  }, [permissions, selectedRole]);
-
-  const availablePermissions = permissions.filter(
-    (permission) =>
-      !assignedPermissions.some((item) => item.id === permission.id),
-  );
-
-  const openCreate = () => {
-    setDialogMode('create');
-    setFormState(createRoleForm);
-    setDialogOpen(true);
-  };
-
-  const openEdit = () => {
-    if (!selectedRole) return;
-    setDialogMode('edit');
-    setFormState({
-      id: selectedRole.id,
-      name: selectedRole.name,
-      description: selectedRole.description || '',
-      active: selectedRole.active,
-    });
-    setDialogOpen(true);
-  };
-
-  const handleSave = async () => {
-    try {
-      if (dialogMode === 'create') {
-        const response = await createRole(formState);
-        toast.success(response.message || 'Rol creado.');
-      } else {
-        const roleId = formState.id || selectedRole?.id;
-
-        if (!roleId) {
-          throw new Error('No se encontro el identificador del rol a editar.');
-        }
-
-        const payload: UpdateRoleInput = {
-          id: roleId,
-          name: formState.name,
-          description: formState.description,
-          active: formState.active,
-        };
-
-        const response = await updateRole(payload);
-        toast.success(response.message || 'Rol actualizado.');
-      }
-      setDialogOpen(false);
-    } catch (error) {
-      toast.error(getApolloErrorMessage(error));
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!selectedRole) return;
-
-    try {
-      const response = await deleteRole(selectedRole.id);
-      toast.success(response.message || 'Rol eliminado.');
-      setDeleteOpen(false);
-      setSelectedId('');
-    } catch (error) {
-      toast.error(getApolloErrorMessage(error));
-    }
-  };
-
-  const handleAssignPermissions = async () => {
-    if (!selectedRole || assignIds.length === 0) return;
-
-    try {
-      const response = await addPermissionsToRole(selectedRole.id, assignIds);
-      toast.success(response.message || 'Permisos asignados.');
-      setAssignIds([]);
-    } catch (error) {
-      toast.error(getApolloErrorMessage(error));
-    }
-  };
-
-  const handleRemovePermissions = async () => {
-    if (!selectedRole || removeIds.length === 0) return;
-
-    try {
-      const response = await removePermissionsFromRole(
-        selectedRole.id,
-        removeIds,
-      );
-      toast.success(response.message || 'Permisos removidos.');
-      setRemoveIds([]);
-    } catch (error) {
-      toast.error(getApolloErrorMessage(error));
-    }
-  };
+    rolesQuery, roles, permissions, selectedId, setSelectedId, dialogMode,
+    dialogOpen, setDialogOpen, deleteOpen, setDeleteOpen, assignIds, setAssignIds,
+    removeIds, setRemoveIds, formState, setFormState, selectedRole, assignedPermissions,
+    openCreate, openEdit, handleSave, handleDelete, handleSavePermissions,
+    createState, updateState, deleteState, addPermissionsState, removePermissionsState,
+  } = useRolesPage();
 
   return (
     <div className="space-y-6">
@@ -236,17 +84,14 @@ const RolesPageContent: React.FC = () => {
             selectedRole={selectedRole}
             permissions={permissions}
             assignedPermissions={assignedPermissions}
-            availablePermissions={availablePermissions}
             assignIds={assignIds}
             removeIds={removeIds}
             onAssignIdsChange={setAssignIds}
             onRemoveIdsChange={setRemoveIds}
             onEdit={openEdit}
             onDelete={() => setDeleteOpen(true)}
-            onAssignPermissions={() => void handleAssignPermissions()}
-            onRemovePermissions={() => void handleRemovePermissions()}
-            addPermissionsLoading={addPermissionsState.loading}
-            removePermissionsLoading={removePermissionsState.loading}
+            onSavePermissions={() => void handleSavePermissions()}
+            permissionsLoading={addPermissionsState.loading || removePermissionsState.loading}
           />
         </SectionCard>
       </div>
@@ -285,10 +130,4 @@ const RolesPageContent: React.FC = () => {
   );
 };
 
-class RolesPage extends React.Component {
-  render() {
-    return <RolesPageContent />;
-  }
-}
-
-export default RolesPage;
+export default RolesPageContent;

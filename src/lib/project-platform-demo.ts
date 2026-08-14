@@ -179,6 +179,7 @@ export const priorityLabels: Record<TaskPriority, string> = {
   low: 'Low',
   medium: 'Medium',
   high: 'High',
+  urgent: 'Urgent',
   critical: 'Critical',
 };
 

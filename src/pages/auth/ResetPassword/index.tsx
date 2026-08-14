@@ -199,10 +199,4 @@ const ResetPasswordContent: React.FC = () => {
   );
 };
 
-class ResetPassword extends React.Component {
-  render() {
-    return <ResetPasswordContent />;
-  }
-}
-
-export default ResetPassword;
+export default ResetPasswordContent;

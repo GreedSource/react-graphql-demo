@@ -708,6 +708,969 @@ actions.read
 permissions.read
 ```
 
+## Frontend Integration Reference
+
+Esta seccion consolida los contratos que el frontend debe conocer para integrar todos los flujos funcionales del backend.
+La API es schema-first con Ariadne, por lo que los nombres de operaciones, inputs y campos deben respetarse exactamente como estan definidos aqui.
+
+### Reglas Generales de Cliente
+
+- Todas las operaciones GraphQL usan `POST /graphql`, excepto suscripciones que usan `WS /graphql`.
+- Enviar `Authorization: Bearer <accessToken>` en queries y mutations protegidas.
+- Guardar `accessToken`, `refreshToken` y `user` despues de `login`, `register` o `refreshToken`.
+- Los `ID` GraphQL deben tratarse como `string` en frontend.
+- Los campos `DateTime` deben enviarse y mostrarse como ISO 8601.
+- Los campos opcionales que no cambian en updates deben omitirse; no enviar `null` salvo que el flujo quiera limpiar el dato y backend lo soporte.
+- Los permisos visibles en UI salen de `user.role.permissions` como pares `{ type, action }`.
+- La UI puede ocultar acciones por permisos, pero el backend sigue siendo la fuente de autorizacion.
+
+Ejemplo de normalizacion de permisos:
+
+```ts
+type BackendPermission = { type: string; action: string };
+
+export function toPermissionKeys(permissions: BackendPermission[] = []) {
+  return new Set(permissions.map((permission) => `${permission.type}.${permission.action}`));
+}
+
+export function can(permissionKeys: Set<string>, permission: string) {
+  return permissionKeys.has(permission);
+}
+```
+
+### Operaciones Publicas
+
+Estas operaciones no requieren permiso RBAC.
+
+```graphql
+mutation Register($input: RegisterInput!) {
+  register(input: $input) {
+    status
+    message
+    data {
+      accessToken
+      refreshToken
+      user {
+        id
+        name
+        lastname
+        email
+        role { id name permissions { type action } }
+      }
+    }
+  }
+}
+```
+
+Variables:
+
+```json
+{
+  "input": {
+    "name": "Ana",
+    "lastname": "Lopez",
+    "email": "ana@example.com",
+    "password": "secret123",
+    "confirmPassword": "secret123"
+  }
+}
+```
+
+```graphql
+mutation Login($input: LoginInput!) {
+  login(input: $input) {
+    status
+    message
+    data {
+      accessToken
+      refreshToken
+      user {
+        id
+        name
+        lastname
+        email
+        role { id name permissions { type action } }
+      }
+    }
+  }
+}
+```
+
+```graphql
+mutation RefreshToken($refreshToken: String!) {
+  refreshToken(refreshToken: $refreshToken) {
+    status
+    message
+    data {
+      accessToken
+      refreshToken
+      user {
+        id
+        name
+        lastname
+        email
+        role { id name permissions { type action } }
+      }
+    }
+  }
+}
+```
+
+```graphql
+mutation RecoverPassword($email: String!) {
+  recoverPassword(email: $email) { status message data }
+}
+```
+
+```graphql
+mutation ResetPassword($input: ResetPasswordInput!) {
+  resetPassword(input: $input) { status message data }
+}
+```
+
+```graphql
+mutation Logout {
+  logout { status message data }
+}
+```
+
+Flujo frontend esperado:
+
+- `login/register`: persistir tokens y usuario, precargar permisos, redirigir a dashboard.
+- `refreshToken`: ejecutar cuando una operacion responde `UNAUTHORIZED`; si falla, limpiar sesion y redirigir a login.
+- `recoverPassword`: mostrar estado neutral aunque el email no exista, para evitar enumeracion.
+- `resetPassword`: tomar `token` desde la URL enviada por correo y solicitar `password` + `confirmPassword`.
+- `logout`: llamar mutation si hay sesion, limpiar almacenamiento local y cerrar conexiones WebSocket.
+
+### Operaciones Protegidas
+
+```graphql
+query Profile {
+  profile {
+    status
+    message
+    data {
+      id
+      name
+      lastname
+      email
+      role { id name permissions { type action } }
+    }
+  }
+}
+```
+
+`profile` requiere usuario autenticado. Debe usarse al restaurar sesion o al abrir la aplicacion si hay token persistido.
+
+## GraphQL Operation Matrix
+
+Esta matriz debe usarse para guards de rutas, visibilidad de botones, estados disabled y mensajes de acceso denegado.
+
+| Dominio | Operacion | Tipo | Permiso |
+|---------|-----------|------|---------|
+| Auth | `register` | Mutation | Publica |
+| Auth | `login` | Mutation | Publica |
+| Auth | `refreshToken` | Mutation | Publica |
+| Auth | `recoverPassword` | Mutation | Publica |
+| Auth | `resetPassword` | Mutation | Publica |
+| Auth | `logout` | Mutation | Publica |
+| Auth | `profile` | Query | Autenticado |
+| Users | `users` | Query | `users.read` |
+| Users | `user` | Query | `users.read` |
+| Users | `updateUser` | Mutation | `users.update` |
+| Users | `deleteUser` | Mutation | `users.delete` |
+| Users | `userUpdated` | Subscription | Autenticado por contexto WS |
+| Roles | `roles` | Query | `roles.read` |
+| Roles | `role` | Query | `roles.read` |
+| Roles | `createRole` | Mutation | `roles.create` |
+| Roles | `updateRole` | Mutation | `roles.update` |
+| Roles | `deleteRole` | Mutation | `roles.delete` |
+| Roles | `addPermissionsToRole` | Mutation | `roles.update` |
+| Roles | `removePermissionsFromRole` | Mutation | `roles.update` |
+| Modules | `modules` | Query | `modules.read` |
+| Modules | `module` | Query | `modules.read` |
+| Modules | `createModule` | Mutation | `modules.create` |
+| Modules | `updateModule` | Mutation | `modules.update` |
+| Actions | `actions` | Query | `actions.read` |
+| Actions | `createAction` | Mutation | `actions.create` |
+| Permissions | `permissions` | Query | `permissions.read` |
+| Permissions | `createPermission` | Mutation | `permissions.create` |
+| Permissions | `deletePermission` | Mutation | `permissions.delete` |
+| Projects | `projects` | Query | `projects.read` |
+| Projects | `project` | Query | `projects.read` + autorizacion por recurso |
+| Projects | `createProject` | Mutation | `projects.create` |
+| Projects | `updateProject` | Mutation | `projects.update` + autorizacion por recurso |
+| Projects | `archiveProject` | Mutation | `projects.archive` + autorizacion por recurso |
+| Projects | `deleteProject` | Mutation | `projects.delete` + autorizacion por recurso |
+| Tasks | `tasks` | Query | `tasks.read` + autorizacion por proyecto cuando aplica |
+| Tasks | `task` | Query | `tasks.read` + autorizacion por recurso |
+| Tasks | `createTask` | Mutation | `tasks.create` |
+| Tasks | `updateTask` | Mutation | `tasks.update` + autorizacion por recurso |
+| Tasks | `assignTask` | Mutation | `tasks.assign` + autorizacion por recurso |
+| Tasks | `completeTask` | Mutation | `tasks.complete` + autorizacion por recurso |
+| Tasks | `deleteTask` | Mutation | `tasks.delete` + autorizacion por recurso |
+| Members | `projectMembers` | Query | `members.read` |
+| Members | `addProjectMember` | Mutation | `members.manage` |
+| Members | `updateProjectMemberRole` | Mutation | `members.manage` |
+| Members | `removeProjectMember` | Mutation | `members.manage` |
+| Audit | `auditLogs` | Query | `activity.read` |
+
+## Auth And Session Flow
+
+Pantallas requeridas:
+
+- Login
+- Registro
+- Recuperar password
+- Resetear password
+- Perfil/sesion
+- Logout
+
+Estados que debe manejar la UI:
+
+- `loading`: envio de formulario o restauracion de sesion.
+- `authenticated`: hay `accessToken` valido y `profile` responde correctamente.
+- `refreshing`: se esta renovando el token.
+- `anonymous`: no hay sesion o refresh fallo.
+- `forbidden`: sesion valida sin permiso para una ruta.
+
+Estrategia recomendada:
+
+```ts
+async function executeWithRefresh(operation: () => Promise<unknown>) {
+  try {
+    return await operation();
+  } catch (error) {
+    if (!isUnauthorized(error)) throw error;
+    await refreshAccessToken();
+    return operation();
+  }
+}
+```
+
+Reglas:
+
+- Nunca usar `refreshToken` como bearer token.
+- Si `refreshToken` falla, limpiar almacenamiento y cerrar WebSocket.
+- Rehidratar usuario con `profile` al cargar la app, porque el rol o permisos pueden haber cambiado.
+- Si `profile` devuelve `FORBIDDEN` o `UNAUTHORIZED`, tratarlo como sesion invalida.
+
+## Users Flow
+
+Pantallas esperadas:
+
+- Lista de usuarios.
+- Detalle de usuario.
+- Edicion basica de usuario.
+- Asignacion de rol.
+- Eliminacion/desactivacion segun comportamiento backend.
+
+Queries y mutations:
+
+```graphql
+query Users {
+  users {
+    status
+    message
+    data {
+      id
+      name
+      lastname
+      email
+      role { id name description active permissions { type action } }
+    }
+  }
+}
+```
+
+```graphql
+query User($id: ID!) {
+  user(id: $id) {
+    status
+    message
+    data {
+      id
+      name
+      lastname
+      email
+      role { id name permissions { type action } }
+    }
+  }
+}
+```
+
+```graphql
+mutation UpdateUser($input: UpdateUserInput!) {
+  updateUser(input: $input) {
+    status
+    message
+    data { id name lastname email role { id name } }
+  }
+}
+```
+
+Variables:
+
+```json
+{
+  "input": {
+    "id": "user-id",
+    "name": "Ana",
+    "lastname": "Lopez",
+    "roleId": "role-id"
+  }
+}
+```
+
+```graphql
+mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id) { status message data }
+}
+```
+
+UX:
+
+- Mostrar asignacion de rol solo con `users.update` y `roles.read`.
+- Deshabilitar eliminar el propio usuario activo en UI aunque backend sea la autoridad final.
+- Refrescar `profile` si el usuario actual cambia su propio rol o datos.
+
+## Roles And Permissions Flow
+
+Pantallas esperadas:
+
+- Lista de roles.
+- Crear rol.
+- Editar rol.
+- Matriz de permisos por modulo y accion.
+- Agregar/quitar permisos de un rol.
+- Eliminar rol.
+
+Queries y mutations:
+
+```graphql
+query Roles {
+  roles {
+    status
+    message
+    data {
+      id
+      name
+      description
+      active
+      permissions { type action }
+    }
+  }
+}
+```
+
+```graphql
+query Role($id: ID!) {
+  role(id: $id) {
+    status
+    message
+    data {
+      id
+      name
+      description
+      active
+      permissions { type action }
+    }
+  }
+}
+```
+
+```graphql
+mutation CreateRole($input: CreateRoleInput!) {
+  createRole(input: $input) {
+    status
+    message
+    data { id name description active permissions { type action } }
+  }
+}
+```
+
+```graphql
+mutation UpdateRole($input: UpdateRoleInput!) {
+  updateRole(input: $input) {
+    status
+    message
+    data { id name description active permissions { type action } }
+  }
+}
+```
+
+```graphql
+mutation DeleteRole($id: ID!) {
+  deleteRole(id: $id) { status message data }
+}
+```
+
+```graphql
+mutation AddPermissionsToRole($roleId: ID!, $permissionIds: [ID!]!) {
+  addPermissionsToRole(roleId: $roleId, permissionIds: $permissionIds) {
+    status
+    message
+    data
+  }
+}
+```
+
+```graphql
+mutation RemovePermissionsFromRole($roleId: ID!, $permissionIds: [ID!]!) {
+  removePermissionsFromRole(roleId: $roleId, permissionIds: $permissionIds) {
+    status
+    message
+    data
+  }
+}
+```
+
+Variables para matriz:
+
+```json
+{
+  "roleId": "role-id",
+  "permissionIds": ["permission-id-1", "permission-id-2"]
+}
+```
+
+UX:
+
+- Construir la matriz usando `modules`, `actions` y `permissions`.
+- Usar `Permission.id` para asignar/quitar permisos, no `moduleKey.actionKey`.
+- Mostrar `moduleKey.actionKey` como etiqueta legible para frontend.
+- Despues de cambiar permisos de un rol, refrescar `roles` y `profile` si el rol afectado es el del usuario actual.
+
+## Modules, Actions And Permission Catalog Flow
+
+Estas pantallas son de administracion avanzada. Deben protegerse con permisos especificos porque modifican el catalogo base de RBAC.
+
+```graphql
+query Modules {
+  modules {
+    status
+    message
+    data { id name key description active }
+  }
+}
+```
+
+```graphql
+query Module($id: ID!) {
+  module(id: $id) {
+    status
+    message
+    data { id name key description active }
+  }
+}
+```
+
+```graphql
+mutation CreateModule($input: CreateModuleInput!) {
+  createModule(input: $input) {
+    status
+    message
+    data { id name key description active }
+  }
+}
+```
+
+```graphql
+mutation UpdateModule($input: UpdateModuleInput!) {
+  updateModule(input: $input) {
+    status
+    message
+    data { id name key description active }
+  }
+}
+```
+
+```graphql
+query Actions {
+  actions {
+    status
+    message
+    data { id name key description active }
+  }
+}
+```
+
+```graphql
+mutation CreateAction($input: CreateActionInput!) {
+  createAction(input: $input) {
+    status
+    message
+    data { id name key description active }
+  }
+}
+```
+
+```graphql
+query Permissions {
+  permissions {
+    status
+    message
+    data {
+      id
+      description
+      moduleId
+      actionId
+      moduleKey
+      actionKey
+    }
+  }
+}
+```
+
+```graphql
+mutation CreatePermission($input: CreatePermissionInput!) {
+  createPermission(input: $input) {
+    status
+    message
+    data { id description moduleId actionId moduleKey actionKey }
+  }
+}
+```
+
+```graphql
+mutation DeletePermission($id: ID!) {
+  deletePermission(id: $id)
+}
+```
+
+UX:
+
+- `module.key` y `action.key` deben tratarse como claves tecnicas estables.
+- Antes de borrar permisos, mostrar confirmacion porque puede afectar roles existentes.
+- No existe mutation `updateAction` en el contrato actual aunque existe `UpdateActionInput`; frontend no debe implementarla hasta que backend la exponga.
+
+## Project Workspace Flow
+
+Pantallas esperadas:
+
+- Lista de proyectos.
+- Detalle de proyecto.
+- Crear proyecto.
+- Editar proyecto.
+- Archivar proyecto.
+- Eliminar proyecto.
+- Tabs internos: tareas, miembros, actividad contextual si se agrega filtrado futuro.
+
+Queries y mutations:
+
+```graphql
+query Projects($includeArchived: Boolean) {
+  projects(includeArchived: $includeArchived) {
+    status
+    message
+    data {
+      id
+      name
+      description
+      status
+      ownerId
+      archivedAt
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+```graphql
+query Project($id: ID!) {
+  project(id: $id) {
+    status
+    message
+    data {
+      id
+      name
+      description
+      status
+      ownerId
+      archivedAt
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+```graphql
+mutation CreateProject($input: CreateProjectInput!) {
+  createProject(input: $input) {
+    status
+    message
+    data { id name description status ownerId archivedAt createdAt updatedAt }
+  }
+}
+```
+
+```graphql
+mutation UpdateProject($input: UpdateProjectInput!) {
+  updateProject(input: $input) {
+    status
+    message
+    data { id name description status ownerId archivedAt createdAt updatedAt }
+  }
+}
+```
+
+```graphql
+mutation ArchiveProject($id: ID!) {
+  archiveProject(id: $id) {
+    status
+    message
+    data { id name status archivedAt updatedAt }
+  }
+}
+```
+
+```graphql
+mutation DeleteProject($id: ID!) {
+  deleteProject(id: $id) { status message data }
+}
+```
+
+Variables:
+
+```json
+{
+  "input": {
+    "name": "Project A",
+    "description": "Internal delivery workspace",
+    "ownerId": "user-id"
+  }
+}
+```
+
+UX:
+
+- `includeArchived: false` debe ser el default visual.
+- Mostrar proyectos archivados en filtro separado.
+- Bloquear edicion de proyectos archivados salvo acciones de administracion que el backend permita.
+- Mostrar estados de recurso denegado como `FORBIDDEN`, no como proyecto inexistente.
+- La autorizacion por recurso puede negar acciones aunque el usuario tenga permiso global.
+
+## Task Management Flow
+
+Pantallas esperadas:
+
+- Lista de tareas global o por proyecto.
+- Kanban/lista por `status`.
+- Crear tarea.
+- Editar tarea.
+- Asignar responsable.
+- Completar tarea.
+- Eliminar tarea.
+
+Queries y mutations:
+
+```graphql
+query Tasks($projectId: ID) {
+  tasks(projectId: $projectId) {
+    status
+    message
+    data {
+      id
+      projectId
+      title
+      description
+      status
+      priority
+      assigneeId
+      createdById
+      dueDate
+      completedAt
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+```graphql
+query Task($id: ID!) {
+  task(id: $id) {
+    status
+    message
+    data {
+      id
+      projectId
+      title
+      description
+      status
+      priority
+      assigneeId
+      createdById
+      dueDate
+      completedAt
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+```graphql
+mutation CreateTask($input: CreateTaskInput!) {
+  createTask(input: $input) {
+    status
+    message
+    data {
+      id
+      projectId
+      title
+      description
+      status
+      priority
+      assigneeId
+      createdById
+      dueDate
+      completedAt
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+```graphql
+mutation UpdateTask($input: UpdateTaskInput!) {
+  updateTask(input: $input) {
+    status
+    message
+    data { id title description status priority assigneeId dueDate completedAt updatedAt }
+  }
+}
+```
+
+```graphql
+mutation AssignTask($id: ID!, $assigneeId: ID!) {
+  assignTask(id: $id, assigneeId: $assigneeId) {
+    status
+    message
+    data { id assigneeId updatedAt }
+  }
+}
+```
+
+```graphql
+mutation CompleteTask($id: ID!) {
+  completeTask(id: $id) {
+    status
+    message
+    data { id status completedAt updatedAt }
+  }
+}
+```
+
+```graphql
+mutation DeleteTask($id: ID!) {
+  deleteTask(id: $id) { status message data }
+}
+```
+
+UX:
+
+- Usar `tasks(projectId)` dentro del detalle de proyecto.
+- Usar `tasks` sin `projectId` solo en vistas globales.
+- Filtrar o agrupar por `status`: `todo`, `in_progress`, `blocked`, `done`.
+- Mostrar prioridad con orden visual: `urgent`, `high`, `medium`, `low`.
+- La asignacion debe cargar candidatos desde `users` y, para contexto de proyecto, desde `projectMembers`.
+- `completeTask` debe ser una accion rapida visible solo con `tasks.complete`.
+- Si una tarea requiere ownership o membresia, backend puede responder `FORBIDDEN` aunque el permiso global exista.
+
+## Project Members Flow
+
+Pantallas esperadas:
+
+- Lista de miembros por proyecto.
+- Agregar miembro.
+- Cambiar rol de miembro.
+- Remover miembro.
+
+Queries y mutations:
+
+```graphql
+query ProjectMembers($projectId: ID!) {
+  projectMembers(projectId: $projectId) {
+    status
+    message
+    data {
+      id
+      projectId
+      userId
+      projectRoleId
+      projectRole { id name description active }
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+```graphql
+mutation AddProjectMember($input: AddProjectMemberInput!) {
+  addProjectMember(input: $input) {
+    status
+    message
+    data {
+      id
+      projectId
+      userId
+      projectRoleId
+      projectRole { id name }
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+```graphql
+mutation UpdateProjectMemberRole($input: UpdateProjectMemberRoleInput!) {
+  updateProjectMemberRole(input: $input) {
+    status
+    message
+    data {
+      id
+      projectId
+      userId
+      projectRoleId
+      projectRole { id name }
+      updatedAt
+    }
+  }
+}
+```
+
+```graphql
+mutation RemoveProjectMember($id: ID!) {
+  removeProjectMember(id: $id) { status message data }
+}
+```
+
+Variables:
+
+```json
+{
+  "input": {
+    "projectId": "project-id",
+    "userId": "user-id",
+    "projectRoleId": "project-role-id"
+  }
+}
+```
+
+UX:
+
+- Cargar `users` para seleccionar usuario.
+- Usar `projectMembers(projectId)` para evitar agregar duplicados.
+- Mostrar `projectRole.name` como rol contextual del proyecto.
+- Los roles de proyecto son distintos de `User.role`; `User.role` es RBAC global, `ProjectMember.projectRole` es autorizacion contextual.
+
+## Audit Flow
+
+Pantalla esperada:
+
+- Registro de actividad administrativo.
+
+```graphql
+query AuditLogs($limit: Int) {
+  auditLogs(limit: $limit) {
+    status
+    message
+    data {
+      id
+      userId
+      module
+      action
+      resourceType
+      resourceId
+      status
+      metadata
+      createdAt
+    }
+  }
+}
+```
+
+UX:
+
+- Default recomendado: `limit: 100`.
+- Renderizar `metadata` como JSON expandible o tabla key-value.
+- Permitir filtros client-side por `module`, `action`, `status`, `resourceType` y `userId`.
+- No mostrar esta pantalla sin `activity.read`.
+
+## WebSocket And Subscriptions
+
+Endpoint:
+
+```text
+ws://<host>/graphql
+wss://<host>/graphql
+```
+
+Subscription disponible para usuario:
+
+```graphql
+subscription UserUpdated($userId: ID!) {
+  userUpdated(userId: $userId) {
+    id
+    name
+    lastname
+    email
+    role { id name permissions { type action } }
+  }
+}
+```
+
+Uso recomendado:
+
+- Abrir la suscripcion solo cuando haya sesion autenticada.
+- Pasar el token en el mecanismo de connection params del cliente GraphQL usado por frontend.
+- Suscribirse al `userId` del usuario actual para detectar cambios de perfil o permisos.
+- Al recibir evento, reemplazar el usuario local y recalcular `permissionKeys`.
+- Cerrar la conexion en logout o cuando falle refresh token.
+
+Nota:
+
+- `hello` y su subscription asociada son diagnosticas/desarrollo; no son parte de los flujos de producto.
+
+## Error Handling For All Flows
+
+Mapeo recomendado:
+
+| Codigo | UI esperada |
+|--------|-------------|
+| `UNAUTHORIZED` | Intentar refresh; si falla, redirect a login |
+| `FORBIDDEN` | Mostrar pantalla 403 o toast de accion no permitida |
+| `NOT_FOUND` | Mostrar empty state de recurso inexistente |
+| `BAD_REQUEST` | Mostrar errores de validacion del formulario |
+| `CONFLICT` | Mostrar conflicto de dato duplicado o estado invalido |
+| `INTERNAL_SERVER_ERROR` | Mostrar mensaje generico y registrar detalle tecnico |
+
+Reglas:
+
+- No depender solamente de `status`; revisar `errors[].extensions.code` cuando GraphQL devuelva errores.
+- Una respuesta con `data: null` en un campo nullable puede significar recurso inexistente o error controlado; revisar `message`.
+- En mutations exitosas, usar `data` de la respuesta para actualizar cache local.
+
+## Recommended Integration Order
+
+1. Cliente GraphQL HTTP con bearer token.
+2. Login, refresh token, logout y restauracion con `profile`.
+3. Normalizador de permisos y guards de rutas.
+4. Pantallas base de usuarios y roles.
+5. Catalogos RBAC: modules, actions, permissions.
+6. Matriz de permisos por rol.
+7. Projects list/detail/create/update/archive/delete.
+8. Project members.
+9. Tasks por proyecto y vista global.
+10. Audit logs.
+11. WebSocket `userUpdated` para cambios de usuario/permisos en vivo.
+
 ## Suggested Frontend Route Guards
 
 Map pages to permissions:

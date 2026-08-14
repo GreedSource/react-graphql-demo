@@ -9,7 +9,7 @@ const MobileToggle: React.FC<MobileToggleProps> = ({ isOpen, onToggle }) => {
   return (
     <button
       onClick={onToggle}
-      className="fixed left-4 top-4 z-50 rounded-xl bg-slate-900 p-2 text-white shadow-lg transition-all duration-200 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 lg:hidden"
+      className="fixed left-4 top-4 z-50 rounded-lg border border-border bg-surface-card p-2 text-text shadow-lg shadow-black/10 transition-all duration-200 hover:bg-surface-card-hover active:scale-95 lg:hidden"
       aria-label="Toggle sidebar"
     >
       <svg

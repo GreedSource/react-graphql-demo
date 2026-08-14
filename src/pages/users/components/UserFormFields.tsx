@@ -1,13 +1,6 @@
 import type * as React from 'react';
 import { MenuItem, TextField } from '@mui/material';
-import type { UpdateUserInput } from '@/types/admin';
-
-interface UserFormFieldsProps {
-  formState: UpdateUserInput;
-  formErrors: Partial<Record<'name' | 'lastname', string>>;
-  roles: Array<{ id: string; name: string }>;
-  onChange: (state: UpdateUserInput) => void;
-}
+import type { UserFormFieldsProps } from '../types';
 
 const UserFormFields: React.FC<UserFormFieldsProps> = ({
   formState,

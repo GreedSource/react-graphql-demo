@@ -2,19 +2,7 @@ import type * as React from 'react';
 import { Button } from '@mui/material';
 import { StateCard } from '@/components/ui/StateCard';
 import { StatusChip } from '@/components/ui/StatusChip';
-
-interface ModuleDetailPanelProps {
-  selectedModule:
-    | {
-        id: string;
-        name: string;
-        key: string;
-        active: boolean;
-        description?: string | null;
-      }
-    | undefined;
-  onEdit: () => void;
-}
+import type { ModuleDetailPanelProps } from '../types';
 
 const ModuleDetailPanel: React.FC<ModuleDetailPanelProps> = ({
   selectedModule,

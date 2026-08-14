@@ -2,21 +2,21 @@ import type * as React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import PageTransition from '../components/ui/PageTransition';
 
 const MainLayout: React.FC = () => {
   return (
-    <div className="flex h-screen bg-gradient-to-b from-surface-elevated to-surface transition-colors duration-300">
+    <div className="app-surface flex h-screen text-text transition-colors duration-300">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <PageTransition>
-            <Outlet />
-          </PageTransition>
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-[1560px] px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
+            <PageTransition>
+              <Outlet />
+            </PageTransition>
+          </div>
         </main>
-        <Footer />
       </div>
     </div>
   );

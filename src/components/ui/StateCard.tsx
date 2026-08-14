@@ -20,19 +20,19 @@ export const StateCard: React.FC<StateCardProps> = ({
   loading = false,
 }) => {
   return (
-    <div className="rounded-3xl border border-border bg-surface-card/90 p-6 shadow-sm transition-colors duration-300">
-      <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-elevated text-text">
-          {loading ? <CircularProgress size={20} color="inherit" /> : icon}
-        </div>
-        <div className="flex-1 space-y-2">
-          <h3 className="text-lg font-semibold text-text">{title}</h3>
-          <p className="text-sm text-text-secondary">{description}</p>
+    <div className="bg-surface-card p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-xs font-semibold uppercase text-text-muted">{description}</p>
+          <h3 className="text-3xl font-semibold leading-tight text-text">{title}</h3>
           {actionLabel && onAction ? (
             <Button variant="outlined" onClick={onAction}>
               {actionLabel}
             </Button>
           ) : null}
+        </div>
+        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-accent-soft text-accent">
+          {loading ? <CircularProgress size={20} color="inherit" /> : icon}
         </div>
       </div>
     </div>

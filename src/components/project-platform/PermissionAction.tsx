@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import { Button, Tooltip } from '@mui/material';
+import type { ButtonProps } from '@mui/material';
 import { usePermission } from '@/lib/permissions';
 
 interface PermissionActionProps {
@@ -8,6 +9,11 @@ interface PermissionActionProps {
   children: ReactNode;
   variant?: 'text' | 'outlined' | 'contained';
   disabledLabel?: string;
+  startIcon?: ReactNode;
+  endIcon?: ReactNode;
+  fullWidth?: boolean;
+  onClick?: ButtonProps['onClick'];
+  type?: ButtonProps['type'];
 }
 
 export const PermissionAction: React.FC<PermissionActionProps> = ({
@@ -15,14 +21,28 @@ export const PermissionAction: React.FC<PermissionActionProps> = ({
   children,
   variant = 'outlined',
   disabledLabel = 'No tienes permiso para realizar esta accion en este proyecto',
+  startIcon,
+  endIcon,
+  fullWidth = false,
+  onClick,
+  type = 'button',
 }) => {
   const { can } = usePermission();
   const allowed = can(permission);
 
   return (
     <Tooltip title={allowed ? permission : disabledLabel}>
-      <span>
-        <Button disabled={!allowed} size="small" variant={variant}>
+      <span className={fullWidth ? 'block w-full' : undefined}>
+        <Button
+          disabled={!allowed}
+          endIcon={endIcon}
+          fullWidth={fullWidth}
+          size="small"
+          startIcon={startIcon}
+          onClick={onClick}
+          type={type}
+          variant={variant}
+        >
           {children}
         </Button>
       </span>

@@ -121,10 +121,4 @@ const WelcomePageContent: React.FC = () => {
   );
 };
 
-class WelcomePage extends React.Component {
-  render() {
-    return <WelcomePageContent />;
-  }
-}
-
-export default WelcomePage;
+export default WelcomePageContent;

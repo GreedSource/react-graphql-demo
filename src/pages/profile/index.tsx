@@ -94,10 +94,4 @@ const ProfilePageContent: React.FC = () => {
   );
 };
 
-class ProfilePage extends React.Component {
-  render() {
-    return <ProfilePageContent />;
-  }
-}
-
-export default ProfilePage;
+export default ProfilePageContent;

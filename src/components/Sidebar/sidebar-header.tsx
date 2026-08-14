@@ -23,19 +23,22 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 
   return (
     <div style={animationStyle}>
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/20 text-lg font-bold text-sky-600 dark:text-sky-300 transition-all duration-200 hover:scale-105 hover:bg-sky-500/30">
-          GA
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-text-muted">
-            Control center
-          </p>
-          <span className="text-xl font-semibold text-slate-900 dark:text-white">
-            {APP_CONFIG.name || 'GraphQL Admin'}
-          </span>
+      <div className="mb-5 px-2 pt-2">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-teal-400 text-sm font-black text-slate-950">
+            P
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
+              Control center
+            </p>
+            <span className="block truncate text-base font-semibold text-white">
+              {APP_CONFIG.name || 'RBAC Platform'}
+            </span>
+          </div>
         </div>
       </div>
+      <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white/35">Workspace</p>
       <SidebarRoutes />
     </div>
   );

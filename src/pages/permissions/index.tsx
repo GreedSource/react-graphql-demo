@@ -215,10 +215,4 @@ const PermissionsPageContent: React.FC = () => {
   );
 };
 
-class PermissionsPage extends React.Component {
-  render() {
-    return <PermissionsPageContent />;
-  }
-}
-
-export default PermissionsPage;
+export default PermissionsPageContent;

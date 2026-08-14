@@ -1,129 +1,36 @@
 import * as React from 'react';
-import { Assignment, History, Warning, Workspaces } from '@mui/icons-material';
+import { ArrowForwardRounded, AssignmentRounded, ErrorOutlineRounded, FolderRounded, HistoryRounded } from '@mui/icons-material';
 import { Alert, Button, LinearProgress } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useProfileQuery } from '@/hooks/auth.hook';
-import { usePermission } from '@/lib/permissions';
-import { PageHeader } from '@/components/ui/PageHeader';
-import { SectionCard } from '@/components/ui/SectionCard';
-import { StateCard } from '@/components/ui/StateCard';
-import { getApolloErrorMessage } from '@/lib/graphql';
+import { useProjects } from '@/hooks/project.hook';
+import { useTasks } from '@/hooks/task.hook';
+import { useAuditLogs } from '@/hooks/audit.hook';
 import { PermissionAction } from '@/components/project-platform/PermissionAction';
-import {
-  ProjectRoleChip,
-  ProjectStatusChip,
-  TaskStatusChip,
-} from '@/components/project-platform/ProjectBadges';
-import {
-  auditEvents,
-  getProjectName,
-  projects,
-  tasks,
-} from '@/lib/project-platform-demo';
+import { PriorityChip, TaskStatusChip } from '@/components/project-platform/ProjectBadges';
+import { getApolloErrorMessage } from '@/lib/graphql';
 
 const HomePageContent: React.FC = () => {
+  const navigate = useNavigate();
   const profileQuery = useProfileQuery();
-  const { can } = usePermission();
-
+  const projectsQuery = useProjects();
+  const tasksQuery = useTasks();
+  const auditQuery = useAuditLogs(10);
   const profile = profileQuery.data?.profile?.data;
-  const assignedTasks = tasks.filter((task) => task.assignee === 'Joel Alvarez');
-  const blockedTasks = tasks.filter((task) => task.status === 'blocked');
-  const visibleProjects = can('projects.read') ? projects : [];
-
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        eyebrow="Project platform"
-        title={`Hola${profile ? `, ${profile.name}` : ''}`}
-        description="Gestiona proyectos, tareas, miembros y auditoria con acciones condicionadas por permisos globales y contexto de proyecto."
-        actions={
-          <div className="flex flex-wrap gap-3">
-            <PermissionAction permission="projects.create" variant="contained">
-              Nuevo proyecto
-            </PermissionAction>
-            <Button component={Link} to="/projects" variant="outlined">
-              Ver proyectos
-            </Button>
-          </div>
-        }
-      />
-
-      {profileQuery.error ? (
-        <Alert severity="warning">
-          {getApolloErrorMessage(profileQuery.error)}
-        </Alert>
-      ) : null}
-
-      <div className="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
-        <StateCard title={String(visibleProjects.length)} description="Proyectos activos" icon={<Workspaces />} />
-        <StateCard title={String(assignedTasks.length)} description="Tareas asignadas" icon={<Assignment />} />
-        <StateCard title={String(blockedTasks.length)} description="Atrasadas o bloqueadas" icon={<Warning />} />
-        <StateCard title={String(auditEvents.length)} description="Actividad reciente" icon={<History />} />
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <SectionCard
-          title="Proyectos por contexto"
-          description="El mismo usuario conserva la sesion, pero cambia sus capacidades segun el proyecto seleccionado."
-        >
-          <div className="space-y-3">
-            {visibleProjects.map((project) => (
-              <Link
-                className="block rounded-lg border border-border p-4 hover:border-accent"
-                key={project.id}
-                to={`/projects/${project.id}`}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h2 className="font-semibold text-text">{project.name}</h2>
-                    <p className="text-sm text-text-secondary">{project.summary}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <ProjectRoleChip role={project.contextualRole} />
-                    <ProjectStatusChip status={project.status} />
-                  </div>
-                </div>
-                <LinearProgress className="mt-4" variant="determinate" value={project.progress} />
-              </Link>
-            ))}
-            {visibleProjects.length === 0 ? (
-              <p className="text-sm text-text-secondary">
-                No tienes permiso projects.read para consultar proyectos.
-              </p>
-            ) : null}
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          title="Tareas y auditoria"
-          description="Acciones ejecutables y denegadas deben seguir manejando FORBIDDEN desde GraphQL."
-        >
-          <div className="space-y-4">
-            {assignedTasks.map((task) => (
-              <div className="rounded-lg border border-border p-3" key={task.id}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium text-text">{task.title}</p>
-                    <p className="text-xs text-text-muted">{getProjectName(task.projectId)}</p>
-                  </div>
-                  <TaskStatusChip status={task.status} />
-                </div>
-              </div>
-            ))}
-            <PermissionAction permission="tasks.complete">
-              Completar seleccionada
-            </PermissionAction>
-          </div>
-        </SectionCard>
-      </div>
+  const projects = projectsQuery.data?.projects?.data ?? [];
+  const tasks = tasksQuery.data?.tasks?.data ?? [];
+  const logs = auditQuery.data?.auditLogs?.data ?? [];
+  const blocked = tasks.filter((task) => task.status === 'blocked');
+  const error = profileQuery.error || projectsQuery.error || tasksQuery.error || auditQuery.error;
+  const projectName = (id: string) => projects.find((project) => project.id === id)?.name ?? 'Proyecto';
+  return <div className="space-y-6">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"><div><p className="mb-1 text-sm font-medium text-accent">Centro de operaciones</p><h1 className="text-3xl font-semibold sm:text-4xl">Buenos dias{profile ? `, ${profile.name}` : ''}.</h1><p className="mt-2 text-sm text-text-secondary">Resumen en tiempo real de proyectos, tareas y auditoria.</p></div><div className="flex gap-2"><Button component={Link} to="/reports" variant="outlined">Ver reporte</Button><PermissionAction permission="projects.create" variant="contained" onClick={() => navigate('/projects?create=1')}>Nuevo proyecto</PermissionAction></div></div>
+    {error ? <Alert severity="error">{getApolloErrorMessage(error)}</Alert> : null}
+    <div className="metric-grid"><div className="bg-surface-card p-5"><FolderRounded className="text-accent" /><p className="mt-3 text-3xl font-semibold">{projects.length}</p><p className="text-xs text-text-muted">Proyectos activos</p></div><div className="bg-surface-card p-5"><AssignmentRounded className="text-sky-600" /><p className="mt-3 text-3xl font-semibold">{tasks.length}</p><p className="text-xs text-text-muted">Tareas totales</p></div><div className="bg-surface-card p-5"><ErrorOutlineRounded className="text-red-500" /><p className="mt-3 text-3xl font-semibold">{blocked.length}</p><p className="text-xs text-text-muted">Bloqueos activos</p></div><div className="bg-surface-card p-5"><HistoryRounded className="text-amber-600" /><p className="mt-3 text-3xl font-semibold">{logs.length}</p><p className="text-xs text-text-muted">Eventos recientes</p></div></div>
+    <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
+      <section className="workspace-card rounded-lg"><div className="flex items-center justify-between border-b border-border p-5"><div><h2 className="font-semibold">Portafolio</h2><p className="text-xs text-text-muted">Proyectos entregados por el backend</p></div><Button component={Link} to="/projects" size="small" endIcon={<ArrowForwardRounded />}>Ver todos</Button></div><div className="divide-y divide-border">{projects.slice(0, 5).map((project) => { const projectTasks = tasks.filter((task) => task.projectId === project.id); const projectDone = projectTasks.filter((task) => task.status === 'done').length; const value = projectTasks.length ? Math.round(projectDone / projectTasks.length * 100) : 0; return <Link className="grid gap-3 p-4 hover:bg-surface-elevated sm:grid-cols-[1fr_180px] sm:items-center" to={`/projects/${project.id}`} key={project.id}><div><p className="font-medium">{project.name}</p><p className="text-xs text-text-muted">{project.description || project.status}</p></div><div><div className="mb-1 flex justify-between text-xs text-text-muted"><span>Avance</span><strong>{value}%</strong></div><LinearProgress variant="determinate" value={value} /></div></Link>; })}</div></section>
+      <section className="workspace-card rounded-lg p-5"><div className="mb-4 flex items-center justify-between"><h2 className="font-semibold">Tareas bloqueadas</h2><Button component={Link} to="/tasks" size="small">Tablero</Button></div><div className="space-y-3">{blocked.slice(0, 5).map((task) => <button className="w-full rounded-md border border-border p-3 text-left hover:bg-surface-elevated" onClick={() => navigate('/tasks')} key={task.id}><div className="flex gap-2"><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{task.title}</p><p className="text-xs text-text-muted">{projectName(task.projectId)}</p></div><PriorityChip priority={task.priority} /><TaskStatusChip status={task.status} /></div></button>)}{!blocked.length ? <p className="py-6 text-center text-sm text-text-muted">No hay tareas bloqueadas.</p> : null}</div></section>
     </div>
-  );
+  </div>;
 };
-
-class HomePage extends React.Component {
-  render() {
-    return <HomePageContent />;
-  }
-}
-
-export default HomePage;
+export default HomePageContent;

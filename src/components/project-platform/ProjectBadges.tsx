@@ -6,11 +6,7 @@ import type {
   TaskPriority,
   TaskStatus,
 } from '@/types/project-platform';
-import {
-  priorityLabels,
-  roleLabels,
-  taskStatusLabels,
-} from '@/lib/project-platform-demo';
+import { priorityLabels, roleLabels, taskStatusLabels } from '@/lib/project-platform-labels';
 
 interface ProjectRoleChipProps {
   role: ProjectRole;
@@ -62,7 +58,7 @@ export const TaskStatusChip: React.FC<TaskStatusChipProps> = ({ status }) => {
 
 export const PriorityChip: React.FC<PriorityChipProps> = ({ priority }) => {
   const color =
-    priority === 'critical'
+    priority === 'critical' || priority === 'urgent'
       ? 'error'
       : priority === 'high'
         ? 'warning'

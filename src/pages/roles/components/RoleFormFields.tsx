@@ -1,11 +1,6 @@
 import type * as React from 'react';
 import { MenuItem, TextField } from '@mui/material';
-import type { CreateRoleInput } from '@/types/admin';
-
-interface RoleFormFieldsProps {
-  formState: CreateRoleInput & { id?: string };
-  onChange: (state: CreateRoleInput & { id?: string }) => void;
-}
+import type { RoleFormFieldsProps } from '../types';
 
 const RoleFormFields: React.FC<RoleFormFieldsProps> = ({
   formState,

@@ -1,13 +1,7 @@
 import type * as React from 'react';
 import { MenuItem, TextField } from '@mui/material';
 import { slugifyKey } from '@/lib/validation';
-import type { CreateModuleInput } from '@/types/admin';
-
-interface ModuleFormFieldsProps {
-  formState: CreateModuleInput & { id?: string };
-  dialogMode: 'create' | 'edit';
-  onChange: (state: CreateModuleInput & { id?: string }) => void;
-}
+import type { ModuleFormFieldsProps } from '../types';
 
 const ModuleFormFields: React.FC<ModuleFormFieldsProps> = ({
   formState,

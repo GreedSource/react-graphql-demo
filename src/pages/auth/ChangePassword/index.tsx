@@ -25,10 +25,4 @@ const ChangePasswordContent: React.FC = () => {
   );
 };
 
-class ChangePassword extends React.Component {
-  render() {
-    return <ChangePasswordContent />;
-  }
-}
-
-export default ChangePassword;
+export default ChangePasswordContent;

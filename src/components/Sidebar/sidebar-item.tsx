@@ -27,13 +27,19 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <Link
       to={to}
-      className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium ${
+      className={`group flex min-h-10 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all ${
         active
-          ? 'bg-sky-500/15 text-sky-700 dark:text-white'
-          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+          ? 'bg-white/12 text-white shadow-sm'
+          : 'text-white/62 hover:bg-white/[0.07] hover:text-white'
       }`}
     >
-      <span className="text-lg transition-transform duration-200 hover:scale-110">
+      <span
+        className={`grid h-6 w-6 place-items-center text-base transition-colors [&_.MuiSvgIcon-root]:text-[19px] ${
+          active
+            ? 'text-teal-300'
+            : 'text-white/42 group-hover:text-white/80'
+        }`}
+      >
         {icon}
       </span>
       <span

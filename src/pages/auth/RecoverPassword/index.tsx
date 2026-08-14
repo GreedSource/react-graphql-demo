@@ -154,10 +154,4 @@ const RecoverPasswordContent: React.FC = () => {
   );
 };
 
-class RecoverPassword extends React.Component {
-  render() {
-    return <RecoverPasswordContent />;
-  }
-}
-
-export default RecoverPassword;
+export default RecoverPasswordContent;

@@ -1,20 +1,7 @@
 import type * as React from 'react';
 import { Button } from '@mui/material';
 import { StateCard } from '@/components/ui/StateCard';
-
-interface UserDetailPanelProps {
-  selectedUser:
-    | {
-        id: string;
-        name: string;
-        lastname: string;
-        email: string;
-        role?: { name: string } | null;
-      }
-    | undefined;
-  onEdit: () => void;
-  onDelete: () => void;
-}
+import type { UserDetailPanelProps } from '../types';
 
 const UserDetailPanel: React.FC<UserDetailPanelProps> = ({
   selectedUser,

@@ -13,14 +13,15 @@ const ThemeToggle: React.FC = () => {
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
       sx={{
         color: 'inherit',
-        bgcolor: 'surface.elevated',
+        border: '1px solid var(--border-primary)',
+        bgcolor: 'var(--bg-card)',
         transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
         '&:hover': {
-          bgcolor: 'surface.card-hover',
-          transform: 'scale(1.08) rotate(15deg)',
+          bgcolor: 'var(--bg-card-hover)',
+          transform: 'translateY(-1px)',
         },
         '&:active': {
-          transform: 'scale(0.95) rotate(0deg)',
+          transform: 'translateY(0)',
         },
       }}
     >

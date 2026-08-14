@@ -15,11 +15,7 @@ import { useAuthActions } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { isValidEmail } from '@/lib/validation';
 import { useUserStore } from '@/stores/user.store';
-
-interface LoginFormState {
-  email: string;
-  password: string;
-}
+import type { LoginFormState } from './types';
 
 const LoginContent: React.FC = () => {
   const navigate = useNavigate();
@@ -261,10 +257,4 @@ const LoginContent: React.FC = () => {
   );
 };
 
-class Login extends React.Component {
-  render() {
-    return <LoginContent />;
-  }
-}
-
-export default Login;
+export default LoginContent;

@@ -171,10 +171,4 @@ const ActionsPageContent: React.FC = () => {
   );
 };
 
-class ActionsPage extends React.Component {
-  render() {
-    return <ActionsPageContent />;
-  }
-}
-
-export default ActionsPage;
+export default ActionsPageContent;

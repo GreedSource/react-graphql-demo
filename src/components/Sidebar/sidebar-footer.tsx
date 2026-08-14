@@ -25,20 +25,25 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({
 
   return (
     <div
-      className="flex items-center gap-3 rounded-3xl border border-slate-200 bg-slate-100 p-4 dark:border-slate-800 dark:bg-slate-900/80 transition-all duration-200 hover:border-slate-300 hover:bg-slate-200 dark:hover:border-slate-700 dark:hover:bg-slate-900"
+      className="rounded-md border border-white/10 bg-white/[0.05] p-3 transition-colors hover:bg-white/[0.08]"
       style={animationStyle}
     >
-      <Avatar
-        alt={`${user?.name} ${user?.lastname}`}
-        src={`https://ui-avatars.com/api/?name=${user?.name}+${user?.lastname}`}
-        sx={{ width: 32, height: 32 }}
-        className="transition-transform duration-200 hover:scale-110"
-      />
-      <div>
-        <p className="text-sm font-medium">
-          {user?.name} {user?.lastname}
-        </p>
-        <p className="text-xs text-text-muted">{user?.email}</p>
+      <div className="flex items-center gap-3">
+        <Avatar
+          alt={`${user?.name} ${user?.lastname}`}
+          src={`https://ui-avatars.com/api/?name=${user?.name}+${user?.lastname}`}
+          sx={{ width: 34, height: 34 }}
+        />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-white">
+            {user?.name} {user?.lastname}
+          </p>
+          <p className="truncate text-xs text-white/45">{user?.email}</p>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center gap-2 border-t border-white/10 pt-3 text-[11px] text-white/50">
+        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+        Sesion activa
       </div>
     </div>
   );

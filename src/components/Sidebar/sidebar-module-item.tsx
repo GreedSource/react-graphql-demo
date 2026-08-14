@@ -72,14 +72,14 @@ const SidebarModuleItem: React.FC<SidebarModuleItemProps> = ({
     >
       <button
         onClick={() => setExpanded(!expanded)}
-        className={`flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-medium ${
+        className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all ${
           isAnyChildActive
-            ? 'bg-sky-500/15 text-sky-700 dark:text-white'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+            ? 'bg-white/10 text-white'
+            : 'text-white/62 hover:bg-white/[0.07] hover:text-white'
         }`}
       >
         <div className="flex items-center gap-3">
-          <span className="text-lg transition-transform duration-200 hover:scale-110">
+          <span className="grid h-6 w-6 place-items-center text-white/45 [&_.MuiSvgIcon-root]:text-[19px]">
             {module.icon}
           </span>
           <span>{module.label}</span>
@@ -102,7 +102,7 @@ const SidebarModuleItem: React.FC<SidebarModuleItemProps> = ({
       >
         <div
           ref={contentRef}
-          className="ml-6 mt-1 space-y-1 border-l border-slate-200 dark:border-slate-800 pl-4"
+          className="ml-4 mt-1 space-y-1 border-l border-white/10 pl-3"
         >
           {filteredChildren.map((child, index) => (
             <SidebarItem

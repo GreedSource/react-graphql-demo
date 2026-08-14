@@ -1,112 +1,22 @@
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button } from '@mui/material';
 import { FormDialog } from '@/components/ui/FormDialog';
-import { toast } from 'react-toastify';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { StateCard } from '@/components/ui/StateCard';
-import { useRoles } from '@/hooks/role.hook';
-import { useUser, useUserMutations, useUsers } from '@/hooks/user.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
-import type { UpdateUserInput } from '@/types/admin';
-import UserDetailPanel from './user-detail-panel';
-import UserFormFields from './user-form-fields';
-
-const emptyForm: UpdateUserInput = {
-  id: '',
-  name: '',
-  lastname: '',
-  roleId: '',
-};
+import UserDetailPanel from './components/UserDetailPanel';
+import UserFormFields from './components/UserFormFields';
+import { useUsersPage } from './hooks/useUsersPage';
 
 const UsersPageContent: React.FC = () => {
-  const usersQuery = useUsers();
-  const rolesQuery = useRoles();
-  const { updateUser, deleteUser, updateState, deleteState } =
-    useUserMutations();
-  const users = useMemo(
-    () => usersQuery.data?.users?.data ?? [],
-    [usersQuery.data],
-  );
-  const roles = useMemo(
-    () => rolesQuery.data?.roles?.data ?? [],
-    [rolesQuery.data],
-  );
-  const [selectedId, setSelectedId] = useState<string>('');
-  const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [formState, setFormState] = useState<UpdateUserInput>(emptyForm);
-  const [formErrors, setFormErrors] = useState<
-    Partial<Record<'name' | 'lastname', string>>
-  >({});
-  const userDetailQuery = useUser(selectedId);
-
-  useEffect(() => {
-    if (!selectedId && users.length > 0) {
-      setSelectedId(users[0].id);
-    }
-  }, [selectedId, users]);
-
-  const selectedUser = useMemo(() => {
-    return (
-      userDetailQuery.data?.user?.data ??
-      users.find((user) => user.id === selectedId)
-    );
-  }, [selectedId, userDetailQuery.data?.user?.data, users]);
-
-  const openEdit = () => {
-    if (!selectedUser) return;
-    setFormState({
-      id: selectedUser.id,
-      name: selectedUser.name,
-      lastname: selectedUser.lastname,
-      roleId: selectedUser.role?.id ?? '',
-    });
-    setFormErrors({});
-    setEditOpen(true);
-  };
-
-  const validate = () => {
-    const errors: Partial<Record<'name' | 'lastname', string>> = {};
-    if (!formState.name?.trim()) errors.name = 'El nombre es obligatorio.';
-    if (!formState.lastname?.trim())
-      errors.lastname = 'El apellido es obligatorio.';
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleUpdate = async () => {
-    if (!validate()) return;
-
-    try {
-      const response = await updateUser({
-        id: formState.id,
-        name: formState.name,
-        lastname: formState.lastname,
-        roleId: formState.roleId || undefined,
-      });
-      toast.success(response.message || 'Usuario actualizado.');
-      setEditOpen(false);
-    } catch (error) {
-      toast.error(getApolloErrorMessage(error));
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!selectedUser) return;
-
-    try {
-      const response = await deleteUser(selectedUser.id);
-      toast.success(response.message || 'Usuario eliminado.');
-      setDeleteOpen(false);
-      setSelectedId('');
-    } catch (error) {
-      toast.error(getApolloErrorMessage(error));
-    }
-  };
+  const {
+    usersQuery, users, roles, selectedId, setSelectedId, editOpen, setEditOpen,
+    deleteOpen, setDeleteOpen, formState, setFormState, formErrors, selectedUser,
+    openEdit, handleUpdate, handleDelete, updateState, deleteState,
+  } = useUsersPage();
 
   return (
     <div className="space-y-6">
@@ -224,10 +134,4 @@ const UsersPageContent: React.FC = () => {
   );
 };
 
-class UsersPage extends React.Component {
-  render() {
-    return <UsersPageContent />;
-  }
-}
-
-export default UsersPage;
+export default UsersPageContent;

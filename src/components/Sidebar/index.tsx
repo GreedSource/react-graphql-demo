@@ -5,7 +5,7 @@ import MobileToggle from './mobile-toggle';
 import SidebarHeader from './sidebar-header';
 import SidebarFooter from './sidebar-footer';
 
-const SIDEBAR_WIDTH = '18rem';
+const SIDEBAR_WIDTH = '16rem';
 const TRANSITION_DURATION = '300ms';
 const TRANSITION_TIMING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
@@ -35,7 +35,7 @@ const Sidebar: React.FC = () => {
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col justify-between border-r border-slate-200 bg-white text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:text-white p-6 transition-all lg:relative lg:z-auto lg:h-screen lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col justify-between bg-[var(--nav-bg)] p-3 text-[var(--nav-text)] shadow-2xl transition-all lg:relative lg:z-auto lg:h-screen lg:translate-x-0 lg:shadow-none ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{
