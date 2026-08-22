@@ -1,6 +1,6 @@
 import type * as React from 'react';
 import type { ReactNode } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Checkbox,
@@ -90,6 +90,11 @@ export const DataTable: DataTableComponent = <T,>({
     return filteredRows.slice(start, start + rowsPerPage);
   }, [filteredRows, page, rowsPerPage]);
 
+  useEffect(() => {
+    const lastPage = Math.max(Math.ceil(filteredRows.length / rowsPerPage) - 1, 0);
+    if (page > lastPage) setPage(lastPage);
+  }, [filteredRows.length, page, rowsPerPage]);
+
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -126,13 +131,14 @@ export const DataTable: DataTableComponent = <T,>({
     onSelectionChange?.(newSelected);
   };
 
-  const isAllSelected =
-    paginatedRows.length > 0 && selectedKeys.size === paginatedRows.length;
-  const isSomeSelected = selectedKeys.size > 0 && !isAllSelected;
+  const selectedOnPage = paginatedRows.filter((row) => selectedKeys.has(getRowKey(row))).length;
+  const isAllSelected = paginatedRows.length > 0 && selectedOnPage === paginatedRows.length;
+  const isSomeSelected = selectedOnPage > 0 && !isAllSelected;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {searchable && (
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-card p-3">
         <TextField
           size="small"
           placeholder={searchPlaceholder}
@@ -183,6 +189,8 @@ export const DataTable: DataTableComponent = <T,>({
             ) : null,
           }}
         />
+        <span className="hidden shrink-0 rounded-lg bg-accent-soft px-2.5 py-1.5 text-xs font-semibold text-accent sm:inline-flex">{filteredRows.length} {filteredRows.length === 1 ? 'resultado' : 'resultados'}</span>
+        </div>
       )}
 
       <Paper
@@ -198,18 +206,19 @@ export const DataTable: DataTableComponent = <T,>({
           },
         }}
       >
-        <TableContainer sx={{ maxHeight: 'calc(100% - 52px)' }}>
+        <TableContainer sx={{ maxHeight: 560, overflow: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow
                 sx={{
                   bgcolor: 'var(--bg-secondary)',
+                  '& th': { position: 'sticky', top: 0, zIndex: 2, bgcolor: 'var(--bg-secondary)' },
                   '& .MuiTableCell-root': {
                     borderBottom: '1px solid var(--border-primary)',
                   },
                 }}
               >
-                {(enableRowSelection || searchable) && (
+                {enableRowSelection && (
                   <TableCell padding="checkbox" sx={{ width: 48 }}>
                     {enableRowSelection && (
                       <Checkbox
@@ -272,10 +281,10 @@ export const DataTable: DataTableComponent = <T,>({
                             : 'var(--bg-card-hover)',
                         },
                         '& .MuiTableCell-root': {
-                          py: 1.5,
+                          py: 1.75,
                           px: 2,
                           borderColor: 'var(--border-primary)',
-                          transition: 'color 120ms ease',
+                          transition: 'color 120ms ease, background-color 120ms ease',
                           '&:first-of-type': { pl: 3 },
                           '&:last-of-type': { pr: 3 },
                         },
@@ -288,7 +297,7 @@ export const DataTable: DataTableComponent = <T,>({
                         }),
                       }}
                     >
-                      {(enableRowSelection || searchable) && (
+                      {enableRowSelection && (
                         <TableCell padding="checkbox">
                           {enableRowSelection && (
                             <Checkbox
@@ -324,7 +333,7 @@ export const DataTable: DataTableComponent = <T,>({
                   <TableCell
                     colSpan={
                       columns.length +
-                      (enableRowSelection || searchable ? 1 : 0)
+                      (enableRowSelection ? 1 : 0)
                     }
                     sx={{ py: 6 }}
                   >

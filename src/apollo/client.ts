@@ -83,7 +83,7 @@ function refreshTokenFlow(
         const payload = data?.refreshToken?.data;
 
         if (!payload?.accessToken) {
-          throw new Error(data?.refreshToken?.message || 'Sesion expirada.');
+          throw new Error(data?.refreshToken?.message || 'Sesión expirada.');
         }
 
         useUserStore.getState().setSession({

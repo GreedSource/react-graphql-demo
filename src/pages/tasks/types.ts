@@ -7,4 +7,8 @@ export interface TaskCardProps {
   onDragStart: (taskId: string) => void;
   onDragEnd: () => void;
   projectName: string;
+  canDelete?: boolean;
+  canComplete?: boolean;
+  onDelete?: () => void;
+  onComplete?: () => void;
 }

@@ -35,11 +35,12 @@ const Sidebar: React.FC = () => {
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col justify-between bg-[var(--nav-bg)] p-3 text-[var(--nav-text)] shadow-2xl transition-all lg:relative lg:z-auto lg:h-screen lg:translate-x-0 lg:shadow-none ${
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col overflow-hidden bg-[var(--nav-bg)] p-3 text-[var(--nav-text)] shadow-2xl transition-all lg:relative lg:z-auto lg:h-screen lg:translate-x-0 lg:shadow-none ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{
           width: SIDEBAR_WIDTH,
+          backgroundImage: 'linear-gradient(180deg, color-mix(in srgb, var(--nav-bg) 92%, var(--accent)), var(--nav-bg) 45%)',
           transitionProperty: 'transform, opacity',
           transitionDuration: isMounted ? TRANSITION_DURATION : '0ms',
           transitionTimingFunction: TRANSITION_TIMING,

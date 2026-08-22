@@ -22,15 +22,15 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   };
 
   return (
-    <div style={animationStyle}>
-      <div className="mb-5 px-2 pt-2">
+    <div className="flex min-h-0 flex-1 flex-col" style={animationStyle}>
+      <div className="mb-5 shrink-0 px-2 pt-2">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-teal-400 text-sm font-black text-slate-950">
-            P
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent)] text-sm font-black text-white shadow-lg shadow-indigo-950/20">
+            R
           </div>
           <div className="min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
-              Control center
+              Centro de control
             </p>
             <span className="block truncate text-base font-semibold text-white">
               {APP_CONFIG.name || 'RBAC Platform'}
@@ -38,8 +38,10 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           </div>
         </div>
       </div>
-      <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white/35">Workspace</p>
-      <SidebarRoutes />
+      <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white/35">Navegación</p>
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,0.16)_transparent]">
+        <SidebarRoutes />
+      </div>
     </div>
   );
 };

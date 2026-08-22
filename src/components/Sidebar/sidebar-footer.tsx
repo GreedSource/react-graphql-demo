@@ -25,7 +25,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({
 
   return (
     <div
-      className="rounded-md border border-white/10 bg-white/[0.05] p-3 transition-colors hover:bg-white/[0.08]"
+      className="mt-3 shrink-0 rounded-2xl border border-white/10 bg-white/[0.06] p-3 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.09]"
       style={animationStyle}
     >
       <div className="flex items-center gap-3">
@@ -43,7 +43,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({
       </div>
       <div className="mt-3 flex items-center gap-2 border-t border-white/10 pt-3 text-[11px] text-white/50">
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-        Sesion activa
+        Sesión activa
       </div>
     </div>
   );

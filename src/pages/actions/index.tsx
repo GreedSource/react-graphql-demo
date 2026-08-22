@@ -30,7 +30,7 @@ const ActionsPageContent: React.FC = () => {
   const handleSave = async () => {
     try {
       const response = await createAction(formState);
-      toast.success(response.message || 'Accion creada.');
+      toast.success(response.message || 'Acción creada.');
       setDialogOpen(false);
       setFormState(emptyAction);
     } catch (error) {
@@ -42,11 +42,11 @@ const ActionsPageContent: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Acciones"
-        title="Catalogo de acciones"
+        title="Catálogo de acciones"
         description="Administra acciones reutilizables para combinarlas despues en permisos."
         actions={
           <Button variant="contained" onClick={() => setDialogOpen(true)}>
-            Nueva accion
+            Nueva acción
           </Button>
         }
       />
@@ -70,12 +70,12 @@ const ActionsPageContent: React.FC = () => {
               (item) => item.description || '',
             ]}
             columns={[
-              { key: 'name', header: 'Accion', render: (item) => item.name },
+              { key: 'name', header: 'Acción', render: (item) => item.name },
               { key: 'key', header: 'Key', render: (item) => item.key },
               {
                 key: 'description',
-                header: 'Descripcion',
-                render: (item) => item.description || 'Sin descripcion',
+                header: 'Descripción',
+                render: (item) => item.description || 'Sin descripción',
               },
               {
                 key: 'status',
@@ -87,7 +87,7 @@ const ActionsPageContent: React.FC = () => {
         ) : (
           <StateCard
             title="Sin acciones"
-            description="Crea la primera accion del sistema."
+              description="Crea la primera acción del sistema."
           />
         )}
       </SectionCard>
@@ -95,8 +95,8 @@ const ActionsPageContent: React.FC = () => {
       <FormDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        title="Crear accion"
-        subtitle="Registra una accion reutilizable para el modelo de permisos."
+        title="Crear acción"
+        subtitle="Registra una acción reutilizable para el modelo de permisos."
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
@@ -137,7 +137,7 @@ const ActionsPageContent: React.FC = () => {
           fullWidth
         />
         <TextField
-          label="Descripcion"
+          label="Descripción"
           value={formState.description ?? ''}
           onChange={(event) =>
             setFormState((current) => ({

@@ -5,6 +5,7 @@ import { ExpandMore } from '@mui/icons-material';
 import { usePermission, hasAnyPermission } from '@/lib/permissions';
 import type { SidebarModule } from '@/config/sidebar-routes.config';
 import SidebarItem from './sidebar-item';
+import { activeChildRoute } from '@/lib/navigation';
 
 interface SidebarModuleItemProps {
   module: SidebarModule;
@@ -32,9 +33,8 @@ const SidebarModuleItem: React.FC<SidebarModuleItemProps> = ({
     );
   });
 
-  const isAnyChildActive = filteredChildren.some(
-    (child) => location.pathname === child.to,
-  );
+  const activeRoute = activeChildRoute(location.pathname, filteredChildren.map((child) => child.to));
+  const isAnyChildActive = Boolean(activeRoute);
   const [expanded, setExpanded] = useState(isAnyChildActive);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -72,7 +72,7 @@ const SidebarModuleItem: React.FC<SidebarModuleItemProps> = ({
     >
       <button
         onClick={() => setExpanded(!expanded)}
-        className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+        className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ${
           isAnyChildActive
             ? 'bg-white/10 text-white'
             : 'text-white/62 hover:bg-white/[0.07] hover:text-white'
@@ -110,7 +110,7 @@ const SidebarModuleItem: React.FC<SidebarModuleItemProps> = ({
               to={child.to}
               icon={child.icon}
               label={child.label}
-              active={location.pathname === child.to}
+              active={activeRoute === child.to}
               delay={expanded ? index * 50 : 0}
             />
           ))}

@@ -58,11 +58,11 @@ const LoginContent: React.FC = () => {
     const nextErrors: Partial<LoginFormState> = {};
 
     if (!isValidEmail(formState.email)) {
-      nextErrors.email = 'Ingresa un correo valido.';
+      nextErrors.email = 'Ingresa un correo válido.';
     }
 
     if (!formState.password.trim()) {
-      nextErrors.password = 'La contrasena es obligatoria.';
+      nextErrors.password = 'La contraseña es obligatoria.';
     }
 
     setErrors(nextErrors);
@@ -78,7 +78,7 @@ const LoginContent: React.FC = () => {
 
     try {
       const response = await login(formState);
-      toast.success(response.message || 'Sesion iniciada correctamente.');
+      toast.success(response.message || 'Sesión iniciada correctamente.');
       const nextPath = location.state?.from?.pathname || '/';
       navigate(nextPath, { replace: true });
     } catch (error) {
@@ -99,7 +99,7 @@ const LoginContent: React.FC = () => {
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
           Acceso seguro
         </p>
-        <h2 className="text-3xl font-semibold text-text">Iniciar sesion</h2>
+        <h2 className="text-3xl font-semibold text-text">Iniciar sesión</h2>
         <p className="text-sm text-text-secondary">
           Entra al panel para administrar usuarios, roles y permisos.
         </p>
@@ -125,7 +125,7 @@ const LoginContent: React.FC = () => {
         }}
       >
         <TextField
-          label="Correo electronico"
+          label="Correo electrónico"
           type="email"
           value={formState.email}
           onChange={(event) => handleChange('email', event.target.value)}
@@ -152,7 +152,7 @@ const LoginContent: React.FC = () => {
         }}
       >
         <TextField
-          label="Contrasena"
+          label="Contraseña"
           type={showPassword ? 'text' : 'password'}
           value={formState.password}
           onChange={(event) => handleChange('password', event.target.value)}
@@ -250,7 +250,7 @@ const LoginContent: React.FC = () => {
           to="/recover-password"
           className="font-medium text-text-secondary transition-all duration-200 hover:text-text hover:underline"
         >
-          Olvide mi contrasena
+          Olvidé mi contraseña
         </Link>
       </div>
     </form>

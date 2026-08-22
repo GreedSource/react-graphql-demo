@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AddRounded, SearchRounded, ViewKanbanRounded, ViewListRounded } from '@mui/icons-material';
+import { AddRounded, InboxOutlined, SearchRounded, ViewKanbanRounded, ViewListRounded } from '@mui/icons-material';
 import { Alert, Button, IconButton, MenuItem, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -7,9 +7,11 @@ import { PermissionAction } from '@/components/project-platform/PermissionAction
 import { priorityLabels, taskStatusLabels } from '@/lib/project-platform-labels';
 import type { TaskPriority, TaskStatus } from '@/types/project-platform';
 import { FormDialog } from '@/components/ui/FormDialog';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import TaskCard from './components/TaskCard';
 import { useTasksPage } from './hooks/useTasksPage';
+import { formatDate } from '@/lib/date-format';
 
 const columns: TaskStatus[] = ['todo', 'in_progress', 'blocked', 'done'];
 
@@ -22,6 +24,11 @@ const TasksPageContent: React.FC = () => {
     closeCreate, openCreate, createTask, updateTask, moveTask, completeTask, deleteTask,
     createState, updateState,
   } = useTasksPage();
+  const [deleteTarget, setDeleteTarget] = React.useState<string | null>(null);
+  const confirmDeleteTask = async () => {
+    if (!deleteTarget) return;
+    try { await deleteTask(deleteTarget); setDeleteTarget(null); setSelectedTask(null); toast.success('Tarea eliminada'); } catch (error) { toast.error(getApolloErrorMessage(error)); }
+  };
 
   return (
   <div className="space-y-5">
@@ -29,33 +36,33 @@ const TasksPageContent: React.FC = () => {
 
     {tasksQuery.error ? <Alert severity="error">{getApolloErrorMessage(tasksQuery.error)}</Alert> : null}
 
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-card p-3 lg:flex-row lg:items-center">
+    <div className="workspace-card flex flex-col gap-3 rounded-2xl border bg-surface-card/80 p-3.5 lg:flex-row lg:items-center">
       <TextField value={query} onChange={(event) => setQuery(event.target.value)} size="small" placeholder="Buscar en el tablero" slotProps={{ input: { startAdornment: <SearchRounded className="mr-2 text-text-muted" fontSize="small" /> } }} sx={{ width: { xs: '100%', lg: 320 } }} />
       <TextField select size="small" value={projectId} onChange={(event) => setProjectId(event.target.value)} label="Proyecto" sx={{ minWidth: 190 }}><MenuItem value="all">Todos los proyectos</MenuItem>{apiProjects.map((project) => <MenuItem key={project.id} value={project.id}>{project.name}</MenuItem>)}</TextField>
       <Button onClick={() => { setQuery(''); setProjectId('all'); }} sx={{ ml: { lg: 'auto' } }}>Limpiar</Button>
       <Button onClick={() => setView((current) => current === 'kanban' ? 'list' : 'kanban')} variant="outlined" startIcon={view === 'kanban' ? <ViewListRounded /> : <ViewKanbanRounded />}>{view === 'kanban' ? 'Lista' : 'Kanban'}</Button>
     </div>
 
-    {view === 'kanban' ? <div className="grid items-start gap-4 overflow-x-auto pb-3 md:grid-cols-2 xl:grid-cols-4">
+    {view === 'kanban' ? <div className="grid h-[calc(100dvh-285px)] min-h-[360px] grid-flow-col auto-cols-[86vw] items-stretch gap-3 overflow-x-auto pb-3 snap-x snap-mandatory md:h-[calc(100dvh-250px)] md:min-h-0 md:grid-flow-row md:auto-cols-auto md:grid-cols-2 md:gap-4 md:overflow-visible md:snap-none xl:grid-cols-4">
       {columns.map((status) => {
         const columnTasks = filteredTasks.filter((task) => task.status === status);
         return (
           <section
-            className={`min-w-[270px] rounded-lg border p-3 transition-colors ${dragOverStatus === status ? 'border-accent bg-accent-soft' : 'border-transparent bg-surface-elevated'}`}
+            className={`group flex min-h-0 min-w-0 snap-start flex-col overflow-hidden rounded-2xl border border-transparent p-3 transition-all duration-300 ${status === 'blocked' ? 'bg-rose-100/85 dark:bg-rose-950/35' : status === 'done' ? 'bg-emerald-100/85 dark:bg-emerald-950/35' : status === 'in_progress' ? 'bg-sky-100/85 dark:bg-sky-950/35' : 'bg-amber-100/85 dark:bg-amber-950/35'} ${dragOverStatus === status ? 'scale-[1.01] shadow-lg shadow-accent/15 ring-2 ring-accent/50' : 'shadow-sm hover:-translate-y-0.5 hover:shadow-md'}`}
             key={status}
             onDragOver={(event) => { if (!can('tasks.update')) return; event.preventDefault(); event.dataTransfer.dropEffect = 'move'; setDragOverStatus(status); }}
             onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragOverStatus(null); }}
             onDrop={(event) => { event.preventDefault(); moveTask(event.dataTransfer.getData('text/plain') || draggedTaskId || '', status); }}
           >
-            <div className="mb-3 flex items-center justify-between px-1">
-              <div className="flex items-center gap-2"><span className={`h-2 w-2 rounded-full ${status === 'blocked' ? 'bg-red-500' : status === 'done' ? 'bg-emerald-500' : status === 'in_progress' ? 'bg-sky-500' : 'bg-zinc-400'}`} /><h2 className="text-xs font-bold uppercase text-text-secondary">{taskStatusLabels[status]}</h2><span className="rounded bg-surface-card px-1.5 text-xs text-text-muted">{columnTasks.length}</span></div>
-              <IconButton aria-label={`Agregar a ${taskStatusLabels[status]}`} onClick={() => openCreate(status)} size="small"><AddRounded fontSize="small" /></IconButton>
+            <div className="mb-4 flex shrink-0 items-center justify-between px-1">
+              <div className="flex items-center gap-2"><span className={`h-2.5 w-2.5 rounded-full ring-4 ring-white/5 ${status === 'blocked' ? 'bg-rose-400' : status === 'done' ? 'bg-emerald-400' : status === 'in_progress' ? 'bg-sky-400' : 'bg-slate-400'}`} /><h2 className="text-xs font-bold uppercase tracking-[0.1em] text-text-secondary">{taskStatusLabels[status]}</h2><span className="rounded-full bg-surface-card px-2 py-0.5 text-[11px] font-bold text-text-muted shadow-sm">{columnTasks.length}</span></div>
+              <IconButton aria-label={`Agregar a ${taskStatusLabels[status]}`} onClick={() => openCreate(status)} size="small" sx={{ color: 'var(--text-muted)', '&:hover': { bgcolor: 'var(--accent-soft)', color: 'var(--accent)' } }}><AddRounded fontSize="small" /></IconButton>
             </div>
-            <div className="space-y-3">{columnTasks.map((task) => <TaskCard key={task.id} task={task} projectName={projectName(task.projectId)} onOpen={setSelectedTask} draggable={can('tasks.update')} onDragStart={setDraggedTaskId} onDragEnd={() => { setDraggedTaskId(null); setDragOverStatus(null); }} />)}{columnTasks.length === 0 ? <div className={`rounded-md border border-dashed p-6 text-center text-xs ${dragOverStatus === status ? 'border-accent text-accent' : 'border-border text-text-muted'}`}>{draggedTaskId ? 'Soltar aquí' : 'Sin tareas'}</div> : null}</div>
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:var(--accent-soft)_transparent]">{columnTasks.map((task) => <TaskCard key={task.id} task={task} projectName={projectName(task.projectId)} onOpen={setSelectedTask} canDelete={can('tasks.delete')} canComplete={can('tasks.complete') && task.status !== 'done'} onDelete={() => setDeleteTarget(task.id)} onComplete={async () => { try { await completeTask(task.id); toast.success('Tarea completada'); } catch (error) { toast.error(getApolloErrorMessage(error)); } }} draggable={can('tasks.update')} onDragStart={setDraggedTaskId} onDragEnd={() => { setDraggedTaskId(null); setDragOverStatus(null); }} />)}{columnTasks.length === 0 ? <div className={`rounded-xl border border-dashed p-7 text-center text-xs transition-colors ${dragOverStatus === status ? 'border-accent bg-accent-soft text-accent' : 'border-border/80 text-text-muted'}`}><InboxOutlined className="mb-2 text-text-muted" fontSize="small" />{draggedTaskId ? 'Suelta la tarea aquí' : 'No hay tareas en esta etapa'}</div> : null}</div>
           </section>
         );
       })}
-    </div> : <div className="workspace-card overflow-hidden rounded-lg divide-y divide-border">{filteredTasks.map((task) => <button className="grid w-full gap-2 p-4 text-left hover:bg-surface-elevated sm:grid-cols-[1fr_180px_130px] sm:items-center" key={task.id} onClick={() => setSelectedTask(task)}><div><p className="text-sm font-semibold">{task.title}</p><p className="text-xs text-text-muted">{projectName(task.projectId)}</p></div><span className="text-sm text-text-secondary">{users.find((user) => user.id === task.assignee)?.name ?? task.assignee}</span><span className="text-xs text-text-muted">Vence {task.dueDate || 'Sin fecha'}</span></button>)}</div>}
+    </div> : <div className="workspace-card overflow-hidden rounded-lg divide-y divide-border">{filteredTasks.map((task) => <button className="grid w-full gap-2 p-4 text-left hover:bg-surface-elevated sm:grid-cols-[1fr_180px_150px] sm:items-center" key={task.id} onClick={() => setSelectedTask(task)}><div><p className="text-sm font-semibold">{task.title}</p><p className="text-xs text-text-muted">{projectName(task.projectId)}</p></div><span className="text-sm text-text-secondary">{users.find((user) => user.id === task.assignee)?.name ?? task.assignee}</span><span className="text-xs text-text-muted">Vence {formatDate(task.dueDate)}</span></button>)}</div>}
 
     <FormDialog open={dialogOpen} onClose={closeCreate} title="Nueva tarea" subtitle={`Se agregará a ${taskStatusLabels[newStatus]}.`} actions={<><Button onClick={closeCreate}>Cancelar</Button><Button variant="contained" disabled={!title.trim() || !assignee.trim() || createState.loading} onClick={() => void createTask()}>Crear tarea</Button></>}>
       <TextField autoFocus label="Título" value={title} onChange={(event) => setTitle(event.target.value)} />
@@ -63,7 +70,7 @@ const TasksPageContent: React.FC = () => {
       <TextField select label="Responsable" value={assignee} onChange={(event) => setAssignee(event.target.value)}>{users.map((user) => <MenuItem key={user.id} value={user.id}>{user.name} {user.lastname}</MenuItem>)}</TextField>
     </FormDialog>
 
-    <FormDialog open={Boolean(selectedTask)} onClose={() => setSelectedTask(null)} title="Editar tarea" subtitle={selectedTask ? `Actualiza la tarea de ${projectName(selectedTask.projectId)}.` : undefined} actions={<><PermissionAction permission="tasks.delete" onClick={async () => { if (!selectedTask) return; try { await deleteTask(selectedTask.id); setSelectedTask(null); toast.success('Tarea eliminada'); } catch (error) { toast.error(getApolloErrorMessage(error)); } }}>Eliminar</PermissionAction><Button onClick={() => setSelectedTask(null)}>Cancelar</Button>{selectedTask?.status !== 'done' ? <PermissionAction permission="tasks.complete" onClick={async () => { if (!selectedTask) return; try { await completeTask(selectedTask.id); setSelectedTask(null); toast.success('Tarea completada'); } catch (error) { toast.error(getApolloErrorMessage(error)); } }}>Completar</PermissionAction> : null}<PermissionAction permission="tasks.update" variant="contained" onClick={() => void updateTask()}>{updateState.loading ? 'Guardando...' : 'Guardar cambios'}</PermissionAction></>}>
+    <FormDialog open={Boolean(selectedTask)} onClose={() => setSelectedTask(null)} title="Editar tarea" subtitle={selectedTask ? `Actualiza la tarea de ${projectName(selectedTask.projectId)}.` : undefined} actions={<div className="flex w-full items-center justify-end gap-2"><Button onClick={() => setSelectedTask(null)}>Cancelar</Button><PermissionAction permission="tasks.update" variant="contained" onClick={() => void updateTask()}>{updateState.loading ? 'Guardando...' : 'Guardar cambios'}</PermissionAction></div>}>
       {selectedTask ? <>
         <TextField autoFocus label="Título" value={selectedTask.title} onChange={(event) => setSelectedTask({ ...selectedTask, title: event.target.value })} />
         <div className="grid gap-4 sm:grid-cols-2">
@@ -76,6 +83,7 @@ const TasksPageContent: React.FC = () => {
         {selectedTask.status === 'blocked' ? <TextField label="Motivo del bloqueo" multiline minRows={2} value={selectedTask.blockedReason ?? ''} onChange={(event) => setSelectedTask({ ...selectedTask, blockedReason: event.target.value })} /> : null}
       </> : null}
     </FormDialog>
+    <ConfirmDialog open={Boolean(deleteTarget)} title="Eliminar tarea" description="Esta tarea se eliminará permanentemente. La acción tendrá una breve ventana de cancelación antes de enviarse." onClose={() => setDeleteTarget(null)} onConfirm={() => void confirmDeleteTask()} destructive />
   </div>
   );
 };

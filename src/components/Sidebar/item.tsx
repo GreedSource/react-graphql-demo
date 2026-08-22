@@ -8,6 +8,7 @@ import type {
 } from '@/config/sidebar-routes.config';
 import SidebarItem from './sidebar-item';
 import SidebarModuleItem from './sidebar-module-item';
+import { isRouteActive } from '@/lib/navigation';
 
 const SidebarRoutes: React.FC = () => {
   const location = useLocation();
@@ -66,7 +67,7 @@ const SidebarRoutes: React.FC = () => {
             to={item.to}
             icon={item.icon}
             label={item.label}
-            active={location.pathname === item.to}
+            active={isRouteActive(location.pathname, item.to)}
             delay={index * 60 + 100}
           />
         );

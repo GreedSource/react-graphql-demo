@@ -76,7 +76,7 @@ const ResetPasswordContent: React.FC = () => {
 
     try {
       const response = await resetPassword(formState);
-      toast.success(response.message || 'Contrasena restablecida correctamente.');
+      toast.success(response.message || 'Contraseña restablecida correctamente.');
       navigate('/login', { replace: true });
     } catch (error) {
       toast.error(getApolloErrorMessage(error));
@@ -96,9 +96,9 @@ const ResetPasswordContent: React.FC = () => {
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
           Restablecer
         </p>
-        <h2 className="text-3xl font-semibold text-text">Nueva contrasena</h2>
+        <h2 className="text-3xl font-semibold text-text">Nueva contraseña</h2>
         <p className="text-sm text-text-secondary">
-          Ingresa tu nueva contrasena para continuar.
+          Ingresa tu nueva contraseña para continuar.
         </p>
       </div>
 
@@ -122,7 +122,7 @@ const ResetPasswordContent: React.FC = () => {
         }}
       >
         <PasswordInput
-          label="Nueva contrasena"
+          label="Nueva contraseña"
           value={formState.password}
           onChange={(value) => handleChange('password', value)}
           error={errors.password}
@@ -139,7 +139,7 @@ const ResetPasswordContent: React.FC = () => {
         }}
       >
         <PasswordInput
-          label="Confirmar contrasena"
+          label="Confirmar contraseña"
           value={formState.confirmPassword}
           onChange={(value) => handleChange('confirmPassword', value)}
           error={errors.confirmPassword}
@@ -174,7 +174,7 @@ const ResetPasswordContent: React.FC = () => {
           {resetPasswordState.loading ? (
             <CircularProgress size={22} color="inherit" />
           ) : (
-            'Restablecer contrasena'
+            'Restablecer contraseña'
           )}
         </Button>
       </div>

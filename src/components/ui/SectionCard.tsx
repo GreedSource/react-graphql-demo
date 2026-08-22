@@ -30,7 +30,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
 
   return (
     <section
-      className={`group rounded-lg border p-5 transition-colors duration-200 ${variantStyles[variant]} ${className}`}
+      className={`group rounded-2xl border p-5 transition-all duration-300 ${variantStyles[variant]} ${className}`}
     >
       {/* Header */}
       <div className="mb-4 flex items-start justify-between gap-3">
@@ -42,7 +42,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
           )}
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-text">{title}</h2>
+              <h2 className="text-base font-semibold tracking-tight text-text">{title}</h2>
               {badge !== undefined && (
                 <span className="inline-flex h-5 min-w-5 items-center justify-center rounded px-1.5 text-[11px] font-semibold text-accent bg-accent-soft">
                   {badge}

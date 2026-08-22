@@ -25,7 +25,7 @@ const RolesPageContent: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Roles"
-        title="Gestion de roles"
+        title="Gestión de roles"
         description="Crea roles, ajusta su estado y administra la asignacion o remocion de permisos."
         actions={
           <Button variant="contained" onClick={openCreate}>
@@ -100,7 +100,7 @@ const RolesPageContent: React.FC = () => {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         title={dialogMode === 'create' ? 'Crear rol' : 'Editar rol'}
-        subtitle="Configura el nombre, la descripcion y el estado del rol."
+        subtitle="Configura el nombre, la descripción y el estado del rol."
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>

@@ -30,7 +30,7 @@ const RecoverPasswordContent: React.FC = () => {
     event.preventDefault();
 
     if (!isValidEmail(email)) {
-      setError('Ingresa un correo valido.');
+      setError('Ingresa un correo válido.');
       return;
     }
 
@@ -58,7 +58,7 @@ const RecoverPasswordContent: React.FC = () => {
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
           Recuperacion
         </p>
-        <h2 className="text-3xl font-semibold text-text">Recuperar contrasena</h2>
+        <h2 className="text-3xl font-semibold text-text">Recuperar contraseña</h2>
         <p className="text-sm text-text-secondary">
           Te enviaremos los siguientes pasos al correo registrado.
         </p>

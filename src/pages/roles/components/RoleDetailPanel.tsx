@@ -36,7 +36,7 @@ const RoleDetailPanel: React.FC<RoleDetailPanelProps> = ({
   }, [permissions, query]);
 
   if (!selectedRole) {
-    return <StateCard title="Sin seleccion" description="Selecciona un rol para ver su detalle." />;
+    return <StateCard title="Sin selección" description="Selecciona un rol para ver su detalle." />;
   }
 
   const isChecked = (permissionId: string) =>
@@ -72,7 +72,7 @@ const RoleDetailPanel: React.FC<RoleDetailPanelProps> = ({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-3"><h3 className="text-xl font-semibold text-text">{selectedRole.name}</h3><StatusChip active={selectedRole.active} /></div>
-          <p className="mt-1 text-sm text-text-secondary">{selectedRole.description || 'Este rol no tiene descripcion.'}</p>
+          <p className="mt-1 text-sm text-text-secondary">{selectedRole.description || 'Este rol no tiene descripción.'}</p>
         </div>
         <div className="flex shrink-0 gap-2"><Button size="small" variant="outlined" onClick={onEdit}>Editar</Button><Button size="small" color="error" onClick={onDelete}>Eliminar</Button></div>
       </div>

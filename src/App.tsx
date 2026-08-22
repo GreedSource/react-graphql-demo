@@ -6,6 +6,7 @@ import { CircularProgress } from '@mui/material';
 import { GuestRoute } from '@/components/auth/GuestRoute';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import PermissionRouteGuard from '@/components/auth/PermissionRouteGuard';
+import AppDocumentTitle from '@/components/ui/AppDocumentTitle';
 
 const MainLayout = lazy(() => import('./layouts/MainLayout'));
 const AuthLayout = lazy(() => import('./layouts/AuthLayout'));
@@ -18,6 +19,13 @@ const TasksPage = lazy(() => import('./pages/tasks'));
 const MembersPage = lazy(() => import('./pages/members'));
 const ReportsPage = lazy(() => import('./pages/reports'));
 const ActivityPage = lazy(() => import('./pages/activity'));
+const CRMDashboardPage = lazy(() => import('./pages/crm-dashboard'));
+const CompaniesPage = lazy(() => import('./pages/companies'));
+const ContactsPage = lazy(() => import('./pages/contacts'));
+const LeadsPage = lazy(() => import('./pages/leads'));
+const OpportunitiesPage = lazy(() => import('./pages/opportunities'));
+const ActivitiesCRMPage = lazy(() => import('./pages/activities-crm'));
+const CRMAdministrationPage = lazy(() => import('./pages/crm-administration'));
 const UsersPage = lazy(() => import('./pages/users'));
 const RolesPage = lazy(() => import('./pages/roles'));
 const ModulesPage = lazy(() => import('./pages/modules'));
@@ -43,6 +51,7 @@ const RouteFallback: React.FC = () => {
 const App: React.FC = () => {
   return (
     <>
+      <AppDocumentTitle />
       <ToastContainer position="top-right" autoClose={3500} />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
@@ -72,6 +81,28 @@ const App: React.FC = () => {
 
               <Route element={<PermissionRouteGuard permissionType="activity" permissionActions={['read']} />}>
                 <Route path="/activity" element={<ActivityPage />} />
+              </Route>
+
+              <Route element={<PermissionRouteGuard permissionType="dashboard" permissionActions={['read']} />}>
+                <Route path="/crm" element={<CRMDashboardPage />} />
+              </Route>
+              <Route element={<PermissionRouteGuard permissionType="modules" permissionActions={['read', 'create']} />}>
+                <Route path="/crm/settings" element={<CRMAdministrationPage />} />
+              </Route>
+              <Route element={<PermissionRouteGuard permissionType="companies" permissionActions={['read']} />}>
+                <Route path="/crm/companies" element={<CompaniesPage />} />
+              </Route>
+              <Route element={<PermissionRouteGuard permissionType="contacts" permissionActions={['read']} />}>
+                <Route path="/crm/contacts" element={<ContactsPage />} />
+              </Route>
+              <Route element={<PermissionRouteGuard permissionType="leads" permissionActions={['read']} />}>
+                <Route path="/crm/leads" element={<LeadsPage />} />
+              </Route>
+              <Route element={<PermissionRouteGuard permissionType="opportunities" permissionActions={['read']} />}>
+                <Route path="/crm/opportunities" element={<OpportunitiesPage />} />
+              </Route>
+              <Route element={<PermissionRouteGuard permissionType="activities" permissionActions={['read']} />}>
+                <Route path="/crm/activities" element={<ActivitiesCRMPage />} />
               </Route>
 
               {/* Permission-guarded routes */}

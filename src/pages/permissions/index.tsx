@@ -64,8 +64,8 @@ const PermissionsPageContent: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Permisos"
-        title="Catalogo de permisos"
-        description="Crea permisos a partir de modulo + accion y eliminalos cuando ya no apliquen."
+        title="Catálogo de permisos"
+        description="Crea permisos a partir de módulo + acción y elimínalos cuando ya no apliquen."
         actions={
           <Button variant="contained" onClick={() => setDialogOpen(true)}>
             Nuevo permiso
@@ -94,18 +94,18 @@ const PermissionsPageContent: React.FC = () => {
             columns={[
               {
                 key: 'module',
-                header: 'Modulo',
+              header: 'Módulo',
                 render: (item) => item.moduleKey,
               },
               {
                 key: 'action',
-                header: 'Accion',
+              header: 'Acción',
                 render: (item) => item.actionKey,
               },
               {
                 key: 'description',
-                header: 'Descripcion',
-                render: (item) => item.description || 'Sin descripcion',
+              header: 'Descripción',
+              render: (item) => item.description || 'Sin descripción',
               },
               {
                 key: 'actions',
@@ -134,7 +134,7 @@ const PermissionsPageContent: React.FC = () => {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         title="Crear permiso"
-        subtitle="Combina un modulo y una accion para definir un permiso asignable."
+        subtitle="Combina un módulo y una acción para definir un permiso asignable."
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
@@ -149,7 +149,7 @@ const PermissionsPageContent: React.FC = () => {
         }
       >
         <TextField
-          label="Modulo"
+          label="Módulo"
           select
           value={formState.moduleId}
           onChange={(event) =>
@@ -168,7 +168,7 @@ const PermissionsPageContent: React.FC = () => {
           ))}
         </TextField>
         <TextField
-          label="Accion"
+          label="Acción"
           select
           value={formState.actionId}
           onChange={(event) =>
@@ -187,7 +187,7 @@ const PermissionsPageContent: React.FC = () => {
           ))}
         </TextField>
         <TextField
-          label="Descripcion"
+          label="Descripción"
           value={formState.description ?? ''}
           onChange={(event) =>
             setFormState((current) => ({

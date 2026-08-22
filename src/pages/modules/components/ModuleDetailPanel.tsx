@@ -11,8 +11,8 @@ const ModuleDetailPanel: React.FC<ModuleDetailPanelProps> = ({
   if (!selectedModule) {
     return (
       <StateCard
-        title="Sin seleccion"
-        description="Selecciona un modulo de la tabla."
+        title="Sin selección"
+        description="Selecciona un módulo de la tabla."
       />
     );
   }
@@ -30,10 +30,10 @@ const ModuleDetailPanel: React.FC<ModuleDetailPanelProps> = ({
         {selectedModule.key}
       </p>
       <p>
-        {selectedModule.description || 'Sin descripcion para este modulo.'}
+        {selectedModule.description || 'Sin descripción para este módulo.'}
       </p>
       <Button variant="contained" onClick={onEdit}>
-        Editar modulo
+        Editar módulo
       </Button>
     </div>
   );

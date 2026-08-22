@@ -126,7 +126,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
             </p>
           )}
           {strength === 'strong' && (
-            <p className="text-xs text-green-500">Contrasena segura</p>
+            <p className="text-xs text-green-500">Contraseña segura</p>
           )}
         </div>
       )}

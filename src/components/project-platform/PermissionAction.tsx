@@ -12,6 +12,7 @@ interface PermissionActionProps {
   startIcon?: ReactNode;
   endIcon?: ReactNode;
   fullWidth?: boolean;
+  size?: ButtonProps['size'];
   onClick?: ButtonProps['onClick'];
   type?: ButtonProps['type'];
 }
@@ -24,6 +25,7 @@ export const PermissionAction: React.FC<PermissionActionProps> = ({
   startIcon,
   endIcon,
   fullWidth = false,
+  size = 'small',
   onClick,
   type = 'button',
 }) => {
@@ -37,7 +39,7 @@ export const PermissionAction: React.FC<PermissionActionProps> = ({
           disabled={!allowed}
           endIcon={endIcon}
           fullWidth={fullWidth}
-          size="small"
+          size={size}
           startIcon={startIcon}
           onClick={onClick}
           type={type}

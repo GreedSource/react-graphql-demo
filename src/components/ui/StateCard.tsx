@@ -20,7 +20,7 @@ export const StateCard: React.FC<StateCardProps> = ({
   loading = false,
 }) => {
   return (
-    <div className="bg-surface-card p-4 sm:p-5">
+    <div className="rounded-xl border border-border/60 bg-surface-card p-4 shadow-sm sm:p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1 space-y-1">
           <p className="text-xs font-semibold uppercase text-text-muted">{description}</p>

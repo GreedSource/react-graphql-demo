@@ -34,7 +34,7 @@ const ModuleFormFields: React.FC<ModuleFormFieldsProps> = ({
         fullWidth
       />
       <TextField
-        label="Descripcion"
+        label="Descripción"
         value={formState.description ?? ''}
         onChange={(event) =>
           onChange({ ...formState, description: event.target.value })

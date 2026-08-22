@@ -10,11 +10,11 @@ const ChangePasswordContent: React.FC = () => {
           Proximo flujo
         </p>
         <h2 className="text-3xl font-semibold text-text">
-          Cambio de contrasena
+          Cambio de contraseña
         </h2>
       </div>
       <Alert severity="info">
-        El backend actual no expone aun un mutation para cambio de contrasena.
+        El backend actual todavía no expone una mutación para cambiar la contraseña.
         La pantalla queda reservada para conectar ese flujo cuando el endpoint
         este disponible.
       </Alert>

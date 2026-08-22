@@ -22,11 +22,11 @@ const ModulesPageContent: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Modulos"
-        title="Catalogo de modulos"
+        title="Catálogo de módulos"
         description="Administra los modulos funcionales usados para construir permisos."
         actions={
           <Button variant="contained" onClick={openCreate}>
-            Nuevo modulo
+            Nuevo módulo
           </Button>
         }
       />
@@ -51,7 +51,7 @@ const ModulesPageContent: React.FC = () => {
               columns={[
                 {
                   key: 'name',
-                  header: 'Modulo',
+                  header: 'Módulo',
                   render: (item) => (
                     <span className="font-medium">{item.name}</span>
                   ),
@@ -71,7 +71,7 @@ const ModulesPageContent: React.FC = () => {
           ) : (
             <StateCard
               title="Sin modulos"
-              description="Crea el primer modulo para modelar permisos."
+              description="Crea el primer módulo para modelar permisos."
             />
           )}
         </SectionCard>
@@ -87,8 +87,8 @@ const ModulesPageContent: React.FC = () => {
       <FormDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        title={dialogMode === 'create' ? 'Crear modulo' : 'Editar modulo'}
-        subtitle="Define el nombre interno del modulo y su clave tecnica."
+        title={dialogMode === 'create' ? 'Crear módulo' : 'Editar módulo'}
+        subtitle="Define el nombre interno del módulo y su clave técnica."
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>

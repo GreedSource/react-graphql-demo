@@ -44,14 +44,14 @@ const RegisterContent: React.FC = () => {
 
     if (!formState.name.trim()) nextErrors.name = 'El nombre es obligatorio.';
     if (!formState.lastname.trim()) nextErrors.lastname = 'El apellido es obligatorio.';
-    if (!isValidEmail(formState.email)) nextErrors.email = 'Ingresa un correo valido.';
+    if (!isValidEmail(formState.email)) nextErrors.email = 'Ingresa un correo válido.';
 
     const passwordValidation = validatePassword(formState.password);
     if (!passwordValidation.isValid) {
       nextErrors.password = passwordValidation.errors.join(', ');
     }
     if (formState.password !== formState.confirmPassword) {
-      nextErrors.confirmPassword = 'Las contrasenas no coinciden.';
+      nextErrors.confirmPassword = 'Las contraseñas no coinciden.';
     }
 
     setErrors(nextErrors);
@@ -161,7 +161,7 @@ const RegisterContent: React.FC = () => {
         }}
       >
         <TextField
-          label="Correo electronico"
+          label="Correo electrónico"
           type="email"
           value={formState.email}
           onChange={(event) => handleChange('email', event.target.value)}
@@ -181,7 +181,7 @@ const RegisterContent: React.FC = () => {
         }}
       >
         <PasswordInput
-          label="Contrasena"
+          label="Contraseña"
           value={formState.password}
           onChange={(value) => handleChange('password', value)}
           error={errors.password}
@@ -198,7 +198,7 @@ const RegisterContent: React.FC = () => {
         }}
       >
         <PasswordInput
-          label="Confirmar contrasena"
+          label="Confirmar contraseña"
           value={formState.confirmPassword}
           onChange={(value) => handleChange('confirmPassword', value)}
           error={errors.confirmPassword}

@@ -31,7 +31,7 @@ const ProjectsPageContent: React.FC = () => {
   const handleDelete = async () => { if (!confirmProject) return; try { const response = await deleteProject(confirmProject.id); toast.success(response.message || 'Proyecto eliminado.'); setConfirmProject(null); } catch (error) { toast.error(getApolloErrorMessage(error)); } };
 
   return <div className="space-y-5">
-    <PageHeader eyebrow="Portafolio" title="Proyectos" description="Administra proyectos activos y archivados desde el backend." actions={<PermissionAction permission="projects.create" variant="contained" startIcon={<AddRounded />} onClick={() => setDialogOpen(true)}>Nuevo proyecto</PermissionAction>} />
+    <PageHeader eyebrow="Portafolio" title="Proyectos" description="Administra proyectos activos y archivados desde un solo lugar." actions={<PermissionAction permission="projects.create" variant="contained" startIcon={<AddRounded />} onClick={() => setDialogOpen(true)}>Nuevo proyecto</PermissionAction>} />
     {projectsQuery.error ? <Alert severity="error">{getApolloErrorMessage(projectsQuery.error)}</Alert> : null}
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-card p-3 sm:flex-row sm:items-center">
       <TextField value={query} onChange={(event) => setQuery(event.target.value)} size="small" placeholder="Buscar proyecto" slotProps={{ input: { startAdornment: <SearchRounded className="mr-2 text-text-muted" fontSize="small" /> } }} sx={{ width: { xs: '100%', sm: 320 } }} />
@@ -41,7 +41,7 @@ const ProjectsPageContent: React.FC = () => {
     <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
       {filteredProjects.map((project) => <article className="workspace-card rounded-lg p-5" key={project.id}>
         <div className="mb-4 flex items-start justify-between gap-3"><div><p className="text-xs uppercase text-text-muted">{project.status}</p><h2 className="mt-1 text-lg font-semibold">{project.name}</h2></div><span className={`h-2.5 w-2.5 rounded-full ${project.archivedAt ? 'bg-zinc-400' : 'bg-emerald-500'}`} /></div>
-        <p className="min-h-10 text-sm text-text-secondary">{project.description || 'Sin descripcion.'}</p>
+        <p className="min-h-10 text-sm text-text-secondary">{project.description || 'Sin descripción.'}</p>
         <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
           <Button component={Link} to={`/projects/${project.id}`} size="small" endIcon={<ArrowForwardRounded />}>Abrir</Button>
           {!project.archivedAt ? <PermissionAction permission="projects.archive" startIcon={<ArchiveRounded />} onClick={() => void handleArchive(project)}>{archiveState.loading ? 'Archivando' : 'Archivar'}</PermissionAction> : null}
@@ -50,8 +50,8 @@ const ProjectsPageContent: React.FC = () => {
       </article>)}
     </div>
     {!filteredProjects.length && !projectsQuery.loading ? <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-text-muted">No hay proyectos para mostrar.</div> : null}
-    <FormDialog open={dialogOpen} onClose={closeDialog} title="Nuevo proyecto" subtitle="El usuario actual quedara registrado como propietario." actions={<><Button onClick={closeDialog}>Cancelar</Button><Button variant="contained" disabled={!name.trim() || !user?.id || createState.loading} onClick={() => void handleCreate()}>Crear proyecto</Button></>}><TextField autoFocus label="Nombre" value={name} onChange={(event) => setName(event.target.value)} /><TextField label="Descripcion" multiline minRows={3} value={description} onChange={(event) => setDescription(event.target.value)} /></FormDialog>
-    <ConfirmDialog open={Boolean(confirmProject)} title="Eliminar proyecto" description={`Se eliminara ${confirmProject?.name ?? ''}. Esta accion no se puede deshacer.`} onClose={() => setConfirmProject(null)} onConfirm={() => void handleDelete()} destructive loading={deleteState.loading} />
+    <FormDialog open={dialogOpen} onClose={closeDialog} title="Nuevo proyecto" subtitle="El usuario actual quedará registrado como propietario." actions={<><Button onClick={closeDialog}>Cancelar</Button><Button variant="contained" disabled={!name.trim() || !user?.id || createState.loading} onClick={() => void handleCreate()}>Crear proyecto</Button></>}><TextField autoFocus label="Nombre" value={name} onChange={(event) => setName(event.target.value)} /><TextField label="Descripción" multiline minRows={3} value={description} onChange={(event) => setDescription(event.target.value)} /></FormDialog>
+    <ConfirmDialog open={Boolean(confirmProject)} title="Eliminar proyecto" description={`Se eliminará ${confirmProject?.name ?? ''}. Esta acción no se puede deshacer.`} onClose={() => setConfirmProject(null)} onConfirm={() => void handleDelete()} destructive loading={deleteState.loading} />
   </div>;
 };
 

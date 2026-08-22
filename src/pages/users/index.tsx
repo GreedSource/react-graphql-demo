@@ -22,7 +22,7 @@ const UsersPageContent: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Usuarios"
-        title="Gestion de usuarios"
+        title="Gestión de usuarios"
         description="Consulta el detalle de cada usuario, actualiza sus datos basicos y asigna roles existentes."
       />
 
