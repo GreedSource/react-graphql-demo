@@ -1,44 +1,59 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRoles } from '@/hooks/role.hook';
-import { useUser, useUserMutations, useUsers } from '@/hooks/user.hook';
+import { useUserMutations, useUsers } from '@/hooks/user.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
-import type { UpdateUserInput } from '@/types/admin';
+import { useUserStore } from '@/stores/user.store';
+import type { User } from '@/types/admin';
+import type { UserEditFormState } from '../types';
 
-const emptyForm: UpdateUserInput = { id: '', name: '', lastname: '', roleId: '' };
+const emptyForm: UserEditFormState = {
+  id: '',
+  name: '',
+  lastname: '',
+  email: '',
+  roleId: '',
+  roleName: '',
+};
 
 export const useUsersPage = () => {
   const usersQuery = useUsers();
   const rolesQuery = useRoles();
+  const currentUser = useUserStore((state) => state.user);
   const { updateUser, deleteUser, updateState, deleteState } = useUserMutations();
   const users = useMemo(() => usersQuery.data?.users?.data ?? [], [usersQuery.data]);
   const roles = useMemo(() => rolesQuery.data?.roles?.data ?? [], [rolesQuery.data]);
-  const [selectedId, setSelectedId] = useState('');
+  const [selectedUser, setSelectedUser] = useState<User | undefined>();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [formState, setFormState] = useState<UpdateUserInput>(emptyForm);
+  const [formState, setFormState] = useState<UserEditFormState>(emptyForm);
   const [formErrors, setFormErrors] = useState<Partial<Record<'name' | 'lastname', string>>>({});
-  const userDetailQuery = useUser(selectedId);
 
-  useEffect(() => {
-    if (!selectedId && users.length > 0) setSelectedId(users[0].id);
-  }, [selectedId, users]);
-
-  const selectedUser = useMemo(
-    () => userDetailQuery.data?.user?.data ?? users.find((user) => user.id === selectedId),
-    [selectedId, userDetailQuery.data?.user?.data, users],
-  );
-
-  const openEdit = () => {
-    if (!selectedUser) return;
+  const openEdit = (user: User) => {
+    setSelectedUser(user);
     setFormState({
-      id: selectedUser.id,
-      name: selectedUser.name,
-      lastname: selectedUser.lastname,
-      roleId: selectedUser.role?.id ?? '',
+      id: user.id,
+      name: user.name,
+      lastname: user.lastname,
+      email: user.email,
+      roleId: user.role?.id ?? '',
+      roleName: user.role?.name ?? '',
     });
     setFormErrors({});
     setEditOpen(true);
+  };
+
+  const openDelete = (user: User) => {
+    if (!currentUser?.id || user.id === currentUser.id) {
+      toast.info(
+        currentUser?.id
+          ? 'No puedes eliminar tu propio usuario.'
+          : 'No se puede eliminar el usuario hasta verificar tu sesión.',
+      );
+      return;
+    }
+    setSelectedUser(user);
+    setDeleteOpen(true);
   };
 
   const validate = () => {
@@ -51,12 +66,15 @@ export const useUsersPage = () => {
 
   const handleUpdate = async () => {
     if (!validate()) return;
+    const canEditRole = Boolean(
+      currentUser?.id && formState.id && formState.id !== currentUser.id,
+    );
     try {
       const response = await updateUser({
         id: formState.id,
         name: formState.name,
         lastname: formState.lastname,
-        roleId: formState.roleId || undefined,
+        ...(canEditRole ? { roleId: formState.roleId || undefined } : {}),
       });
       toast.success(response.message || 'Usuario actualizado.');
       setEditOpen(false);
@@ -65,21 +83,40 @@ export const useUsersPage = () => {
     }
   };
 
+  const canEditRole = Boolean(
+    currentUser?.id && formState.id && formState.id !== currentUser.id,
+  );
+  const roleHelperText = canEditRole
+    ? 'Puedes actualizar el rol de este usuario.'
+    : currentUser?.id && formState.id === currentUser.id
+      ? 'Tu rol no se puede modificar para proteger tu acceso a la plataforma.'
+      : 'El rol se habilitará cuando se confirme tu sesión.';
+
   const handleDelete = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser || !currentUser?.id || selectedUser.id === currentUser.id) {
+      setDeleteOpen(false);
+      setSelectedUser(undefined);
+      toast.error(
+        currentUser?.id
+          ? 'No puedes eliminar tu propio usuario.'
+          : 'No se puede eliminar el usuario hasta verificar tu sesión.',
+      );
+      return;
+    }
     try {
       const response = await deleteUser(selectedUser.id);
       toast.success(response.message || 'Usuario eliminado.');
       setDeleteOpen(false);
-      setSelectedId('');
+      setSelectedUser(undefined);
     } catch (error) {
       toast.error(getApolloErrorMessage(error));
     }
   };
 
   return {
-    usersQuery, users, roles, selectedId, setSelectedId, editOpen, setEditOpen,
-    deleteOpen, setDeleteOpen, formState, setFormState, formErrors, selectedUser,
-    openEdit, handleUpdate, handleDelete, updateState, deleteState,
+    usersQuery, users, roles, currentUser, canEditRole, roleHelperText,
+    editOpen, setEditOpen, deleteOpen, setDeleteOpen,
+    formState, setFormState, formErrors, selectedUser, openEdit, openDelete,
+    handleUpdate, handleDelete, updateState, deleteState,
   };
 };

@@ -1,6 +1,10 @@
 import * as React from 'react';
+import DeleteOutlineRounded from '@mui/icons-material/DeleteOutlineRounded';
+import EditRounded from '@mui/icons-material/EditRounded';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import { FormDialog } from '@/components/ui/FormDialog';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
@@ -8,15 +12,15 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { StateCard } from '@/components/ui/StateCard';
 import { getApolloErrorMessage } from '@/lib/graphql';
-import UserDetailPanel from './components/UserDetailPanel';
 import UserFormFields from './components/UserFormFields';
 import { useUsersPage } from './hooks/useUsersPage';
 
 const UsersPageContent: React.FC = () => {
   const {
-    usersQuery, users, roles, selectedId, setSelectedId, editOpen, setEditOpen,
-    deleteOpen, setDeleteOpen, formState, setFormState, formErrors, selectedUser,
-    openEdit, handleUpdate, handleDelete, updateState, deleteState,
+    usersQuery, users, roles, currentUser, canEditRole, roleHelperText,
+    editOpen, setEditOpen, deleteOpen, setDeleteOpen,
+    formState, setFormState, formErrors, selectedUser, openEdit, openDelete,
+    handleUpdate, handleDelete, updateState, deleteState,
   } = useUsersPage();
 
   return (
@@ -24,7 +28,7 @@ const UsersPageContent: React.FC = () => {
       <PageHeader
         eyebrow="Usuarios"
         title="Gestión de usuarios"
-        description="Consulta el detalle de cada usuario, actualiza sus datos basicos y asigna roles existentes."
+        description="Actualiza los datos personales y gestiona el rol de otros usuarios sin poner en riesgo tu propio acceso."
       />
 
       {usersQuery.error ? (
@@ -33,8 +37,7 @@ const UsersPageContent: React.FC = () => {
         </Alert>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <SectionCard title="Listado" badge={users.length}>
+      <SectionCard title="Usuarios" description="Edita nombres y roles de otras cuentas; tu propio rol siempre queda protegido." badge={users.length}>
           {usersQuery.loading && !users.length ? (
             <StateCard
               title="Cargando usuarios"
@@ -45,8 +48,6 @@ const UsersPageContent: React.FC = () => {
             <DataTable
               rows={users}
               getRowKey={(item) => item.id}
-              selectedRowKey={selectedId}
-              onRowClick={(user) => setSelectedId(user.id)}
               searchable
               searchPlaceholder="Buscar por nombre, correo o rol..."
               searchableFields={[
@@ -59,20 +60,70 @@ const UsersPageContent: React.FC = () => {
                   key: 'name',
                   header: 'Usuario',
                   render: (user) => (
-                    <span className="font-medium">
-                      {user.name} {user.lastname}
-                    </span>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-xs font-bold uppercase text-accent">
+                        {`${user.name[0] ?? ''}${user.lastname[0] ?? ''}`}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate font-semibold text-text">{user.name} {user.lastname}</span>
+                        <span className="block truncate text-xs text-text-muted">{user.email}</span>
+                      </span>
+                    </div>
                   ),
-                },
-                {
-                  key: 'email',
-                  header: 'Correo',
-                  render: (user) => user.email,
                 },
                 {
                   key: 'role',
                   header: 'Rol',
-                  render: (user) => user.role?.name || 'Sin rol',
+                  render: (user) => (
+                    <span className="inline-flex rounded-full bg-surface-elevated px-2.5 py-1 text-xs font-semibold text-text-secondary">
+                      {user.role?.name || 'Sin rol'}
+                    </span>
+                  ),
+                },
+                {
+                  key: 'actions',
+                  header: 'Acciones',
+                  align: 'right',
+                  render: (user) => (
+                    <div className="flex justify-end gap-1">
+                      <Tooltip title="Editar usuario">
+                        <IconButton
+                          aria-label={`Editar a ${user.name} ${user.lastname}`}
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openEdit(user);
+                          }}
+                          sx={{
+                            color: 'var(--text-secondary)',
+                            '&:hover': { color: 'var(--accent)', bgcolor: 'var(--accent-soft)' },
+                          }}
+                        >
+                          <EditRounded fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={user.id === currentUser?.id ? 'No puedes eliminar tu propio usuario' : !currentUser?.id ? 'No se puede eliminar hasta verificar tu sesión' : 'Eliminar usuario'}>
+                        <span className={!currentUser?.id || user.id === currentUser.id ? 'inline-flex cursor-not-allowed' : 'inline-flex'}>
+                          <IconButton
+                            aria-label={`Eliminar a ${user.name} ${user.lastname}`}
+                            size="small"
+                            disabled={!currentUser?.id || user.id === currentUser.id}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openDelete(user);
+                            }}
+                            sx={{
+                              color: 'var(--text-secondary)',
+                              '&:hover': { color: 'var(--error, #c45147)', bgcolor: 'var(--danger-soft)' },
+                              '&.Mui-disabled': { color: 'var(--text-muted)', opacity: 0.55 },
+                            }}
+                          >
+                            <DeleteOutlineRounded fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </div>
+                  ),
                 },
               ]}
             />
@@ -82,25 +133,13 @@ const UsersPageContent: React.FC = () => {
               description="No hay registros todavia. El alta se realiza desde el flujo de registro."
             />
           )}
-        </SectionCard>
-
-        <SectionCard
-          title="Detalle"
-          description="Selecciona un usuario para ver y editar su informacion."
-        >
-          <UserDetailPanel
-            selectedUser={selectedUser}
-            onEdit={openEdit}
-            onDelete={() => setDeleteOpen(true)}
-          />
-        </SectionCard>
-      </div>
+      </SectionCard>
 
       <FormDialog
         open={editOpen}
         onClose={() => setEditOpen(false)}
         title="Editar usuario"
-        subtitle="Actualiza los datos basicos y el rol asociado."
+        subtitle="Actualiza el nombre, apellido y, si corresponde, el rol. El correo no se puede editar y tu propio rol queda protegido."
         actions={
           <>
             <Button onClick={() => setEditOpen(false)}>Cancelar</Button>
@@ -118,6 +157,8 @@ const UsersPageContent: React.FC = () => {
           formState={formState}
           formErrors={formErrors}
           roles={roles}
+          roleDisabled={!canEditRole}
+          roleHelperText={roleHelperText}
           onChange={setFormState}
         />
       </FormDialog>

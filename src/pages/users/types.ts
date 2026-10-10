@@ -1,5 +1,3 @@
-import type { UpdateUserInput } from '@/types/admin';
-
 export interface UserSummary {
   id: string;
   name: string;
@@ -13,6 +11,15 @@ export interface UserRoleOption {
   name: string;
 }
 
+export interface UserEditFormState {
+  id: string;
+  name: string;
+  lastname: string;
+  email: string;
+  roleId: string;
+  roleName: string;
+}
+
 export interface UserDetailPanelProps {
   selectedUser: UserSummary | undefined;
   onEdit: () => void;
@@ -20,8 +27,10 @@ export interface UserDetailPanelProps {
 }
 
 export interface UserFormFieldsProps {
-  formState: UpdateUserInput;
+  formState: UserEditFormState;
   formErrors: Partial<Record<'name' | 'lastname', string>>;
   roles: UserRoleOption[];
-  onChange: (state: UpdateUserInput) => void;
+  roleDisabled: boolean;
+  roleHelperText: string;
+  onChange: (state: UserEditFormState) => void;
 }

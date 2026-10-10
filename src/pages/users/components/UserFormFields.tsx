@@ -7,6 +7,8 @@ const UserFormFields: React.FC<UserFormFieldsProps> = ({
   formState,
   formErrors,
   roles,
+  roleDisabled,
+  roleHelperText,
   onChange,
 }) => {
   return (
@@ -30,20 +32,40 @@ const UserFormFields: React.FC<UserFormFieldsProps> = ({
         fullWidth
       />
       <TextField
-        label="Rol"
-        value={formState.roleId ?? ''}
-        onChange={(event) => onChange({ ...formState, roleId: event.target.value })}
-        select
+        label="Correo electrónico"
+        value={formState.email}
+        disabled
         size="small"
         fullWidth
-      >
-        <MenuItem value="">Sin rol</MenuItem>
-        {roles.map((role) => (
-          <MenuItem key={role.id} value={role.id}>
-            {role.name}
-          </MenuItem>
-        ))}
-      </TextField>
+        helperText="El correo electrónico no se puede editar."
+      />
+      {roleDisabled ? (
+        <TextField
+          label="Rol actual"
+          value={formState.roleName || 'Sin rol asignado'}
+          disabled
+          size="small"
+          fullWidth
+          helperText={roleHelperText}
+        />
+      ) : (
+        <TextField
+          label="Rol"
+          value={formState.roleId}
+          onChange={(event) => onChange({ ...formState, roleId: event.target.value })}
+          select
+          size="small"
+          fullWidth
+          helperText={roleHelperText}
+        >
+          <MenuItem value="">Sin rol</MenuItem>
+          {roles.map((role) => (
+            <MenuItem key={role.id} value={role.id}>
+              {role.name}
+            </MenuItem>
+          ))}
+        </TextField>
+      )}
     </>
   );
 };

@@ -8,8 +8,8 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import PermissionRouteGuard from '@/components/auth/PermissionRouteGuard';
 import AppDocumentTitle from '@/components/ui/AppDocumentTitle';
 import BuildUpdatePrompt from '@/components/ui/BuildUpdatePrompt';
+import MainLayout from './layouts/MainLayout';
 
-const MainLayout = lazy(() => import('./layouts/MainLayout'));
 const AuthLayout = lazy(() => import('./layouts/AuthLayout'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const WelcomePage = lazy(() => import('./pages/welcome'));

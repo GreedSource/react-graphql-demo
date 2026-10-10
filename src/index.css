@@ -169,6 +169,8 @@ body::before {
 .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline { border-color: color-mix(in srgb, var(--accent) 45%, var(--border-primary)); }
 .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline { border-color: var(--accent) !important; border-width: 2px; }
 .MuiMenu-paper { border: 1px solid var(--border-primary); border-radius: 16px !important; box-shadow: 0 18px 42px rgba(24, 44, 65, 0.14) !important; }
+.MuiListItemIcon-root { color: var(--text-secondary) !important; }
+.MuiListItemText-secondary { color: var(--text-muted) !important; }
 
 .MuiTable-root tbody tr {
   animation: table-row-in 320ms both cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -197,6 +199,53 @@ body::before {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  body.analytics-printing-card {
+    background: #ffffff !important;
+  }
+
+  body.analytics-printing-card::before {
+    display: none !important;
+  }
+
+  body.analytics-printing-card > *:not(.analytics-print-target) {
+    display: none !important;
+  }
+
+  body.analytics-printing-card .analytics-print-target {
+    --bg-card: #ffffff;
+    --bg-card-hover: #f3f8f5;
+    --bg-secondary: #edf3ef;
+    --bg-elevated: #ffffff;
+    --border-primary: #dbe7e1;
+    --text-primary: #1b2a41;
+    --text-secondary: #586981;
+    --text-muted: #586981;
+    --accent: #c45147;
+    --accent-hover: #ad4038;
+    --accent-soft: #ffebe7;
+    --accent-contrast: #ffffff;
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border-color: #dbe7e1 !important;
+    box-shadow: none !important;
+    color-scheme: light;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body.analytics-printing-card [data-analytics-export-control='true'] {
+    display: none !important;
+  }
 }
 
 .metric-grid {
@@ -335,6 +384,12 @@ a {
   }
   .MuiMenuItem-root {
     color: var(--text-primary) !important;
+  }
+  .MuiListItemIcon-root {
+    color: var(--text-secondary) !important;
+  }
+  .MuiListItemText-secondary {
+    color: var(--text-secondary) !important;
   }
 
   /* Alert */

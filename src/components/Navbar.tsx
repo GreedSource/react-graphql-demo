@@ -75,7 +75,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="sticky top-0 z-20 border-b border-border/75 bg-surface-card/85 shadow-[0_8px_24px_rgba(24,44,65,0.03)] backdrop-blur-2xl">
       <div className="pl-16 pr-4 sm:px-6 lg:px-10">
-        <div className="mx-auto flex h-[5rem] w-full max-w-[1480px] items-center justify-between gap-3 sm:gap-5">
+        <div className="mx-auto flex h-[5rem] w-full max-w-[1920px] items-center justify-between gap-3 sm:gap-5">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-accent">Tu espacio de trabajo</p>
             <p className="mt-0.5 truncate text-[15px] font-bold capitalize text-text">{sectionName}</p>

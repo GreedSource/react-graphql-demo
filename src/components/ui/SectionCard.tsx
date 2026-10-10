@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 interface SectionCardProps {
   title: string;
@@ -10,6 +10,7 @@ interface SectionCardProps {
   action?: ReactNode;
   variant?: 'default' | 'outlined' | 'elevated';
   className?: string;
+  cardRef?: Ref<HTMLElement>;
 }
 
 export const SectionCard: React.FC<SectionCardProps> = ({
@@ -21,6 +22,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
   action,
   variant = 'default',
   className = '',
+  cardRef,
 }) => {
   const variantStyles: Record<string, string> = {
     default: 'workspace-card',
@@ -30,6 +32,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
 
   return (
     <section
+      ref={cardRef}
       className={`group rounded-[20px] border p-5 transition-all duration-300 sm:p-6 ${variantStyles[variant]} ${className}`}
     >
       {/* Header */}
