@@ -1,69 +1,95 @@
-# React + TypeScript + Vite
+# React GraphQL Admin
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dashboard administrativo para gestionar usuarios, roles y permisos mediante una API GraphQL. Incluye autenticación, control de acceso basado en roles (RBAC) e impersonación temporal de usuarios.
 
-Currently, two official plugins are available:
+## Funciones
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Inicio de sesión, registro, recuperación y restablecimiento de contraseña, y cambio de contraseña.
+- Administración de usuarios y asignación de roles.
+- Administración del catálogo RBAC: roles, módulos, acciones y permisos.
+- Protección de rutas y acciones de interfaz según permisos.
+- Impersonación temporal desde el catálogo de usuarios, sujeta al permiso `users.impersonate`.
+- Banner persistente mientras se impersona, con la identidad activa y la acción **Regresar a mi cuenta**.
+- Actualización automática de tokens y restauración de la sesión original al terminar la impersonación.
+- Tema claro/oscuro, notificaciones y suscripciones GraphQL por WebSocket.
 
-## Expanding the ESLint configuration
+Al impersonar, la aplicación opera con el usuario objetivo y sus permisos y asignaciones. La sesión del administrador se conserva para volver a ella. No se permite impersonar la propia cuenta, usuarios inactivos ni iniciar una impersonación anidada.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tecnologías
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- React 19, TypeScript y Vite 7
+- Apollo Client 3 y `graphql-ws`
+- Material UI 7 y Tailwind CSS 4
+- Zustand 5 con persistencia cifrada en IndexedDB
+- React Router DOM 7 y `react-toastify`
+- Bun (recomendado)
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Requisitos y configuración
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Bun o Node.js 18 o posterior
+- Una instancia accesible de la API GraphQL
+
+Copia `.env.example` a `.env` y configura:
+
+```env
+VITE_APP_NAME=<nombre_de_la_aplicacion>
+VITE_GRAPHQL_ENDPOINT=<url_http_de_graphql>
+VITE_INDEXEDDB_DB_NAME=<nombre_de_base_indexeddb>
+VITE_CRYPTO_SECRET=<secreto_para_cifrar_persistencia>
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+El cliente deriva la URL WebSocket desde `VITE_GRAPHQL_ENDPOINT`, convirtiendo `http` en `ws` o `https` en `wss`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Desarrollo y compilación
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+bun install
+bun run dev
 ```
+
+Validaciones y build de producción:
+
+```bash
+bun run lint
+bun run build
+bun run preview
+```
+
+## Docker
+
+```bash
+docker-compose up --build
+```
+
+La imagen se construye en etapas: Bun genera los archivos estáticos y Nginx los sirve con fallback para SPA, compresión gzip y encabezados de seguridad. También se puede construir y ejecutar manualmente:
+
+```bash
+docker build -t react-graphql-admin .
+docker run -p 3000:80 react-graphql-admin
+```
+
+## Organización del código
+
+```text
+src/
+├── apollo/       # Cliente HTTP/WebSocket, autenticación y manejo de errores
+├── components/   # Componentes compartidos, guards y banner de impersonación
+├── graphql/      # Operaciones GraphQL por dominio
+├── hooks/        # Acciones de autenticación y hooks compartidos
+├── layouts/      # Layouts de autenticación y aplicación
+├── pages/        # Páginas de administración y sus componentes/hooks locales
+├── stores/       # Estado global persistido
+├── types/        # Tipos compartidos
+└── utils/        # Utilidades
+```
+
+Las operaciones GraphQL de autenticación viven en `src/graphql/auth/`. La acción del catálogo se encuentra en la página de usuarios y requiere el permiso `users.impersonate`; el layout principal muestra el banner mientras la sesión temporal está activa.
+
+## Flujo de impersonación
+
+1. Un usuario autorizado selecciona **Impersonar** en el catálogo de usuarios.
+2. El frontend llama a `impersonateUser(userId)` y sustituye la sesión activa por la del usuario objetivo.
+3. Las consultas y permisos se resuelven como el usuario objetivo; el cliente limpia la caché de Apollo al cambiar de identidad.
+4. El banner superior permite ejecutar `stopImpersonation` y regresar a la sesión original.
+
+Si expira la sesión temporal y no es posible renovarla, el frontend recupera la sesión original guardada. La autorización definitiva se valida en backend; ocultar o deshabilitar una acción en la interfaz no sustituye ese control.
