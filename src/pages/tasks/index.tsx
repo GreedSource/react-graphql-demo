@@ -31,7 +31,7 @@ const TasksPageContent: React.FC = () => {
   };
 
   return (
-  <div className="space-y-5">
+  <div className="flex h-full min-h-0 flex-col gap-5">
     <PageHeader eyebrow="Trabajo" title="Tablero de tareas" description="Organiza el trabajo por estado y detecta bloqueos antes de que afecten una entrega." actions={<PermissionAction permission="tasks.create" variant="contained" startIcon={<AddRounded />} onClick={() => openCreate()}>Crear tarea</PermissionAction>} />
 
     {tasksQuery.error ? <Alert severity="error">{getApolloErrorMessage(tasksQuery.error)}</Alert> : null}
@@ -43,7 +43,7 @@ const TasksPageContent: React.FC = () => {
       <Button onClick={() => setView((current) => current === 'kanban' ? 'list' : 'kanban')} variant="outlined" startIcon={view === 'kanban' ? <ViewListRounded /> : <ViewKanbanRounded />}>{view === 'kanban' ? 'Lista' : 'Kanban'}</Button>
     </div>
 
-    {view === 'kanban' ? <div className="grid h-[calc(100dvh-285px)] min-h-[360px] grid-flow-col auto-cols-[86vw] items-stretch gap-3 overflow-x-auto pb-3 snap-x snap-mandatory md:h-[calc(100dvh-250px)] md:min-h-0 md:grid-flow-row md:auto-cols-auto md:grid-cols-2 md:gap-4 md:overflow-visible md:snap-none xl:grid-cols-4">
+    {view === 'kanban' ? <div className="grid min-h-0 min-w-0 flex-1 grid-rows-1 grid-flow-col auto-cols-[86vw] items-stretch gap-3 overflow-x-auto pb-3 snap-x snap-mandatory md:grid-rows-2 md:grid-flow-row md:auto-cols-auto md:grid-cols-2 md:gap-4 md:overflow-visible md:snap-none xl:grid-cols-4 xl:grid-rows-1">
       {columns.map((status) => {
         const columnTasks = filteredTasks.filter((task) => task.status === status);
         return (

@@ -8,10 +8,10 @@ const MainLayout: React.FC = () => {
   return (
     <div className="app-surface flex h-screen text-text transition-colors duration-300">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <Navbar />
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-[1560px] px-3 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-7">
+        <main className="min-h-0 flex-1 overflow-y-auto">
+          <div className="mx-auto h-full min-h-full w-full max-w-[1560px] px-3 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-7">
             <PageTransition>
               <Outlet />
             </PageTransition>
