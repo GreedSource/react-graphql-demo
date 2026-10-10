@@ -1,31 +1,41 @@
-# Build artifacts
-node_modules
-dist
-.bun
+# Dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+.bun/
+.npm/
+.yarn/
+.pnpm-store/
+.cache/
+.vite/
+coverage/
+*.tsbuildinfo
 
-# IDE / Editor
-.vscode
-.idea
+# Local environment and credentials
+.env*
+
+# Git, CI and local agent configuration
+.git/
+.github/
+.agents/
+.codex/
+.qwen/
+
+# Editors and operating system files
+.vscode/
+.idea/
+.DS_Store
 *.swp
 *.swo
 
-# Docker
-Dockerfile
+# Docker files and local logs
 docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+dockerfile
 *.log
 
-# Environment
-.env
-.env.*
-!.env.example
-
-# Git / CI
-.git
-.gitignore
-.github
-
-# Documentation / misc
+# Documentation not needed to build the web bundle
 README.md
-.qwen
-.codex
-*.md
+AGENTS.md
+docs/
