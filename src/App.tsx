@@ -43,8 +43,8 @@ const NotFound = lazy(() =>
 
 const RouteFallback: React.FC = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950">
-      <CircularProgress sx={{ color: 'white' }} />
+    <div className="flex min-h-screen items-center justify-center bg-surface">
+      <CircularProgress sx={{ color: 'var(--accent)' }} />
     </div>
   );
 };

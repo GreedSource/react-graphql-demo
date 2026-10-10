@@ -1,16 +1,19 @@
 import * as React from 'react';
+import AdminPanelSettingsRounded from '@mui/icons-material/AdminPanelSettingsRounded';
+import KeyRounded from '@mui/icons-material/KeyRounded';
+import PeopleAltRounded from '@mui/icons-material/PeopleAltRounded';
+import ShieldRounded from '@mui/icons-material/ShieldRounded';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { DataTable } from '@/components/ui/DataTable';
 import { FormDialog } from '@/components/ui/FormDialog';
+import { MetricCard } from '@/components/ui/MetricCard';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionCard } from '@/components/ui/SectionCard';
-import { StateCard } from '@/components/ui/StateCard';
-import { StatusChip } from '@/components/ui/StatusChip';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import RoleDetailPanel from './components/RoleDetailPanel';
 import RoleFormFields from './components/RoleFormFields';
+import RoleList from './components/RoleList';
 import { useRolesPage } from './hooks/useRolesPage';
 
 const RolesPageContent: React.FC = () => {
@@ -21,6 +24,8 @@ const RolesPageContent: React.FC = () => {
     openCreate, openEdit, handleSave, handleDelete, handleSavePermissions,
     createState, updateState, deleteState, addPermissionsState, removePermissionsState,
   } = useRolesPage();
+  const activeRoles = roles.filter((role) => role.active).length;
+  const assignedPermissionTotal = roles.reduce((total, role) => total + role.permissions.length, 0);
 
   return (
     <div className="space-y-6">
@@ -41,46 +46,36 @@ const RolesPageContent: React.FC = () => {
         </Alert>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <SectionCard title="Listado de roles" badge={roles.length}>
-          {roles.length ? (
-            <DataTable
-              rows={roles}
-              getRowKey={(role) => role.id}
-              selectedRowKey={selectedId}
-              onRowClick={(role) => setSelectedId(role.id)}
-              searchable
-              searchPlaceholder="Buscar por nombre de rol..."
-              searchableFields={[(role) => role.name]}
-              columns={[
-                {
-                  key: 'name',
-                  header: 'Rol',
-                  render: (role) => (
-                    <span className="font-medium">{role.name}</span>
-                  ),
-                },
-                {
-                  key: 'status',
-                  header: 'Estado',
-                  render: (role) => <StatusChip active={role.active} />,
-                },
-                {
-                  key: 'permissions',
-                  header: 'Permisos',
-                  render: (role) => role.permissions.length,
-                },
-              ]}
-            />
-          ) : (
-            <StateCard
-              title="Sin roles"
-              description="Crea el primer rol administrativo para continuar."
-            />
-          )}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Resumen de roles">
+        <MetricCard label="Roles totales" value={roles.length} detail="Configurados en el sistema" icon={<PeopleAltRounded />} />
+        <MetricCard label="Roles activos" value={activeRoles} detail={`${roles.length - activeRoles} inactivos`} icon={<ShieldRounded />} tone="green" />
+        <MetricCard label="Permisos disponibles" value={permissions.length} detail="En el catálogo global" icon={<KeyRounded />} tone="blue" />
+        <MetricCard label="Asignaciones" value={assignedPermissionTotal} detail="Permisos en los roles" icon={<AdminPanelSettingsRounded />} tone="amber" />
+      </section>
+
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(290px,0.72fr)_minmax(0,1.45fr)]">
+        <SectionCard
+          title="Roles"
+          description="Selecciona un rol para administrar su acceso."
+          badge={roles.length}
+          icon={<PeopleAltRounded />}
+          className="xl:sticky xl:top-6"
+        >
+          <RoleList
+            roles={roles}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onCreate={openCreate}
+            loading={rolesQuery.loading}
+          />
         </SectionCard>
 
-        <SectionCard title="Detalle y permisos">
+        <SectionCard
+          title="Detalle del rol"
+          description="Define exactamente qué puede consultar o modificar."
+          icon={<AdminPanelSettingsRounded />}
+          className="min-w-0"
+        >
           <RoleDetailPanel
             selectedRole={selectedRole}
             permissions={permissions}

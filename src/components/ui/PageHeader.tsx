@@ -15,18 +15,18 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   actions,
 }) => {
   return (
-    <header className="relative flex flex-col gap-4 overflow-hidden border-b border-border/70 pb-6 lg:flex-row lg:items-end lg:justify-between">
-      <div className="pointer-events-none absolute -right-10 -top-20 h-44 w-44 rounded-full bg-accent/10 blur-3xl" />
-      <div className="space-y-1.5">
+    <header className="relative flex flex-col gap-5 overflow-hidden border-b border-border/70 pb-7 lg:flex-row lg:items-end lg:justify-between">
+      <div className="pointer-events-none absolute -right-10 -top-24 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
+      <div className="relative space-y-2">
         {eyebrow ? (
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">
+          <p className="inline-flex rounded-full bg-accent-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="text-2xl font-semibold tracking-tight text-text sm:text-[2rem]">{title}</h1>
-        <p className="max-w-3xl text-sm leading-6 text-text-secondary">{description}</p>
+        <h1 className="text-[1.85rem] font-bold tracking-[-0.035em] text-text sm:text-[2.2rem]">{title}</h1>
+        <p className="max-w-3xl text-[15px] leading-6 text-text-secondary">{description}</p>
       </div>
-      {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
+      {actions ? <div className="relative flex flex-wrap gap-3 lg:justify-end">{actions}</div> : null}
     </header>
   );
 };

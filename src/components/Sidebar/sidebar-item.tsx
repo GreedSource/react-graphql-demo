@@ -27,17 +27,18 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <Link
       to={to}
-      className={`group relative flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ${
+      aria-current={active ? 'page' : undefined}
+      className={`group relative flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2 text-sm font-semibold transition-all duration-200 ${
         active
-          ? 'bg-white/[0.13] text-white shadow-sm before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-[var(--accent)]'
-          : 'text-white/62 hover:translate-x-0.5 hover:bg-white/[0.07] hover:text-white'
+          ? 'bg-[var(--nav-active)] text-white shadow-sm before:absolute before:inset-y-2.5 before:left-0 before:w-1 before:rounded-full before:bg-[var(--accent)]'
+          : 'text-[var(--nav-muted)] hover:translate-x-0.5 hover:bg-white/[0.07] hover:text-white'
       }`}
     >
       <span
-        className={`grid h-6 w-6 place-items-center text-base transition-colors [&_.MuiSvgIcon-root]:text-[19px] ${
+        className={`grid h-7 w-7 place-items-center rounded-xl text-base transition-colors [&_.MuiSvgIcon-root]:text-[19px] ${
           active
-            ? 'text-indigo-200'
-            : 'text-white/42 group-hover:text-white/80'
+            ? 'bg-white/[0.1] text-[var(--accent-hover)]'
+            : 'text-[var(--nav-muted)] group-hover:bg-white/[0.06] group-hover:text-white'
         }`}
       >
         {icon}

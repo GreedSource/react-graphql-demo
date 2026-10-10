@@ -6,12 +6,12 @@ import PageTransition from '../components/ui/PageTransition';
 
 const MainLayout: React.FC = () => {
   return (
-    <div className="app-surface flex h-screen text-text transition-colors duration-300">
+    <div className="app-surface flex h-screen min-h-dvh text-text transition-colors duration-300">
       <Sidebar />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <Navbar />
-        <main className="min-h-0 flex-1 overflow-y-auto">
-          <div className="mx-auto h-full min-h-full w-full max-w-[1560px] px-3 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-7">
+        <main className="main-scroll-area min-h-0 flex-1 overflow-y-auto">
+          <div className="mx-auto h-full min-h-full w-full max-w-[1480px] px-4 py-5 sm:px-7 sm:py-6 lg:px-10 lg:py-8">
             <PageTransition>
               <Outlet />
             </PageTransition>

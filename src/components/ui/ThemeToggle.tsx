@@ -10,11 +10,12 @@ const ThemeToggle: React.FC = () => {
   return (
     <IconButton
       onClick={toggleTheme}
-      size="small"
+      size="medium"
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
       sx={{
         color: 'inherit',
         border: '1px solid var(--border-primary)',
+        borderRadius: '16px',
         bgcolor: 'var(--bg-card)',
         transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
         '&:hover': {

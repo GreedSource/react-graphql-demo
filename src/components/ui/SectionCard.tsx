@@ -24,25 +24,25 @@ export const SectionCard: React.FC<SectionCardProps> = ({
 }) => {
   const variantStyles: Record<string, string> = {
     default: 'workspace-card',
-    outlined: 'border-border/60 bg-transparent shadow-none',
-    elevated: 'workspace-card shadow-lg shadow-black/[0.06]',
+    outlined: 'border-border/70 bg-transparent shadow-none',
+    elevated: 'workspace-card shadow-[0_22px_48px_rgba(24,44,65,0.1)]',
   };
 
   return (
     <section
-      className={`group rounded-2xl border p-5 transition-all duration-300 ${variantStyles[variant]} ${className}`}
+      className={`group rounded-[20px] border p-5 transition-all duration-300 sm:p-6 ${variantStyles[variant]} ${className}`}
     >
       {/* Header */}
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           {icon && (
-            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
+            <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent">
               {icon}
             </div>
           )}
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold tracking-tight text-text">{title}</h2>
+              <h2 className="text-base font-bold tracking-tight text-text">{title}</h2>
               {badge !== undefined && (
                 <span className="inline-flex h-5 min-w-5 items-center justify-center rounded px-1.5 text-[11px] font-semibold text-accent bg-accent-soft">
                   {badge}
@@ -60,7 +60,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
       </div>
 
       {/* Divider */}
-      <div className="-mx-5 mb-4 h-px border-t border-border/60" />
+      <div className="-mx-5 mb-5 h-px border-t border-border/65 sm:-mx-6" />
 
       {/* Content */}
       <div>{children}</div>

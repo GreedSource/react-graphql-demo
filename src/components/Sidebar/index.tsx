@@ -5,7 +5,7 @@ import MobileToggle from './mobile-toggle';
 import SidebarHeader from './sidebar-header';
 import SidebarFooter from './sidebar-footer';
 
-const SIDEBAR_WIDTH = '16rem';
+const SIDEBAR_WIDTH = '17rem';
 const TRANSITION_DURATION = '300ms';
 const TRANSITION_TIMING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
@@ -35,12 +35,13 @@ const Sidebar: React.FC = () => {
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col overflow-hidden bg-[var(--nav-bg)] p-3 text-[var(--nav-text)] shadow-2xl transition-all lg:relative lg:z-auto lg:h-screen lg:translate-x-0 lg:shadow-none ${
+        id="main-sidebar"
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col overflow-hidden border-r border-white/[0.08] bg-[var(--nav-bg)] p-3.5 text-[var(--nav-text)] shadow-2xl transition-all lg:relative lg:z-auto lg:h-screen lg:translate-x-0 lg:shadow-none ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{
           width: SIDEBAR_WIDTH,
-          backgroundImage: 'linear-gradient(180deg, color-mix(in srgb, var(--nav-bg) 92%, var(--accent)), var(--nav-bg) 45%)',
+          backgroundImage: 'radial-gradient(circle at 15% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 18rem), linear-gradient(180deg, var(--nav-bg), color-mix(in srgb, var(--nav-bg) 92%, #091321))',
           transitionProperty: 'transform, opacity',
           transitionDuration: isMounted ? TRANSITION_DURATION : '0ms',
           transitionTimingFunction: TRANSITION_TIMING,

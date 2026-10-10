@@ -14,9 +14,10 @@ const MobileOverlay: React.FC<MobileOverlayProps> = ({
   return (
     <div
       onClick={onClose}
-      className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-${transitionDuration} lg:hidden ${
+      className={`fixed inset-0 z-40 bg-[#0d1b2e]/55 backdrop-blur-sm transition-opacity lg:hidden ${
         isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
       }`}
+      style={{ transitionDuration }}
       aria-hidden="true"
     />
   );
