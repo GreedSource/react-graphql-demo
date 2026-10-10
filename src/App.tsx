@@ -7,6 +7,7 @@ import { GuestRoute } from '@/components/auth/GuestRoute';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import PermissionRouteGuard from '@/components/auth/PermissionRouteGuard';
 import AppDocumentTitle from '@/components/ui/AppDocumentTitle';
+import BuildUpdatePrompt from '@/components/ui/BuildUpdatePrompt';
 
 const MainLayout = lazy(() => import('./layouts/MainLayout'));
 const AuthLayout = lazy(() => import('./layouts/AuthLayout'));
@@ -53,6 +54,7 @@ const App: React.FC = () => {
     <>
       <AppDocumentTitle />
       <ToastContainer position="top-right" autoClose={3500} />
+      <BuildUpdatePrompt />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route element={<ProtectedRoute />}>

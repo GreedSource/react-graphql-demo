@@ -6,12 +6,10 @@ import { ApolloProvider } from '@apollo/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { apolloClient } from './apollo/client';
 import { initializeStores } from './stores/init'; // 👈 asegúrate de exportar bien
-import { ensureCurrentBuild } from './lib/build-version';
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 async function bootstrap() {
-  if (!(await ensureCurrentBuild())) return;
   await initializeStores(); // 👈 Espera a cargar el store desde IndexedDB
 
   createRoot(document.getElementById('root')!).render(
