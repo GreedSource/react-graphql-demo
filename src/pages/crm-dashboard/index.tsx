@@ -1,6 +1,11 @@
 import * as React from 'react';
-import { BusinessRounded, ContactPageRounded, EventRounded, PaidRounded, TrendingUpRounded } from '@mui/icons-material';
-import { Alert, Button } from '@mui/material';
+import BusinessRounded from '@mui/icons-material/BusinessRounded';
+import ContactPageRounded from '@mui/icons-material/ContactPageRounded';
+import EventRounded from '@mui/icons-material/EventRounded';
+import PaidRounded from '@mui/icons-material/PaidRounded';
+import TrendingUpRounded from '@mui/icons-material/TrendingUpRounded';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 import { AnalyticsBarChart } from '@/components/ui/AnalyticsBarChart';
 import { MetricCard } from '@/components/ui/MetricCard';

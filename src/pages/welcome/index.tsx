@@ -1,6 +1,10 @@
 import * as React from 'react';
-import { ArrowForwardRounded, CheckCircleRounded, LockOpenRounded, ManageAccountsRounded, SecurityRounded } from '@mui/icons-material';
-import { Chip } from '@mui/material';
+import ArrowForwardRounded from '@mui/icons-material/ArrowForwardRounded';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import LockOpenRounded from '@mui/icons-material/LockOpenRounded';
+import ManageAccountsRounded from '@mui/icons-material/ManageAccountsRounded';
+import SecurityRounded from '@mui/icons-material/SecurityRounded';
+import Chip from '@mui/material/Chip';
 import { Link } from 'react-router-dom';
 import { SIDEBAR_ROUTES, type RouteConfig, type SidebarModule } from '@/config/sidebar-routes.config';
 import { MetricCard } from '@/components/ui/MetricCard';

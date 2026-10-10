@@ -1,6 +1,12 @@
 import * as React from 'react';
-import { Alert, Avatar, Button, Chip, Collapse } from '@mui/material';
-import { CheckRounded, ExpandMoreRounded, ShieldRounded } from '@mui/icons-material';
+import Alert from '@mui/material/Alert';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Collapse from '@mui/material/Collapse';
+import CheckRounded from '@mui/icons-material/CheckRounded';
+import ExpandMoreRounded from '@mui/icons-material/ExpandMoreRounded';
+import ShieldRounded from '@mui/icons-material/ShieldRounded';
 import { useMemo, useState } from 'react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionCard } from '@/components/ui/SectionCard';

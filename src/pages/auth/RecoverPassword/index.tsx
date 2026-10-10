@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Button, CircularProgress, TextField } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
 import { useAuthActions } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';

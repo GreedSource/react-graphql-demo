@@ -1,14 +1,14 @@
 import * as React from 'react';
-import {
-  ArrowForwardRounded,
-  AssignmentRounded,
-  CheckCircleRounded,
-  ErrorOutlineRounded,
-  FolderRounded,
-  HistoryRounded,
-  TrendingUpRounded,
-} from '@mui/icons-material';
-import { Alert, Button, LinearProgress } from '@mui/material';
+import ArrowForwardRounded from '@mui/icons-material/ArrowForwardRounded';
+import AssignmentRounded from '@mui/icons-material/AssignmentRounded';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import ErrorOutlineRounded from '@mui/icons-material/ErrorOutlineRounded';
+import FolderRounded from '@mui/icons-material/FolderRounded';
+import HistoryRounded from '@mui/icons-material/HistoryRounded';
+import TrendingUpRounded from '@mui/icons-material/TrendingUpRounded';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import LinearProgress from '@mui/material/LinearProgress';
 import { Link, useNavigate } from 'react-router-dom';
 import { useProfileQuery } from '@/hooks/auth.hook';
 import { useProjects } from '@/hooks/project.hook';

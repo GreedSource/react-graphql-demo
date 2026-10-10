@@ -1,6 +1,15 @@
 import * as React from 'react';
-import { AddBusinessRounded, ArrowForwardRounded, CheckCircleRounded, GroupAddRounded, GroupsRounded, PeopleAltRounded } from '@mui/icons-material';
-import { Alert, Button, Chip, MenuItem, TextField } from '@mui/material';
+import AddBusinessRounded from '@mui/icons-material/AddBusinessRounded';
+import ArrowForwardRounded from '@mui/icons-material/ArrowForwardRounded';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import GroupAddRounded from '@mui/icons-material/GroupAddRounded';
+import GroupsRounded from '@mui/icons-material/GroupsRounded';
+import PeopleAltRounded from '@mui/icons-material/PeopleAltRounded';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
 import { OrganizationSelector } from '@/components/crm/OrganizationSelector';
 import { PageHeader } from '@/components/ui/PageHeader';

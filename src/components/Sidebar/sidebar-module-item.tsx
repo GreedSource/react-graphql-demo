@@ -1,7 +1,7 @@
 import type * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ExpandMore } from '@mui/icons-material';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import { usePermission, hasAnyPermission } from '@/lib/permissions';
 import type { SidebarModule } from '@/config/sidebar-routes.config';
 import SidebarItem from './sidebar-item';

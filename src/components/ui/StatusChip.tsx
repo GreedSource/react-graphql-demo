@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { Chip } from '@mui/material';
+import Chip from '@mui/material/Chip';
 
 interface StatusChipProps {
   active: boolean;

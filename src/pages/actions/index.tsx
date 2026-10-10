@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Alert, Button, MenuItem, TextField } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
 import { DataTable } from '@/components/ui/DataTable';
 import { FormDialog } from '@/components/ui/FormDialog';

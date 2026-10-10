@@ -1,6 +1,14 @@
 import * as React from 'react';
-import { GroupRounded, PeopleAltRounded, PersonAddRounded, ShieldRounded } from '@mui/icons-material';
-import { Alert, Avatar, Button, Chip, MenuItem, TextField } from '@mui/material';
+import GroupRounded from '@mui/icons-material/GroupRounded';
+import PeopleAltRounded from '@mui/icons-material/PeopleAltRounded';
+import PersonAddRounded from '@mui/icons-material/PersonAddRounded';
+import ShieldRounded from '@mui/icons-material/ShieldRounded';
+import Alert from '@mui/material/Alert';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PermissionAction } from '@/components/project-platform/PermissionAction';

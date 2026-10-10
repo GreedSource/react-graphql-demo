@@ -1,6 +1,11 @@
 import * as React from 'react';
-import { AssignmentRounded, CheckCircleRounded, ErrorOutlineRounded, FolderRounded, TrendingUpRounded } from '@mui/icons-material';
-import { Alert, LinearProgress } from '@mui/material';
+import AssignmentRounded from '@mui/icons-material/AssignmentRounded';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import ErrorOutlineRounded from '@mui/icons-material/ErrorOutlineRounded';
+import FolderRounded from '@mui/icons-material/FolderRounded';
+import TrendingUpRounded from '@mui/icons-material/TrendingUpRounded';
+import Alert from '@mui/material/Alert';
+import LinearProgress from '@mui/material/LinearProgress';
 import { AnalyticsBarChart } from '@/components/ui/AnalyticsBarChart';
 import { DonutChart } from '@/components/ui/DonutChart';
 import { MetricCard } from '@/components/ui/MetricCard';

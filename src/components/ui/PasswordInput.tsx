@@ -1,12 +1,13 @@
 import type * as React from 'react';
 import { useState, useMemo } from 'react';
-import {
-  TextField,
-  InputAdornment,
-  IconButton,
-  FormHelperText,
-} from '@mui/material';
-import { Visibility, VisibilityOff, Check, Close } from '@mui/icons-material';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import FormHelperText from '@mui/material/FormHelperText';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Check from '@mui/icons-material/Check';
+import Close from '@mui/icons-material/Close';
 import {
   validatePassword,
   getPasswordStrength,

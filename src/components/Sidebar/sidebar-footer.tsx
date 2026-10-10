@@ -1,6 +1,6 @@
 import type * as React from 'react';
 import { type CSSProperties } from 'react';
-import { Avatar } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
 import { useUserStore } from '@/stores/user.store';
 
 interface SidebarFooterProps {

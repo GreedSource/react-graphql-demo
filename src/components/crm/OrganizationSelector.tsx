@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { TextField } from '@mui/material';
-import { MenuItem } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
 import { useCrmOrganizations } from '@/hooks/crm.hook';
 
 interface OrganizationSelectorProps {

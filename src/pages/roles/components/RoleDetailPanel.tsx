@@ -1,7 +1,9 @@
 import type * as React from 'react';
 import { useMemo, useState } from 'react';
-import { Button, Checkbox, TextField } from '@mui/material';
-import { SearchRounded } from '@mui/icons-material';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
+import SearchRounded from '@mui/icons-material/SearchRounded';
 import { StateCard } from '@/components/ui/StateCard';
 import { StatusChip } from '@/components/ui/StatusChip';
 import type { PermissionItem, RoleDetailPanelProps } from '../types';

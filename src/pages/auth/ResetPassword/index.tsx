@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Alert, Button, CircularProgress } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import { toast } from 'react-toastify';
 import { useAuthActions } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';

@@ -2,7 +2,7 @@ import type * as React from 'react';
 import { Suspense, lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { CircularProgress } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import { GuestRoute } from '@/components/auth/GuestRoute';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import PermissionRouteGuard from '@/components/auth/PermissionRouteGuard';
@@ -62,67 +62,195 @@ const App: React.FC = () => {
               <Route path="/welcome" element={<WelcomePage />} />
               <Route path="/profile" element={<ProfilePage />} />
 
-              <Route element={<PermissionRouteGuard permissionType="projects" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="projects"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/projects" element={<ProjectsPage />} />
-                <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
+                <Route
+                  path="/projects/:projectId"
+                  element={<ProjectDetailPage />}
+                />
               </Route>
 
-              <Route element={<PermissionRouteGuard permissionType="tasks" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="tasks"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/tasks" element={<TasksPage />} />
               </Route>
 
-              <Route element={<PermissionRouteGuard permissionType="members" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="members"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/members" element={<MembersPage />} />
               </Route>
 
-              <Route element={<PermissionRouteGuard permissionType="reports" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="reports"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/reports" element={<ReportsPage />} />
               </Route>
 
-              <Route element={<PermissionRouteGuard permissionType="activity" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="activity"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/activity" element={<ActivityPage />} />
               </Route>
 
-              <Route element={<PermissionRouteGuard permissionType="dashboard" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="dashboard"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/crm" element={<CRMDashboardPage />} />
               </Route>
-              <Route element={<PermissionRouteGuard permissionType="modules" permissionActions={['read', 'create']} />}>
-                <Route path="/crm/settings" element={<CRMAdministrationPage />} />
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="modules"
+                    permissionActions={['read', 'create']}
+                  />
+                }
+              >
+                <Route
+                  path="/crm/settings"
+                  element={<CRMAdministrationPage />}
+                />
               </Route>
-              <Route element={<PermissionRouteGuard permissionType="companies" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="companies"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/crm/companies" element={<CompaniesPage />} />
               </Route>
-              <Route element={<PermissionRouteGuard permissionType="contacts" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="contacts"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/crm/contacts" element={<ContactsPage />} />
               </Route>
-              <Route element={<PermissionRouteGuard permissionType="leads" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="leads"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/crm/leads" element={<LeadsPage />} />
               </Route>
-              <Route element={<PermissionRouteGuard permissionType="opportunities" permissionActions={['read']} />}>
-                <Route path="/crm/opportunities" element={<OpportunitiesPage />} />
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="opportunities"
+                    permissionActions={['read']}
+                  />
+                }
+              >
+                <Route
+                  path="/crm/opportunities"
+                  element={<OpportunitiesPage />}
+                />
               </Route>
-              <Route element={<PermissionRouteGuard permissionType="activities" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="activities"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/crm/activities" element={<ActivitiesCRMPage />} />
               </Route>
 
               {/* Permission-guarded routes */}
-              <Route element={<PermissionRouteGuard permissionType="users" permissionActions={['read']} />}>
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="users"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/users" element={<UsersPage />} />
               </Route>
-              
-              <Route element={<PermissionRouteGuard permissionType="roles" permissionActions={['read']} />}>
+
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="roles"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/roles" element={<RolesPage />} />
               </Route>
-              
-              <Route element={<PermissionRouteGuard permissionType="modules" permissionActions={['read']} />}>
+
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="modules"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/modules" element={<ModulesPage />} />
               </Route>
-              
-              <Route element={<PermissionRouteGuard permissionType="actions" permissionActions={['read']} />}>
+
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="actions"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/actions" element={<ActionsPage />} />
               </Route>
-              
-              <Route element={<PermissionRouteGuard permissionType="permissions" permissionActions={['read']} />}>
+
+              <Route
+                element={
+                  <PermissionRouteGuard
+                    permissionType="permissions"
+                    permissionActions={['read']}
+                  />
+                }
+              >
                 <Route path="/permissions" element={<PermissionsPage />} />
               </Route>
             </Route>
@@ -133,7 +261,10 @@ const App: React.FC = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/recover-password" element={<RecoverPassword />} />
-              <Route path="/reset-password/:token" element={<ResetPassword />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
               <Route path="/change-password" element={<ChangePassword />} />
             </Route>
           </Route>

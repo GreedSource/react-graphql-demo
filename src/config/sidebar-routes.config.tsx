@@ -1,27 +1,25 @@
 import type { ReactNode } from 'react';
-import {
-  AdminPanelSettings,
-  Badge,
-  Bolt,
-  Dashboard,
-  DatasetLinked,
-  Extension,
-  Groups,
-  ManageAccounts,
-  People,
-  QueryStats,
-  Shield,
-  TaskAlt,
-  Workspaces,
-  History,
-  BusinessCenter,
-  CorporateFare,
-  ContactPage,
-  TrendingUp,
-  Paid,
-  EventNote,
-  SettingsSuggest,
-} from '@mui/icons-material';
+import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
+import Badge from '@mui/icons-material/Badge';
+import Bolt from '@mui/icons-material/Bolt';
+import Dashboard from '@mui/icons-material/Dashboard';
+import DatasetLinked from '@mui/icons-material/DatasetLinked';
+import Extension from '@mui/icons-material/Extension';
+import Groups from '@mui/icons-material/Groups';
+import ManageAccounts from '@mui/icons-material/ManageAccounts';
+import People from '@mui/icons-material/People';
+import QueryStats from '@mui/icons-material/QueryStats';
+import Shield from '@mui/icons-material/Shield';
+import TaskAlt from '@mui/icons-material/TaskAlt';
+import Workspaces from '@mui/icons-material/Workspaces';
+import History from '@mui/icons-material/History';
+import BusinessCenter from '@mui/icons-material/BusinessCenter';
+import CorporateFare from '@mui/icons-material/CorporateFare';
+import ContactPage from '@mui/icons-material/ContactPage';
+import TrendingUp from '@mui/icons-material/TrendingUp';
+import Paid from '@mui/icons-material/Paid';
+import EventNote from '@mui/icons-material/EventNote';
+import SettingsSuggest from '@mui/icons-material/SettingsSuggest';
 
 /**
  * Configuration for each route in the sidebar.

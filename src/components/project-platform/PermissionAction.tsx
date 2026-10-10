@@ -1,7 +1,8 @@
 import type * as React from 'react';
 import type { ReactNode } from 'react';
-import { Button, Tooltip } from '@mui/material';
-import type { ButtonProps } from '@mui/material';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import type { ButtonProps } from '@mui/material/Button';
 import { usePermission } from '@/lib/permissions';
 
 interface PermissionActionProps {

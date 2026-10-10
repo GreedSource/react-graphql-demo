@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Alert, Button } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 
 const ChangePasswordContent: React.FC = () => {

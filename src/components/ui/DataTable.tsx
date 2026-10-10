@@ -1,23 +1,22 @@
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Checkbox,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Typography,
-  Paper,
-  TextField,
-  InputAdornment,
-  IconButton,
-} from '@mui/material';
-import { Search, Clear } from '@mui/icons-material';
+import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TablePagination from '@mui/material/TablePagination';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Search from '@mui/icons-material/Search';
+import Clear from '@mui/icons-material/Clear';
 
 export interface TableColumn<T> {
   key: string;

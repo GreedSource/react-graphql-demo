@@ -1,5 +1,6 @@
 import type * as React from 'react';
-import { MenuItem, TextField } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 import type { UserFormFieldsProps } from '../types';
 
 const UserFormFields: React.FC<UserFormFieldsProps> = ({

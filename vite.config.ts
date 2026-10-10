@@ -49,6 +49,51 @@ const buildVersionPlugin = (): Plugin => ({
   },
 });
 
+const manualChunks = (id: string): string | undefined => {
+  if (!id.includes('/node_modules/')) return undefined;
+
+  if (
+    id.includes('/node_modules/react/') ||
+    id.includes('/node_modules/react-dom/') ||
+    id.includes('/node_modules/react-router-dom/') ||
+    id.includes('/node_modules/@remix-run/')
+  ) {
+    return 'react-vendor';
+  }
+
+  if (
+    id.includes('/node_modules/@mui/') ||
+    id.includes('/node_modules/@emotion/')
+  ) {
+    return 'mui-vendor';
+  }
+
+  if (
+    id.includes('/node_modules/@apollo/') ||
+    id.includes('/node_modules/graphql/') ||
+    id.includes('/node_modules/graphql-ws/')
+  ) {
+    return 'graphql-vendor';
+  }
+
+  if (
+    id.includes('/node_modules/crypto-js/') ||
+    id.includes('/node_modules/idb/') ||
+    id.includes('/node_modules/zustand/')
+  ) {
+    return 'state-vendor';
+  }
+
+  if (
+    id.includes('/node_modules/react-toastify/') ||
+    id.includes('/node_modules/react-helmet-async/')
+  ) {
+    return 'ui-vendor';
+  }
+
+  return undefined;
+};
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [buildVersionPlugin(), react(), tailwindcss(), tsconfigPaths()],
@@ -65,6 +110,7 @@ export default defineConfig({
         entryFileNames: `assets/[name]-v${buildVersion}-[hash].js`,
         chunkFileNames: `assets/[name]-v${buildVersion}-[hash].js`,
         assetFileNames: `assets/[name]-v${buildVersion}-[hash][extname]`,
+        manualChunks,
       },
     },
   },

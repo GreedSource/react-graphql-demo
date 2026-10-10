@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { Alert, MenuItem, TextField } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useAuditLogs } from '@/hooks/audit.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';

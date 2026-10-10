@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Alert, Button } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 import { DataTable } from '@/components/ui/DataTable';
 import { FormDialog } from '@/components/ui/FormDialog';
 import { PageHeader } from '@/components/ui/PageHeader';

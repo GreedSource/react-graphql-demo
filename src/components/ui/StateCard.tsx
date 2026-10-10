@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import type { ReactNode } from 'react';
-import { Button, CircularProgress } from '@mui/material';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface StateCardProps {
   title: string;

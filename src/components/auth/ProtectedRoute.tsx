@@ -1,6 +1,6 @@
 import type * as React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { CircularProgress } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
   useAuthenticatedUserSubscription,
   useAuthBootstrap,

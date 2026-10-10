@@ -1,6 +1,12 @@
 import type * as React from 'react';
-import { CheckRounded, DeleteOutlineRounded, MoreHorizRounded, OpenInNewRounded } from '@mui/icons-material';
-import { Avatar, IconButton, Menu, MenuItem } from '@mui/material';
+import CheckRounded from '@mui/icons-material/CheckRounded';
+import DeleteOutlineRounded from '@mui/icons-material/DeleteOutlineRounded';
+import MoreHorizRounded from '@mui/icons-material/MoreHorizRounded';
+import OpenInNewRounded from '@mui/icons-material/OpenInNewRounded';
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
 import { PriorityChip } from '@/components/project-platform/ProjectBadges';
 import type { TaskCardProps } from '../types';
