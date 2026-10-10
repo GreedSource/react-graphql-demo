@@ -78,12 +78,12 @@ const SidebarModuleItem: React.FC<SidebarModuleItemProps> = ({
         onClick={() => setExpanded(!expanded)}
         className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-2xl px-3 py-2 text-sm font-semibold transition-all duration-200 ${
           isAnyChildActive
-            ? 'bg-[var(--nav-active)] text-white'
-            : 'text-[var(--nav-muted)] hover:bg-white/[0.07] hover:text-white'
+            ? 'bg-[var(--nav-active)] text-[var(--nav-text)]'
+            : 'text-[var(--nav-muted)] hover:bg-[var(--nav-hover)] hover:text-[var(--nav-text)]'
         }`}
       >
         <div className="flex items-center gap-3">
-          <span className={`grid h-7 w-7 place-items-center rounded-xl [&_.MuiSvgIcon-root]:text-[19px] ${isAnyChildActive ? 'bg-white/[0.1] text-[var(--accent-hover)]' : 'text-[var(--nav-muted)]'}`}>
+          <span className={`grid h-7 w-7 place-items-center rounded-xl [&_.MuiSvgIcon-root]:text-[19px] ${isAnyChildActive ? 'bg-[var(--nav-icon-active)] text-[var(--accent-hover)]' : 'text-[var(--nav-muted)]'}`}>
             {module.icon}
           </span>
           <span>{module.label}</span>
@@ -107,7 +107,7 @@ const SidebarModuleItem: React.FC<SidebarModuleItemProps> = ({
       >
         <div
           ref={contentRef}
-          className="ml-4 mt-1 space-y-1 border-l border-white/[0.12] pl-3"
+          className="ml-4 mt-1 space-y-1 border-l border-[var(--nav-border)] pl-3"
         >
           {filteredChildren.map((child, index) => (
             <SidebarItem
