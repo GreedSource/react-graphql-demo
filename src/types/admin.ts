@@ -54,6 +54,17 @@ export interface AuthPayload {
   user: User;
 }
 
+export interface OriginalSession {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface ImpersonationState {
+  originalSession: OriginalSession;
+  returnPath: string;
+}
+
 export interface LoginInput {
   email: string;
   password: string;

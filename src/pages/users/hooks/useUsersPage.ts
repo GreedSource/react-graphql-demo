@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useLocation } from 'react-router-dom';
+import { useAuthActions } from '@/hooks/auth.hook';
 import { useRoles } from '@/hooks/role.hook';
 import { useUserMutations, useUsers } from '@/hooks/user.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
@@ -20,6 +22,9 @@ export const useUsersPage = () => {
   const usersQuery = useUsers();
   const rolesQuery = useRoles();
   const currentUser = useUserStore((state) => state.user);
+  const impersonation = useUserStore((state) => state.impersonation);
+  const location = useLocation();
+  const { impersonateUser, impersonateState } = useAuthActions();
   const { updateUser, deleteUser, updateState, deleteState } = useUserMutations();
   const users = useMemo(() => usersQuery.data?.users?.data ?? [], [usersQuery.data]);
   const roles = useMemo(() => rolesQuery.data?.roles?.data ?? [], [rolesQuery.data]);
@@ -54,6 +59,23 @@ export const useUsersPage = () => {
     }
     setSelectedUser(user);
     setDeleteOpen(true);
+  };
+
+  const startImpersonation = async (user: User) => {
+    if (!currentUser?.id || user.id === currentUser.id || impersonation) {
+      toast.info('Selecciona otro usuario para iniciar una sesión temporal.');
+      return;
+    }
+
+    try {
+      await impersonateUser(
+        user.id,
+        `${location.pathname}${location.search}${location.hash}`,
+      );
+      toast.info(`Ahora estás viendo la cuenta de ${user.name} ${user.lastname}.`);
+    } catch (error) {
+      toast.error(getApolloErrorMessage(error));
+    }
   };
 
   const validate = () => {
@@ -114,9 +136,9 @@ export const useUsersPage = () => {
   };
 
   return {
-    usersQuery, users, roles, currentUser, canEditRole, roleHelperText,
+    usersQuery, users, roles, currentUser, impersonation, canEditRole, roleHelperText,
     editOpen, setEditOpen, deleteOpen, setDeleteOpen,
     formState, setFormState, formErrors, selectedUser, openEdit, openDelete,
-    handleUpdate, handleDelete, updateState, deleteState,
+    handleUpdate, handleDelete, startImpersonation, impersonateState, updateState, deleteState,
   };
 };

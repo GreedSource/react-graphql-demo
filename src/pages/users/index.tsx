@@ -1,6 +1,7 @@
 import * as React from 'react';
 import DeleteOutlineRounded from '@mui/icons-material/DeleteOutlineRounded';
 import EditRounded from '@mui/icons-material/EditRounded';
+import LoginRounded from '@mui/icons-material/LoginRounded';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -11,16 +12,17 @@ import { DataTable } from '@/components/ui/DataTable';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { StateCard } from '@/components/ui/StateCard';
+import { PermissionAction } from '@/components/project-platform/PermissionAction';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import UserFormFields from './components/UserFormFields';
 import { useUsersPage } from './hooks/useUsersPage';
 
 const UsersPageContent: React.FC = () => {
   const {
-    usersQuery, users, roles, currentUser, canEditRole, roleHelperText,
+    usersQuery, users, roles, currentUser, impersonation, canEditRole, roleHelperText,
     editOpen, setEditOpen, deleteOpen, setDeleteOpen,
     formState, setFormState, formErrors, selectedUser, openEdit, openDelete,
-    handleUpdate, handleDelete, updateState, deleteState,
+    startImpersonation, impersonateState, handleUpdate, handleDelete, updateState, deleteState,
   } = useUsersPage();
 
   return (
@@ -86,6 +88,20 @@ const UsersPageContent: React.FC = () => {
                   align: 'right',
                   render: (user) => (
                     <div className="flex justify-end gap-1">
+                      {!impersonation && user.id !== currentUser?.id ? (
+                        <PermissionAction
+                          permission="users.impersonate"
+                          size="small"
+                          startIcon={<LoginRounded fontSize="small" />}
+                          disabled={impersonateState.loading}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            void startImpersonation(user);
+                          }}
+                        >
+                          {impersonateState.loading ? 'Entrando...' : 'Impersonar'}
+                        </PermissionAction>
+                      ) : null}
                       <Tooltip title="Editar usuario">
                         <IconButton
                           aria-label={`Editar a ${user.name} ${user.lastname}`}

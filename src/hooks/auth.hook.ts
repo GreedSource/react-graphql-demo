@@ -10,10 +10,12 @@ import { useNavigate } from 'react-router-dom';
 import {
   LOGIN,
   LOGOUT,
+  IMPERSONATE_USER,
   RECOVER_PASSWORD,
   REFRESH_TOKEN,
   REGISTER,
   RESET_PASSWORD,
+  STOP_IMPERSONATION,
 } from '@/graphql/auth/mutations';
 import { PROFILE } from '@/graphql/auth/queries';
 import { USER_UPDATED } from '@/graphql/auth/subscriptions';
@@ -57,6 +59,11 @@ interface RefreshMutationResult {
   refreshToken: ApiResponse<AuthPayload>;
 }
 
+interface ImpersonationMutationResult {
+  impersonateUser: ApiResponse<AuthPayload>;
+  stopImpersonation: ApiResponse<AuthPayload>;
+}
+
 interface UserUpdatedSubscriptionResult {
   userUpdated: User;
 }
@@ -80,6 +87,10 @@ export function useAuthActions() {
   const [resetPasswordMutation, resetPasswordState] =
     useMutation<ResetPasswordResult>(RESET_PASSWORD);
   const [logoutMutation] = useMutation<LogoutResult>(LOGOUT);
+  const [impersonateMutation, impersonateState] =
+    useMutation<ImpersonationMutationResult>(IMPERSONATE_USER);
+  const [stopImpersonationMutation, stopImpersonationState] =
+    useMutation<ImpersonationMutationResult>(STOP_IMPERSONATION);
 
   const login = async (input: LoginInput) => {
     const { data } = await loginMutation({ variables: { input } });
@@ -135,16 +146,57 @@ export function useAuthActions() {
     navigate('/login', { replace: true });
   };
 
+  const impersonateUser = async (userId: string, returnPath: string) => {
+    const { data } = await impersonateMutation({ variables: { userId } });
+    const response = ensureSuccess(
+      data?.impersonateUser,
+      'No se pudo iniciar la impersonación.',
+    );
+    useUserStore.getState().beginImpersonation(response.data, returnPath);
+    await client.clearStore();
+    navigate('/welcome', { replace: true });
+    return response;
+  };
+
+  const stopImpersonation = async () => {
+    if (!useUserStore.getState().impersonation) {
+      return null;
+    }
+
+    try {
+      const { data } = await stopImpersonationMutation();
+      const response = ensureSuccess(
+        data?.stopImpersonation,
+        'No se pudo regresar a la cuenta original.',
+      );
+      const returnPath =
+        useUserStore.getState().endImpersonation(response.data) || '/users';
+      await client.clearStore();
+      navigate(returnPath, { replace: true });
+      return response;
+    } catch (error) {
+      const returnPath =
+        useUserStore.getState().restoreOriginalSession() || '/users';
+      await client.clearStore();
+      navigate(returnPath, { replace: true });
+      throw error;
+    }
+  };
+
   return {
     login,
     register,
     recoverPassword,
     resetPassword,
     performLogout,
+    impersonateUser,
+    stopImpersonation,
     loginState,
     registerState,
     recoverPasswordState,
     resetPasswordState,
+    impersonateState,
+    stopImpersonationState,
   };
 }
 
@@ -166,6 +218,13 @@ export function useAuthBootstrap() {
         setHasResolved(true);
       },
       onError: async () => {
+        const currentState = useUserStore.getState();
+        if (currentState.user && currentState.accessToken) {
+          setSessionChecked(true);
+          setHasResolved(true);
+          return;
+        }
+
         await logoutAll();
         logout();
         setSessionChecked(true);

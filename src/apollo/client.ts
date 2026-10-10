@@ -105,7 +105,13 @@ function refreshTokenFlow(
         forward(operation).subscribe(observer);
       })
       .catch((error) => {
-        useUserStore.getState().logout();
+        const userStore = useUserStore.getState();
+        if (userStore.impersonation) {
+          userStore.restoreOriginalSession();
+          toast.info('La sesión temporal terminó. Regresaste a tu cuenta.');
+        } else {
+          userStore.logout();
+        }
         observer.error(error);
       });
   });
@@ -138,7 +144,13 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   const { refreshToken } = useUserStore.getState();
 
   if (!refreshToken) {
-    useUserStore.getState().logout();
+    const userStore = useUserStore.getState();
+    if (userStore.impersonation) {
+      userStore.restoreOriginalSession();
+      toast.info('La sesión temporal terminó. Regresaste a tu cuenta.');
+    } else {
+      userStore.logout();
+    }
     return;
   }
 

@@ -13,6 +13,7 @@ interface PermissionActionProps {
   startIcon?: ReactNode;
   endIcon?: ReactNode;
   fullWidth?: boolean;
+  disabled?: boolean;
   size?: ButtonProps['size'];
   onClick?: ButtonProps['onClick'];
   type?: ButtonProps['type'];
@@ -26,6 +27,7 @@ export const PermissionAction: React.FC<PermissionActionProps> = ({
   startIcon,
   endIcon,
   fullWidth = false,
+  disabled = false,
   size = 'small',
   onClick,
   type = 'button',
@@ -37,7 +39,7 @@ export const PermissionAction: React.FC<PermissionActionProps> = ({
     <Tooltip title={allowed ? permission : disabledLabel}>
       <span className={fullWidth ? 'block w-full' : undefined}>
         <Button
-          disabled={!allowed}
+          disabled={!allowed || disabled}
           endIcon={endIcon}
           fullWidth={fullWidth}
           size={size}

@@ -90,3 +90,46 @@ export const LOGOUT = gql`
     }
   }
 `;
+
+const AUTH_PAYLOAD_FIELDS = `
+  accessToken
+  refreshToken
+  user {
+    id
+    name
+    lastname
+    email
+    role {
+      id
+      name
+      permissions {
+        type
+        action
+      }
+    }
+  }
+`;
+
+export const IMPERSONATE_USER = gql`
+  mutation ImpersonateUser($userId: ID!) {
+    impersonateUser(userId: $userId) {
+      status
+      message
+      data {
+        ${AUTH_PAYLOAD_FIELDS}
+      }
+    }
+  }
+`;
+
+export const STOP_IMPERSONATION = gql`
+  mutation StopImpersonation {
+    stopImpersonation {
+      status
+      message
+      data {
+        ${AUTH_PAYLOAD_FIELDS}
+      }
+    }
+  }
+`;

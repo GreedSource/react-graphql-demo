@@ -23,5 +23,6 @@ export const logoutAll = async () => {
     accessToken: null,
     refreshToken: null,
     sessionChecked: true,
+    impersonation: null,
   });
 };

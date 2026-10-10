@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { saveState, loadState } from './persistence';
-import type { User } from '@/types/admin';
+import type { AuthPayload, ImpersonationState, User } from '@/types/admin';
 
 const STORE_NAME = 'user';
 const KEY = 'userState';
@@ -12,6 +12,7 @@ interface UserState {
   accessToken: string | null;
   refreshToken: string | null;
   sessionChecked: boolean;
+  impersonation: ImpersonationState | null;
   setUser: (user: User | null) => void;
   setSession: (payload: {
     user: User | null;
@@ -21,6 +22,9 @@ interface UserState {
   setAccessToken: (accessToken: string | null) => void;
   setRefreshToken: (refreshToken: string | null) => void;
   setSessionChecked: (value: boolean) => void;
+  beginImpersonation: (payload: AuthPayload, returnPath: string) => void;
+  endImpersonation: (payload: AuthPayload) => string | null;
+  restoreOriginalSession: () => string | null;
   logout: () => void;
 }
 
@@ -29,6 +33,7 @@ export const useUserStore = create<UserState>((set) => ({
   accessToken: null,
   refreshToken: null,
   sessionChecked: false,
+  impersonation: null,
   setUser: (user) => {
     set((state) => {
       const newState = { ...state, user };
@@ -69,12 +74,77 @@ export const useUserStore = create<UserState>((set) => ({
       return { sessionChecked };
     });
   },
+  beginImpersonation: (payload, returnPath) => {
+    set((state) => {
+      if (!state.user || !state.accessToken || !state.refreshToken) {
+        return state;
+      }
+
+      const nextState = {
+        ...state,
+        user: payload.user,
+        accessToken: payload.accessToken,
+        refreshToken: payload.refreshToken,
+        impersonation: {
+          originalSession: {
+            user: state.user,
+            accessToken: state.accessToken,
+            refreshToken: state.refreshToken,
+          },
+          returnPath,
+        },
+      };
+      saveState(DB_NAME, STORE_NAME, KEY, nextState, ENC_KEY);
+      return nextState;
+    });
+  },
+  endImpersonation: (payload) => {
+    let returnPath: string | null = null;
+    set((state) => {
+      returnPath = state.impersonation?.returnPath ?? null;
+      const nextState = {
+        ...state,
+        user: payload.user,
+        accessToken: payload.accessToken,
+        refreshToken: payload.refreshToken,
+        sessionChecked: true,
+        impersonation: null,
+      };
+      saveState(DB_NAME, STORE_NAME, KEY, nextState, ENC_KEY);
+      return nextState;
+    });
+    return returnPath;
+  },
+  restoreOriginalSession: () => {
+    let returnPath: string | null = null;
+    set((state) => {
+      const originalSession = state.impersonation?.originalSession;
+      returnPath = state.impersonation?.returnPath ?? null;
+
+      if (!originalSession) {
+        return state;
+      }
+
+      const nextState = {
+        ...state,
+        user: originalSession.user,
+        accessToken: originalSession.accessToken,
+        refreshToken: originalSession.refreshToken,
+        sessionChecked: true,
+        impersonation: null,
+      };
+      saveState(DB_NAME, STORE_NAME, KEY, nextState, ENC_KEY);
+      return nextState;
+    });
+    return returnPath;
+  },
   logout: () => {
     set({
       user: null,
       accessToken: null,
       refreshToken: null,
       sessionChecked: true,
+      impersonation: null,
     });
     saveState(
       DB_NAME,
@@ -85,6 +155,7 @@ export const useUserStore = create<UserState>((set) => ({
         accessToken: null,
         refreshToken: null,
         sessionChecked: true,
+        impersonation: null,
       },
       ENC_KEY
     );
@@ -104,6 +175,7 @@ export async function initializeUserStore() {
       accessToken: saved.accessToken ?? null,
       refreshToken: saved.refreshToken ?? null,
       sessionChecked: saved.sessionChecked ?? false,
+      impersonation: saved.impersonation ?? null,
     });
   }
 }
