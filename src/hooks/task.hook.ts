@@ -9,11 +9,25 @@ interface TasksQueryResult {
   tasks: ApiResponse<TaskEntity[]>;
 }
 
+type TaskMutationData = Pick<TaskEntity, 'id'> & Partial<Omit<TaskEntity, 'id'>>;
+
 interface UpdateTaskResult {
-  updateTask: ApiResponse<TaskEntity>;
-  createTask: ApiResponse<TaskEntity>;
-  assignTask: ApiResponse<TaskEntity>;
-  completeTask: ApiResponse<TaskEntity>;
+  updateTask: ApiResponse<TaskMutationData>;
+}
+
+interface CreateTaskResult {
+  createTask: ApiResponse<TaskMutationData>;
+}
+
+interface AssignTaskResult {
+  assignTask: ApiResponse<Pick<TaskEntity, 'id' | 'assigneeId' | 'updatedAt'>>;
+}
+
+interface CompleteTaskResult {
+  completeTask: ApiResponse<Pick<TaskEntity, 'id' | 'status' | 'completedAt' | 'updatedAt'>>;
+}
+
+interface DeleteTaskResult {
   deleteTask: ApiResponse<boolean>;
 }
 
@@ -29,10 +43,14 @@ export function useTask(id?: string) { return useQuery<{ task: ApiResponse<TaskE
 export function useTaskMutations() {
   const [updateTaskMutation, updateState] =
     useMutation<UpdateTaskResult>(UPDATE_TASK);
-  const [createTaskMutation, createState] = useMutation<UpdateTaskResult>(CREATE_TASK);
-  const [assignTaskMutation, assignState] = useMutation<UpdateTaskResult>(ASSIGN_TASK);
-  const [completeTaskMutation, completeState] = useMutation<UpdateTaskResult>(COMPLETE_TASK);
-  const [deleteTaskMutation, deleteState] = useMutation<UpdateTaskResult>(DELETE_TASK);
+  const [createTaskMutation, createState] =
+    useMutation<CreateTaskResult>(CREATE_TASK);
+  const [assignTaskMutation, assignState] =
+    useMutation<AssignTaskResult>(ASSIGN_TASK);
+  const [completeTaskMutation, completeState] =
+    useMutation<CompleteTaskResult>(COMPLETE_TASK);
+  const [deleteTaskMutation, deleteState] =
+    useMutation<DeleteTaskResult>(DELETE_TASK);
   const refresh = [{ query: TASKS }];
 
   const updateTask = async (input: UpdateTaskInput) => {

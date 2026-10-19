@@ -7,15 +7,18 @@ import type { CreateProjectInput, ProjectEntity, UpdateProjectInput } from '@/ty
 
 interface ProjectsResult { projects: ApiResponse<ProjectEntity[]>; }
 interface ProjectResult { project: ApiResponse<ProjectEntity>; }
-interface ProjectMutationsResult { createProject: ApiResponse<ProjectEntity>; updateProject: ApiResponse<ProjectEntity>; archiveProject: ApiResponse<ProjectEntity>; deleteProject: ApiResponse<boolean>; }
+interface CreateProjectResult { createProject: ApiResponse<ProjectEntity>; }
+interface UpdateProjectResult { updateProject: ApiResponse<ProjectEntity>; }
+interface ArchiveProjectResult { archiveProject: ApiResponse<ProjectEntity>; }
+interface DeleteProjectResult { deleteProject: ApiResponse<boolean>; }
 
 export function useProjects(includeArchived = false) { return useQuery<ProjectsResult>(PROJECTS, { variables: { includeArchived }, fetchPolicy: 'cache-and-network' }); }
 export function useProject(id?: string) { return useQuery<ProjectResult>(PROJECT, { variables: { id }, skip: !id, fetchPolicy: 'cache-and-network' }); }
 export function useProjectMutations() {
-  const [createMutation, createState] = useMutation<ProjectMutationsResult>(CREATE_PROJECT);
-  const [updateMutation, updateState] = useMutation<ProjectMutationsResult>(UPDATE_PROJECT);
-  const [archiveMutation, archiveState] = useMutation<ProjectMutationsResult>(ARCHIVE_PROJECT);
-  const [deleteMutation, deleteState] = useMutation<ProjectMutationsResult>(DELETE_PROJECT);
+  const [createMutation, createState] = useMutation<CreateProjectResult>(CREATE_PROJECT);
+  const [updateMutation, updateState] = useMutation<UpdateProjectResult>(UPDATE_PROJECT);
+  const [archiveMutation, archiveState] = useMutation<ArchiveProjectResult>(ARCHIVE_PROJECT);
+  const [deleteMutation, deleteState] = useMutation<DeleteProjectResult>(DELETE_PROJECT);
   const refresh = [{ query: PROJECTS, variables: { includeArchived: false } }, { query: PROJECTS, variables: { includeArchived: true } }];
   const createProject = async (input: CreateProjectInput) => ensureSuccess((await createMutation({ variables: { input }, refetchQueries: refresh, awaitRefetchQueries: true })).data?.createProject, 'No se pudo crear el proyecto.');
   const updateProject = async (input: UpdateProjectInput) => ensureSuccess((await updateMutation({ variables: { input }, refetchQueries: [...refresh, { query: PROJECT, variables: { id: input.id } }], awaitRefetchQueries: true })).data?.updateProject, 'No se pudo actualizar el proyecto.');

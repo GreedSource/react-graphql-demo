@@ -9,85 +9,484 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { FormDialog } from '@/components/ui/FormDialog';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PermissionAction } from '@/components/project-platform/PermissionAction';
+import { getApolloErrorMessage } from '@/lib/graphql';
+import { formatDate } from '@/lib/date-format';
 import { priorityLabels, taskStatusLabels } from '@/lib/project-platform-labels';
 import type { TaskPriority, TaskStatus } from '@/types/project-platform';
-import { FormDialog } from '@/components/ui/FormDialog';
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { getApolloErrorMessage } from '@/lib/graphql';
 import TaskCard from './components/TaskCard';
 import { useTasksPage } from './hooks/useTasksPage';
-import { formatDate } from '@/lib/date-format';
 
 const columns: TaskStatus[] = ['todo', 'in_progress', 'blocked', 'done'];
+const priorities: TaskPriority[] = ['critical', 'urgent', 'high', 'medium', 'low'];
+const columnBackgrounds: Record<TaskStatus, string> = {
+  todo: 'bg-amber-100/85 dark:bg-amber-950/35',
+  in_progress: 'bg-sky-100/85 dark:bg-sky-950/35',
+  blocked: 'bg-rose-100/85 dark:bg-rose-950/35',
+  done: 'bg-emerald-100/85 dark:bg-emerald-950/35',
+};
+const columnIndicators: Record<TaskStatus, string> = {
+  todo: 'bg-slate-400',
+  in_progress: 'bg-sky-400',
+  blocked: 'bg-rose-400',
+  done: 'bg-emerald-400',
+};
+
+const isTaskStatus = (value: string): value is TaskStatus =>
+  columns.some((status) => status === value);
+
+const isTaskPriority = (value: string): value is TaskPriority =>
+  priorities.some((priority) => priority === value);
 
 const TasksPageContent: React.FC = () => {
   const {
-    can, tasksQuery, users, query, setQuery, projectId, setProjectId, view, setView,
-    dialogOpen, selectedTask, setSelectedTask, draggedTaskId, setDraggedTaskId,
-    dragOverStatus, setDragOverStatus, title, setTitle, assignee, setAssignee,
-    newProjectId, setNewProjectId, newStatus, apiProjects, projectName, filteredTasks,
-    closeCreate, openCreate, createTask, updateTask, moveTask,
-    createState, updateState, deleteTarget, setDeleteTarget, confirmDeleteTask,
+    can,
+    tasksQuery,
+    users,
+    query,
+    setQuery,
+    projectId,
+    setProjectId,
+    view,
+    setView,
+    dialogOpen,
+    selectedTask,
+    setSelectedTask,
+    draggedTaskId,
+    setDraggedTaskId,
+    dragOverStatus,
+    setDragOverStatus,
+    title,
+    setTitle,
+    assignee,
+    setAssignee,
+    newProjectId,
+    setNewProjectId,
+    newStatus,
+    apiProjects,
+    projectName,
+    filteredTasks,
+    closeCreate,
+    openCreate,
+    createTask,
+    updateTask,
+    moveTask,
+    createState,
+    updateState,
+    deleteTarget,
+    setDeleteTarget,
+    confirmDeleteTask,
     handleCompleteTask,
   } = useTasksPage();
 
+  const handleColumnDragOver = (
+    event: React.DragEvent<HTMLElement>,
+    status: TaskStatus,
+  ) => {
+    if (!can('tasks.update')) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    setDragOverStatus(status);
+  };
+
+  const handleColumnDrop = (
+    event: React.DragEvent<HTMLElement>,
+    status: TaskStatus,
+  ) => {
+    event.preventDefault();
+    const taskId = event.dataTransfer.getData('text/plain') || draggedTaskId || '';
+    void moveTask(taskId, status);
+  };
+
   return (
-  <div className="flex h-full min-h-0 flex-col gap-5">
-    <PageHeader eyebrow="Trabajo" title="Tablero de tareas" description="Organiza el trabajo por estado y detecta bloqueos antes de que afecten una entrega." actions={<PermissionAction permission="tasks.create" variant="contained" startIcon={<AddRounded />} onClick={() => openCreate()}>Crear tarea</PermissionAction>} />
-
-    {tasksQuery.error ? <Alert severity="error">{getApolloErrorMessage(tasksQuery.error)}</Alert> : null}
-
-    <div className="workspace-card flex flex-col gap-3 rounded-2xl border bg-surface-card/80 p-3.5 lg:flex-row lg:items-center">
-      <TextField value={query} onChange={(event) => setQuery(event.target.value)} size="small" placeholder="Buscar en el tablero" slotProps={{ input: { startAdornment: <SearchRounded className="mr-2 text-text-muted" fontSize="small" /> } }} sx={{ width: { xs: '100%', lg: 320 } }} />
-      <TextField select size="small" value={projectId} onChange={(event) => setProjectId(event.target.value)} label="Proyecto" sx={{ minWidth: 190 }}><MenuItem value="all">Todos los proyectos</MenuItem>{apiProjects.map((project) => <MenuItem key={project.id} value={project.id}>{project.name}</MenuItem>)}</TextField>
-      <Button onClick={() => { setQuery(''); setProjectId('all'); }} sx={{ ml: { lg: 'auto' } }}>Limpiar</Button>
-      <Button onClick={() => setView((current) => current === 'kanban' ? 'list' : 'kanban')} variant="outlined" startIcon={view === 'kanban' ? <ViewListRounded /> : <ViewKanbanRounded />}>{view === 'kanban' ? 'Lista' : 'Kanban'}</Button>
-    </div>
-
-    {view === 'kanban' ? <div className="grid min-h-0 min-w-0 flex-1 grid-rows-1 grid-flow-col auto-cols-[86vw] items-stretch gap-3 overflow-x-auto pb-3 snap-x snap-mandatory md:grid-rows-2 md:grid-flow-row md:auto-cols-auto md:grid-cols-2 md:gap-4 md:overflow-visible md:snap-none xl:grid-cols-4 xl:grid-rows-1">
-      {columns.map((status) => {
-        const columnTasks = filteredTasks.filter((task) => task.status === status);
-        return (
-          <section
-            className={`group flex min-h-0 min-w-0 snap-start flex-col overflow-hidden rounded-2xl border border-transparent p-3 transition-all duration-300 ${status === 'blocked' ? 'bg-rose-100/85 dark:bg-rose-950/35' : status === 'done' ? 'bg-emerald-100/85 dark:bg-emerald-950/35' : status === 'in_progress' ? 'bg-sky-100/85 dark:bg-sky-950/35' : 'bg-amber-100/85 dark:bg-amber-950/35'} ${dragOverStatus === status ? 'scale-[1.01] shadow-lg shadow-accent/15 ring-2 ring-accent/50' : 'shadow-sm hover:-translate-y-0.5 hover:shadow-md'}`}
-            key={status}
-            onDragOver={(event) => { if (!can('tasks.update')) return; event.preventDefault(); event.dataTransfer.dropEffect = 'move'; setDragOverStatus(status); }}
-            onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragOverStatus(null); }}
-            onDrop={(event) => { event.preventDefault(); moveTask(event.dataTransfer.getData('text/plain') || draggedTaskId || '', status); }}
+    <div className="flex h-full min-h-0 flex-col gap-5">
+      <PageHeader
+        eyebrow="Trabajo"
+        title="Tablero de tareas"
+        description="Organiza el trabajo por estado y detecta bloqueos antes de que afecten una entrega."
+        actions={
+          <PermissionAction
+            permission="tasks.create"
+            variant="contained"
+            startIcon={<AddRounded />}
+            onClick={() => openCreate()}
           >
-            <div className="mb-4 flex shrink-0 items-center justify-between px-1">
-              <div className="flex items-center gap-2"><span className={`h-2.5 w-2.5 rounded-full ring-4 ring-white/5 ${status === 'blocked' ? 'bg-rose-400' : status === 'done' ? 'bg-emerald-400' : status === 'in_progress' ? 'bg-sky-400' : 'bg-slate-400'}`} /><h2 className="text-xs font-bold uppercase tracking-[0.1em] text-text-secondary">{taskStatusLabels[status]}</h2><span className="rounded-full bg-surface-card px-2 py-0.5 text-[11px] font-bold text-text-muted shadow-sm">{columnTasks.length}</span></div>
-              <IconButton aria-label={`Agregar a ${taskStatusLabels[status]}`} onClick={() => openCreate(status)} size="small" sx={{ color: 'var(--text-muted)', '&:hover': { bgcolor: 'var(--accent-soft)', color: 'var(--accent)' } }}><AddRounded fontSize="small" /></IconButton>
-            </div>
-            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:var(--accent-soft)_transparent]">{columnTasks.map((task) => <TaskCard key={task.id} task={task} projectName={projectName(task.projectId)} onOpen={setSelectedTask} canDelete={can('tasks.delete')} canComplete={can('tasks.complete') && task.status !== 'done'} onDelete={() => setDeleteTarget(task.id)} onComplete={() => handleCompleteTask(task.id)} draggable={can('tasks.update')} onDragStart={setDraggedTaskId} onDragEnd={() => { setDraggedTaskId(null); setDragOverStatus(null); }} />)}{columnTasks.length === 0 ? <div className={`rounded-xl border border-dashed p-7 text-center text-xs transition-colors ${dragOverStatus === status ? 'border-accent bg-accent-soft text-accent' : 'border-border/80 text-text-muted'}`}><InboxOutlined className="mb-2 text-text-muted" fontSize="small" />{draggedTaskId ? 'Suelta la tarea aquí' : 'No hay tareas en esta etapa'}</div> : null}</div>
-          </section>
-        );
-      })}
-    </div> : <div className="workspace-card overflow-hidden rounded-lg divide-y divide-border">{filteredTasks.map((task) => <button className="grid w-full gap-2 p-4 text-left hover:bg-surface-elevated sm:grid-cols-[1fr_180px_150px] sm:items-center" key={task.id} onClick={() => setSelectedTask(task)}><div><p className="text-sm font-semibold">{task.title}</p><p className="text-xs text-text-muted">{projectName(task.projectId)}</p></div><span className="text-sm text-text-secondary">{users.find((user) => user.id === task.assignee)?.name ?? task.assignee}</span><span className="text-xs text-text-muted">Vence {formatDate(task.dueDate)}</span></button>)}</div>}
+            Crear tarea
+          </PermissionAction>
+        }
+      />
 
-    <FormDialog open={dialogOpen} onClose={closeCreate} title="Nueva tarea" subtitle={`Se agregará a ${taskStatusLabels[newStatus]}.`} actions={<><Button onClick={closeCreate}>Cancelar</Button><Button variant="contained" disabled={!title.trim() || !assignee.trim() || createState.loading} onClick={() => void createTask()}>Crear tarea</Button></>}>
-      <TextField autoFocus label="Título" value={title} onChange={(event) => setTitle(event.target.value)} />
-      <TextField select label="Proyecto" value={newProjectId} onChange={(event) => setNewProjectId(event.target.value)}>{apiProjects.map((project) => <MenuItem key={project.id} value={project.id}>{project.name}</MenuItem>)}</TextField>
-      <TextField select label="Responsable" value={assignee} onChange={(event) => setAssignee(event.target.value)}>{users.map((user) => <MenuItem key={user.id} value={user.id}>{user.name} {user.lastname}</MenuItem>)}</TextField>
-    </FormDialog>
+      {tasksQuery.error ? (
+        <Alert severity="error">
+          {getApolloErrorMessage(tasksQuery.error)}
+        </Alert>
+      ) : null}
 
-    <FormDialog open={Boolean(selectedTask)} onClose={() => setSelectedTask(null)} title="Editar tarea" subtitle={selectedTask ? `Actualiza la tarea de ${projectName(selectedTask.projectId)}.` : undefined} actions={<div className="flex w-full items-center justify-end gap-2"><Button onClick={() => setSelectedTask(null)}>Cancelar</Button><PermissionAction permission="tasks.update" variant="contained" onClick={() => void updateTask()}>{updateState.loading ? 'Guardando...' : 'Guardar cambios'}</PermissionAction></div>}>
-      {selectedTask ? <>
-        <TextField autoFocus label="Título" value={selectedTask.title} onChange={(event) => setSelectedTask({ ...selectedTask, title: event.target.value })} />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField select label="Proyecto" value={selectedTask.projectId} onChange={(event) => setSelectedTask({ ...selectedTask, projectId: event.target.value })}>{apiProjects.map((project) => <MenuItem key={project.id} value={project.id}>{project.name}</MenuItem>)}</TextField>
-          <TextField select label="Responsable" value={selectedTask.assignee} onChange={(event) => setSelectedTask({ ...selectedTask, assignee: event.target.value })}>{users.map((user) => <MenuItem key={user.id} value={user.id}>{user.name} {user.lastname}</MenuItem>)}</TextField>
-          <TextField select label="Estado" value={selectedTask.status} onChange={(event) => setSelectedTask({ ...selectedTask, status: event.target.value as TaskStatus })}>{Object.entries(taskStatusLabels).map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}</TextField>
-          <TextField select label="Prioridad" value={selectedTask.priority} onChange={(event) => setSelectedTask({ ...selectedTask, priority: event.target.value as TaskPriority })}>{Object.entries(priorityLabels).map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}</TextField>
+      <div className="workspace-card flex flex-col gap-3 rounded-2xl border bg-surface-card/80 p-3.5 lg:flex-row lg:items-center">
+        <TextField
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          size="small"
+          placeholder="Buscar en el tablero"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <SearchRounded
+                  className="mr-2 text-text-muted"
+                  fontSize="small"
+                />
+              ),
+            },
+          }}
+          sx={{ width: { xs: '100%', lg: 320 } }}
+        />
+        <TextField
+          select
+          size="small"
+          value={projectId}
+          onChange={(event) => setProjectId(event.target.value)}
+          label="Proyecto"
+          sx={{ minWidth: 190 }}
+        >
+          <MenuItem value="all">Todos los proyectos</MenuItem>
+          {apiProjects.map((project) => (
+            <MenuItem key={project.id} value={project.id}>
+              {project.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        <Button
+          onClick={() => {
+            setQuery('');
+            setProjectId('all');
+          }}
+          sx={{ ml: { lg: 'auto' } }}
+        >
+          Limpiar
+        </Button>
+        <Button
+          onClick={() =>
+            setView((current) => (current === 'kanban' ? 'list' : 'kanban'))
+          }
+          variant="outlined"
+          startIcon={
+            view === 'kanban' ? <ViewListRounded /> : <ViewKanbanRounded />
+          }
+        >
+          {view === 'kanban' ? 'Lista' : 'Kanban'}
+        </Button>
+      </div>
+
+      {view === 'kanban' ? (
+        <div className="grid min-h-0 min-w-0 flex-1 grid-rows-1 grid-flow-col auto-cols-[86vw] items-stretch gap-3 overflow-x-auto pb-3 snap-x snap-mandatory md:grid-rows-2 md:grid-flow-row md:auto-cols-auto md:grid-cols-2 md:gap-4 md:overflow-visible md:snap-none xl:grid-cols-4 xl:grid-rows-1">
+          {columns.map((status) => {
+            const columnTasks = filteredTasks.filter(
+              (task) => task.status === status,
+            );
+
+            return (
+              <section
+                className={`group flex min-h-0 min-w-0 snap-start flex-col overflow-hidden rounded-2xl border border-transparent p-3 transition-all duration-300 ${columnBackgrounds[status]} ${dragOverStatus === status ? 'scale-[1.01] shadow-lg shadow-accent/15 ring-2 ring-accent/50' : 'shadow-sm hover:-translate-y-0.5 hover:shadow-md'}`}
+                key={status}
+                onDragOver={(event) => handleColumnDragOver(event, status)}
+                onDragLeave={(event) => {
+                  if (
+                    !(event.relatedTarget instanceof Node)
+                    || !event.currentTarget.contains(event.relatedTarget)
+                  ) {
+                    setDragOverStatus(null);
+                  }
+                }}
+                onDrop={(event) => handleColumnDrop(event, status)}
+              >
+                <div className="mb-4 flex shrink-0 items-center justify-between px-1">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ring-4 ring-white/5 ${columnIndicators[status]}`}
+                    />
+                    <h2 className="text-xs font-bold uppercase tracking-[0.1em] text-text-secondary">
+                      {taskStatusLabels[status]}
+                    </h2>
+                    <span className="rounded-full bg-surface-card px-2 py-0.5 text-[11px] font-bold text-text-muted shadow-sm">
+                      {columnTasks.length}
+                    </span>
+                  </div>
+                  <IconButton
+                    aria-label={`Agregar a ${taskStatusLabels[status]}`}
+                    onClick={() => openCreate(status)}
+                    size="small"
+                    sx={{
+                      color: 'var(--text-muted)',
+                      '&:hover': {
+                        bgcolor: 'var(--accent-soft)',
+                        color: 'var(--accent)',
+                      },
+                    }}
+                  >
+                    <AddRounded fontSize="small" />
+                  </IconButton>
+                </div>
+
+                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:var(--accent-soft)_transparent]">
+                  {columnTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      projectName={projectName(task.projectId)}
+                      onOpen={setSelectedTask}
+                      canDelete={can('tasks.delete')}
+                      canComplete={
+                        can('tasks.complete') && task.status !== 'done'
+                      }
+                      onDelete={() => setDeleteTarget(task.id)}
+                      onComplete={() => handleCompleteTask(task.id)}
+                      draggable={can('tasks.update')}
+                      onDragStart={setDraggedTaskId}
+                      onDragEnd={() => {
+                        setDraggedTaskId(null);
+                        setDragOverStatus(null);
+                      }}
+                    />
+                  ))}
+                  {!columnTasks.length ? (
+                    <div
+                      className={`rounded-xl border border-dashed p-7 text-center text-xs transition-colors ${dragOverStatus === status ? 'border-accent bg-accent-soft text-accent' : 'border-border/80 text-text-muted'}`}
+                    >
+                      <InboxOutlined
+                        className="mb-2 text-text-muted"
+                        fontSize="small"
+                      />
+                      {draggedTaskId
+                        ? 'Suelta la tarea aquí'
+                        : 'No hay tareas en esta etapa'}
+                    </div>
+                  ) : null}
+                </div>
+              </section>
+            );
+          })}
         </div>
-        <TextField label="Fecha límite" type="date" value={selectedTask.dueDate} onChange={(event) => setSelectedTask({ ...selectedTask, dueDate: event.target.value })} slotProps={{ inputLabel: { shrink: true } }} />
-        {selectedTask.status === 'blocked' ? <TextField label="Motivo del bloqueo" multiline minRows={2} value={selectedTask.blockedReason ?? ''} onChange={(event) => setSelectedTask({ ...selectedTask, blockedReason: event.target.value })} /> : null}
-      </> : null}
-    </FormDialog>
-    <ConfirmDialog open={Boolean(deleteTarget)} title="Eliminar tarea" description="Esta tarea se eliminará permanentemente. La acción tendrá una breve ventana de cancelación antes de enviarse." onClose={() => setDeleteTarget(null)} onConfirm={() => void confirmDeleteTask()} destructive />
-  </div>
+      ) : (
+        <div className="workspace-card divide-y divide-border overflow-hidden rounded-lg">
+          {filteredTasks.map((task) => (
+            <button
+              type="button"
+              className="grid w-full gap-2 p-4 text-left hover:bg-surface-elevated sm:grid-cols-[1fr_180px_150px] sm:items-center"
+              key={task.id}
+              onClick={() => setSelectedTask(task)}
+            >
+              <div>
+                <p className="text-sm font-semibold">{task.title}</p>
+                <p className="text-xs text-text-muted">
+                  {projectName(task.projectId)}
+                </p>
+              </div>
+              <span className="text-sm text-text-secondary">
+                {users.find((user) => user.id === task.assignee)?.name ??
+                  task.assignee}
+              </span>
+              <span className="text-xs text-text-muted">
+                Vence {formatDate(task.dueDate)}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <FormDialog
+        open={dialogOpen}
+        onClose={closeCreate}
+        title="Nueva tarea"
+        subtitle={`Se agregará a ${taskStatusLabels[newStatus]}.`}
+        actions={
+          <>
+            <Button onClick={closeCreate}>Cancelar</Button>
+            <Button
+              variant="contained"
+              disabled={!title.trim() || !assignee.trim() || createState.loading}
+              onClick={() => void createTask()}
+            >
+              Crear tarea
+            </Button>
+          </>
+        }
+      >
+        <TextField
+          autoFocus
+          label="Título"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+        />
+        <TextField
+          select
+          label="Proyecto"
+          value={newProjectId}
+          onChange={(event) => setNewProjectId(event.target.value)}
+        >
+          {apiProjects.map((project) => (
+            <MenuItem key={project.id} value={project.id}>
+              {project.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          select
+          label="Responsable"
+          value={assignee}
+          onChange={(event) => setAssignee(event.target.value)}
+        >
+          {users.map((user) => (
+            <MenuItem key={user.id} value={user.id}>
+              {user.name} {user.lastname}
+            </MenuItem>
+          ))}
+        </TextField>
+      </FormDialog>
+
+      <FormDialog
+        open={Boolean(selectedTask)}
+        onClose={() => setSelectedTask(null)}
+        title="Editar tarea"
+        subtitle={
+          selectedTask
+            ? `Actualiza la tarea de ${projectName(selectedTask.projectId)}.`
+            : undefined
+        }
+        actions={
+          <div className="flex w-full items-center justify-end gap-2">
+            <Button onClick={() => setSelectedTask(null)}>Cancelar</Button>
+            <PermissionAction
+              permission="tasks.update"
+              variant="contained"
+              onClick={() => void updateTask()}
+            >
+              {updateState.loading ? 'Guardando...' : 'Guardar cambios'}
+            </PermissionAction>
+          </div>
+        }
+      >
+        {selectedTask ? (
+          <>
+            <TextField
+              autoFocus
+              label="Título"
+              value={selectedTask.title}
+              onChange={(event) =>
+                setSelectedTask({ ...selectedTask, title: event.target.value })
+              }
+            />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField
+                select
+                label="Proyecto"
+                value={selectedTask.projectId}
+                onChange={(event) =>
+                  setSelectedTask({
+                    ...selectedTask,
+                    projectId: event.target.value,
+                  })
+                }
+              >
+                {apiProjects.map((project) => (
+                  <MenuItem key={project.id} value={project.id}>
+                    {project.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                select
+                label="Responsable"
+                value={selectedTask.assignee}
+                onChange={(event) =>
+                  setSelectedTask({
+                    ...selectedTask,
+                    assignee: event.target.value,
+                  })
+                }
+              >
+                {users.map((user) => (
+                  <MenuItem key={user.id} value={user.id}>
+                    {user.name} {user.lastname}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                select
+                label="Estado"
+                value={selectedTask.status}
+                onChange={(event) => {
+                  const status = event.target.value;
+                  if (isTaskStatus(status)) {
+                    setSelectedTask({ ...selectedTask, status });
+                  }
+                }}
+              >
+                {Object.entries(taskStatusLabels).map(([value, label]) => (
+                  <MenuItem key={value} value={value}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                select
+                label="Prioridad"
+                value={selectedTask.priority}
+                onChange={(event) => {
+                  const priority = event.target.value;
+                  if (isTaskPriority(priority)) {
+                    setSelectedTask({ ...selectedTask, priority });
+                  }
+                }}
+              >
+                {Object.entries(priorityLabels).map(([value, label]) => (
+                  <MenuItem key={value} value={value}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </div>
+            <TextField
+              label="Fecha límite"
+              type="date"
+              value={selectedTask.dueDate}
+              onChange={(event) =>
+                setSelectedTask({
+                  ...selectedTask,
+                  dueDate: event.target.value,
+                })
+              }
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+            {selectedTask.status === 'blocked' ? (
+              <TextField
+                label="Motivo del bloqueo"
+                multiline
+                minRows={2}
+                value={selectedTask.blockedReason ?? ''}
+                onChange={(event) =>
+                  setSelectedTask({
+                    ...selectedTask,
+                    blockedReason: event.target.value,
+                  })
+                }
+              />
+            ) : null}
+          </>
+        ) : null}
+      </FormDialog>
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title="Eliminar tarea"
+        description="Esta tarea se eliminará permanentemente. La acción tendrá una breve ventana de cancelación antes de enviarse."
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => void confirmDeleteTask()}
+        destructive
+      />
+    </div>
   );
 };
 

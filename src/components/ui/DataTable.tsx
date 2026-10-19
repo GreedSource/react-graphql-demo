@@ -105,18 +105,22 @@ export const DataTable: DataTableComponent = <T,>({
     setPage(0);
   };
 
+  const selectedOnPage = paginatedRows.filter((row) =>
+    selectedKeys.has(getRowKey(row)),
+  ).length;
+  const isAllSelected =
+    paginatedRows.length > 0 && selectedOnPage === paginatedRows.length;
+  const isSomeSelected = selectedOnPage > 0 && !isAllSelected;
+
   const handleSelectAll = () => {
-    if (selectedKeys.size === paginatedRows.length) {
-      const newSelected = new Set(selectedKeys);
+    const newSelected = new Set(selectedKeys);
+    if (isAllSelected) {
       paginatedRows.forEach((row) => newSelected.delete(getRowKey(row)));
-      setSelectedKeys(newSelected);
-      onSelectionChange?.(newSelected);
     } else {
-      const newSelected = new Set(selectedKeys);
       paginatedRows.forEach((row) => newSelected.add(getRowKey(row)));
-      setSelectedKeys(newSelected);
-      onSelectionChange?.(newSelected);
     }
+    setSelectedKeys(newSelected);
+    onSelectionChange?.(newSelected);
   };
 
   const handleSelectRow = (rowKey: string) => {
@@ -130,65 +134,66 @@ export const DataTable: DataTableComponent = <T,>({
     onSelectionChange?.(newSelected);
   };
 
-  const selectedOnPage = paginatedRows.filter((row) => selectedKeys.has(getRowKey(row))).length;
-  const isAllSelected = paginatedRows.length > 0 && selectedOnPage === paginatedRows.length;
-  const isSomeSelected = selectedOnPage > 0 && !isAllSelected;
-
   return (
     <div className="space-y-3">
       {searchable && (
         <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-card p-3">
-        <TextField
-          size="small"
-          placeholder={searchPlaceholder}
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setPage(0);
-          }}
-          fullWidth
-          sx={(theme) => ({
-            '& .MuiOutlinedInput-root': {
-              bgcolor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.04)'
-                  : 'rgba(0,0,0,0.02)',
-              borderRadius: 2,
-              '& fieldset': { borderColor: 'transparent' },
-              '&:hover fieldset': {
-                borderColor:
+          <TextField
+            size="small"
+            placeholder={searchPlaceholder}
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(0);
+            }}
+            fullWidth
+            sx={(theme) => ({
+              '& .MuiOutlinedInput-root': {
+                bgcolor:
                   theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.15)'
-                    : 'rgba(0,0,0,0.15)',
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.02)',
+                borderRadius: 2,
+                '& fieldset': { borderColor: 'transparent' },
+                '&:hover fieldset': {
+                  borderColor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.15)'
+                      : 'rgba(0,0,0,0.15)',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(56,189,248,0.5)'
+                      : 'rgba(14,165,233,0.4)',
+                },
               },
-              '&.Mui-focused fieldset': {
-                borderColor:
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(56,189,248,0.5)'
-                    : 'rgba(14,165,233,0.4)',
-              },
-            },
-          })}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search sx={{ color: 'var(--text-muted)', fontSize: 18 }} />
-              </InputAdornment>
-            ),
-            endAdornment: searchQuery ? (
-              <InputAdornment position="end">
-                <IconButton
-                  size="small"
-                  onClick={() => setSearchQuery('')}
-                  sx={{ color: 'var(--text-muted)' }}
-                >
-                  <Clear fontSize="small" />
-                </IconButton>
-              </InputAdornment>
-            ) : null,
-          }}
-        />
-        <span className="hidden shrink-0 rounded-lg bg-accent-soft px-2.5 py-1.5 text-xs font-semibold text-accent sm:inline-flex">{filteredRows.length} {filteredRows.length === 1 ? 'resultado' : 'resultados'}</span>
+            })}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search
+                    sx={{ color: 'var(--text-muted)', fontSize: 18 }}
+                  />
+                </InputAdornment>
+              ),
+              endAdornment: searchQuery ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() => setSearchQuery('')}
+                    sx={{ color: 'var(--text-muted)' }}
+                  >
+                    <Clear fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            }}
+          />
+          <span className="hidden shrink-0 rounded-lg bg-accent-soft px-2.5 py-1.5 text-xs font-semibold text-accent sm:inline-flex">
+            {filteredRows.length}{' '}
+            {filteredRows.length === 1 ? 'resultado' : 'resultados'}
+          </span>
         </div>
       )}
 

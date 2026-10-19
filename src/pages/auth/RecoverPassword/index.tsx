@@ -6,12 +6,12 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
-import { useAuthActions } from '@/hooks/auth.hook';
+import { useRecoverPasswordAction } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { isValidEmail } from '@/lib/validation';
 
 const RecoverPasswordContent: React.FC = () => {
-  const { recoverPassword, recoverPasswordState } = useAuthActions();
+  const { recoverPassword, recoverPasswordState } = useRecoverPasswordAction();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);

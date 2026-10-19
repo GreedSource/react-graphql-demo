@@ -31,6 +31,22 @@ interface CRMListResult {
   [key: string]: ApiResponse<CRMResource[]>;
 }
 
+interface CRMResourceMutationResult {
+  [key: string]: ApiResponse<Partial<CRMResource>> | undefined;
+}
+
+interface CRMResourceDeleteResult {
+  [key: string]: ApiResponse<boolean> | undefined;
+}
+
+interface CRMLeadConversionResult {
+  convertLead: ApiResponse<Pick<CRMResource, 'id' | 'name' | 'stage' | 'value'>>;
+}
+
+interface CRMOpportunityCloseResult {
+  closeOpportunity: ApiResponse<Pick<CRMResource, 'id' | 'name' | 'stage' | 'value'>>;
+}
+
 interface CRMDashboardResult {
   crmDashboard: ApiResponse<CRMDashboardSummary>;
 }
@@ -65,11 +81,16 @@ export function useCrmResources(module: CRMModule, organizationId: string) {
     skip: !organizationId,
     fetchPolicy: 'cache-and-network',
   });
-  const [createMutation, createState] = useMutation(CRM_CREATE_MUTATIONS[module]);
-  const [deleteMutation, deleteState] = useMutation(CRM_DELETE_MUTATIONS[module]);
-  const [updateMutation, updateState] = useMutation(CRM_UPDATE_MUTATIONS[module]);
-  const [convertMutation, convertState] = useMutation(CONVERT_LEAD);
-  const [closeMutation, closeState] = useMutation(CLOSE_OPPORTUNITY);
+  const [createMutation, createState] =
+    useMutation<CRMResourceMutationResult>(CRM_CREATE_MUTATIONS[module]);
+  const [deleteMutation, deleteState] =
+    useMutation<CRMResourceDeleteResult>(CRM_DELETE_MUTATIONS[module]);
+  const [updateMutation, updateState] =
+    useMutation<CRMResourceMutationResult>(CRM_UPDATE_MUTATIONS[module]);
+  const [convertMutation, convertState] =
+    useMutation<CRMLeadConversionResult>(CONVERT_LEAD);
+  const [closeMutation, closeState] =
+    useMutation<CRMOpportunityCloseResult>(CLOSE_OPPORTUNITY);
 
   const createResource = async (input: CRMResourceInput) => {
     const data = await createMutation({ variables: { input }, refetchQueries: [{ query, variables: { organizationId } }] });

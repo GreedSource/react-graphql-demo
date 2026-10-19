@@ -5,7 +5,7 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import { toast } from 'react-toastify';
-import { useAuthActions } from '@/hooks/auth.hook';
+import { useResetPasswordAction } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { validatePassword } from '@/lib/password-validation';
 import PasswordInput from '@/components/ui/PasswordInput';
@@ -14,7 +14,7 @@ import type { ResetPasswordInput } from '@/types/admin';
 const ResetPasswordContent: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useParams<{ token: string }>();
-  const { resetPassword, resetPasswordState } = useAuthActions();
+  const { resetPassword, resetPasswordState } = useResetPasswordAction();
   const [formState, setFormState] = useState<ResetPasswordInput>({
     token: token ?? '',
     password: '',

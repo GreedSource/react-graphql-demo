@@ -25,14 +25,14 @@ import { useTasks } from '@/hooks/task.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import {
   getProjectAnalytics,
+  getPendingProjectChartData,
+  getProjectProgressChartData,
+  getTaskPriorityChartData,
+  getTaskStatusChartData,
   getTaskActivityTrend,
-  taskPriorityColors,
-  taskPriorityOrder,
-  taskStatusColors,
-  taskStatusOrder,
+  sortProjectSummariesByRisk,
   type ProjectHealth,
 } from '@/lib/project-analytics';
-import { priorityLabels, taskStatusLabels } from '@/lib/project-platform-labels';
 
 const healthMeta: Record<ProjectHealth, { label: string; classes: string }> = {
   risk: { label: 'Requiere atención', classes: 'bg-rose-500/10 text-rose-700 dark:text-rose-300' },
@@ -56,49 +56,16 @@ const ReportsPageContent: React.FC = () => {
   const signalsCardRef = React.useRef<HTMLElement | null>(null);
   const projectDetailsRef = React.useRef<HTMLElement | null>(null);
 
-  const statusData = taskStatusOrder.map((status) => ({
-    label: taskStatusLabels[status],
-    value: analytics.statusCounts[status],
-    color: taskStatusColors[status],
-  }));
-  const priorityData = taskPriorityOrder.map((priority) => ({
-    label: priorityLabels[priority],
-    value: analytics.priorityCounts[priority],
-    color: taskPriorityColors[priority],
-  }));
+  const statusData = getTaskStatusChartData(analytics);
+  const priorityData = getTaskPriorityChartData(analytics);
   const statusExportRows: AnalyticsExportRow[] = statusData.map(({ label, value }) => ({ Estado: label, Tareas: value }));
   const priorityExportRows: AnalyticsExportRow[] = priorityData.map(({ label, value }) => ({ Prioridad: label, Tareas: value }));
   const trendExportRows: AnalyticsExportRow[] = activityTrend.map(({ label, created, completed, due }) => ({ Fecha: label, Creadas: created, Completadas: completed, Vencen: due }));
-  const pendingProjectData = analytics.projectSummaries
-    .filter(({ totalTasks }) => totalTasks > 0)
-    .slice()
-    .sort((left, right) => (right.totalTasks - right.completedTasks) - (left.totalTasks - left.completedTasks))
-    .slice(0, 8)
-    .map(({ project, totalTasks, completedTasks }) => ({
-      label: project.name,
-      value: totalTasks - completedTasks,
-      color: '#f59e0b',
-      caption: `${totalTasks - completedTasks} pendientes`,
-    }));
-  const projectProgress = analytics.projectSummaries
-    .slice()
-    .sort((left, right) => right.progress - left.progress)
-    .slice(0, 8)
-    .map(({ project, progress, completedTasks, totalTasks }) => ({
-      label: project.name,
-      value: progress,
-      caption: `${completedTasks}/${totalTasks} completadas`,
-    }));
+  const pendingProjectData = getPendingProjectChartData(analytics, 8);
+  const projectProgress = getProjectProgressChartData(analytics, 8);
   const progressExportRows: AnalyticsExportRow[] = projectProgress.map(({ label, value, caption }) => ({ Proyecto: label, Avance: value, Detalle: caption }));
   const pendingExportRows: AnalyticsExportRow[] = pendingProjectData.map(({ label, value, caption }) => ({ Proyecto: label, Pendientes: value, Detalle: caption }));
-  const detailProjects = analytics.projectSummaries
-    .slice()
-    .sort((left, right) => {
-      const healthWeight = { risk: 3, attention: 2, healthy: 1 };
-      return healthWeight[right.health] - healthWeight[left.health]
-        || (right.overdueTasks + right.blockedTasks) - (left.overdueTasks + left.blockedTasks)
-        || right.progress - left.progress;
-    });
+  const detailProjects = sortProjectSummariesByRisk(analytics.projectSummaries);
   const projectDetailsExportRows: AnalyticsExportRow[] = detailProjects.map(({ project, totalTasks, completedTasks, blockedTasks, overdueTasks, dueSoonTasks, progress, health }) => ({
     Proyecto: project.name,
     Estado: healthMeta[health].label,

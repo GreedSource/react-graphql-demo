@@ -59,8 +59,11 @@ interface RefreshMutationResult {
   refreshToken: ApiResponse<AuthPayload>;
 }
 
-interface ImpersonationMutationResult {
+interface ImpersonateUserResult {
   impersonateUser: ApiResponse<AuthPayload>;
+}
+
+interface StopImpersonationResult {
   stopImpersonation: ApiResponse<AuthPayload>;
 }
 
@@ -75,33 +78,39 @@ export function useProfileQuery(enabled = true) {
   });
 }
 
-export function useAuthActions() {
-  const client = useApolloClient();
-  const navigate = useNavigate();
-  const { setSession, logout } = useUserStore();
+function persistAuthPayload(
+  setSession: (payload: {
+    user: User | null;
+    accessToken?: string | null;
+    refreshToken?: string | null;
+  }) => void,
+  payload: AuthPayload,
+) {
+  setSession({
+    user: payload.user,
+    accessToken: payload.accessToken,
+    refreshToken: payload.refreshToken,
+  });
+}
+
+export function useLoginAction() {
+  const { setSession } = useUserStore();
   const [loginMutation, loginState] = useMutation<AuthMutationResult>(LOGIN);
-  const [registerMutation, registerState] =
-    useMutation<RegisterMutationResult>(REGISTER);
-  const [recoverPasswordMutation, recoverPasswordState] =
-    useMutation<RecoverPasswordResult>(RECOVER_PASSWORD);
-  const [resetPasswordMutation, resetPasswordState] =
-    useMutation<ResetPasswordResult>(RESET_PASSWORD);
-  const [logoutMutation] = useMutation<LogoutResult>(LOGOUT);
-  const [impersonateMutation, impersonateState] =
-    useMutation<ImpersonationMutationResult>(IMPERSONATE_USER);
-  const [stopImpersonationMutation, stopImpersonationState] =
-    useMutation<ImpersonationMutationResult>(STOP_IMPERSONATION);
 
   const login = async (input: LoginInput) => {
     const { data } = await loginMutation({ variables: { input } });
     const response = ensureSuccess(data?.login, 'No se pudo iniciar sesion.');
-    setSession({
-      user: response.data.user,
-      accessToken: response.data.accessToken,
-      refreshToken: response.data.refreshToken,
-    });
+    persistAuthPayload(setSession, response.data);
     return response;
   };
+
+  return { login, loginState };
+}
+
+export function useRegisterAction() {
+  const { setSession } = useUserStore();
+  const [registerMutation, registerState] =
+    useMutation<RegisterMutationResult>(REGISTER);
 
   const register = async (input: RegisterInput) => {
     const { data } = await registerMutation({ variables: { input } });
@@ -109,13 +118,16 @@ export function useAuthActions() {
       data?.register,
       'No se pudo crear la cuenta.',
     );
-    setSession({
-      user: response.data.user,
-      accessToken: response.data.accessToken,
-      refreshToken: response.data.refreshToken,
-    });
+    persistAuthPayload(setSession, response.data);
     return response;
   };
+
+  return { register, registerState };
+}
+
+export function useRecoverPasswordAction() {
+  const [recoverPasswordMutation, recoverPasswordState] =
+    useMutation<RecoverPasswordResult>(RECOVER_PASSWORD);
 
   const recoverPassword = async (email: string) => {
     const { data } = await recoverPasswordMutation({ variables: { email } });
@@ -125,6 +137,13 @@ export function useAuthActions() {
     );
   };
 
+  return { recoverPassword, recoverPasswordState };
+}
+
+export function useResetPasswordAction() {
+  const [resetPasswordMutation, resetPasswordState] =
+    useMutation<ResetPasswordResult>(RESET_PASSWORD);
+
   const resetPassword = async (input: ResetPasswordInput) => {
     const { data } = await resetPasswordMutation({ variables: { input } });
     return ensureSuccess(
@@ -133,11 +152,21 @@ export function useAuthActions() {
     );
   };
 
+  return { resetPassword, resetPasswordState };
+}
+
+export function useLogoutAction() {
+  const client = useApolloClient();
+  const navigate = useNavigate();
+  const { logout } = useUserStore();
+  const [logoutMutation] = useMutation<LogoutResult>(LOGOUT);
+
   const performLogout = async () => {
     try {
       await logoutMutation();
-    } catch {
-      // Si el backend falla igualmente limpiamos la sesion local.
+    } catch (error) {
+      // A backend logout failure must not prevent local session cleanup.
+      console.warn('Backend logout failed; clearing the local session.', error);
     }
 
     await logoutAll();
@@ -145,6 +174,15 @@ export function useAuthActions() {
     logout();
     navigate('/login', { replace: true });
   };
+
+  return { performLogout };
+}
+
+export function useImpersonateUserAction() {
+  const client = useApolloClient();
+  const navigate = useNavigate();
+  const [impersonateMutation, impersonateState] =
+    useMutation<ImpersonateUserResult>(IMPERSONATE_USER);
 
   const impersonateUser = async (userId: string, returnPath: string) => {
     const { data } = await impersonateMutation({ variables: { userId } });
@@ -157,6 +195,15 @@ export function useAuthActions() {
     navigate('/welcome', { replace: true });
     return response;
   };
+
+  return { impersonateUser, impersonateState };
+}
+
+export function useStopImpersonationAction() {
+  const client = useApolloClient();
+  const navigate = useNavigate();
+  const [stopImpersonationMutation, stopImpersonationState] =
+    useMutation<StopImpersonationResult>(STOP_IMPERSONATION);
 
   const stopImpersonation = async () => {
     if (!useUserStore.getState().impersonation) {
@@ -183,21 +230,7 @@ export function useAuthActions() {
     }
   };
 
-  return {
-    login,
-    register,
-    recoverPassword,
-    resetPassword,
-    performLogout,
-    impersonateUser,
-    stopImpersonation,
-    loginState,
-    registerState,
-    recoverPasswordState,
-    resetPasswordState,
-    impersonateState,
-    stopImpersonationState,
-  };
+  return { stopImpersonation, stopImpersonationState };
 }
 
 export function useAuthBootstrap() {

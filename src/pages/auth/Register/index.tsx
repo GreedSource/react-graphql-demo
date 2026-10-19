@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
-import { useAuthActions } from '@/hooks/auth.hook';
+import { useRegisterAction } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { isValidEmail } from '@/lib/validation';
 import { validatePassword } from '@/lib/password-validation';
@@ -15,7 +15,7 @@ import type { RegisterInput } from '@/types/admin';
 
 const RegisterContent: React.FC = () => {
   const navigate = useNavigate();
-  const { register, registerState } = useAuthActions();
+  const { register, registerState } = useRegisterAction();
   const [formState, setFormState] = useState<RegisterInput>({
     name: '',
     lastname: '',

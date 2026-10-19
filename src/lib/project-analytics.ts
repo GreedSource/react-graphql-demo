@@ -4,6 +4,7 @@ import type {
   TaskPriority,
   TaskStatus,
 } from '@/types/project-platform';
+import { priorityLabels, taskStatusLabels } from './project-platform-labels';
 
 export type ProjectHealth = 'healthy' | 'attention' | 'risk';
 
@@ -65,6 +66,99 @@ export interface ProjectAnalyticsSummary {
   priorityCounts: Record<TaskPriority, number>;
   projectSummaries: ProjectAnalytics[];
   atRiskProjects: ProjectAnalytics[];
+}
+
+export interface ProjectChartDatum {
+  label: string;
+  value: number;
+  color?: string;
+  caption?: string;
+  projectId?: string;
+}
+
+export interface TaskChartDatum {
+  label: string;
+  value: number;
+  color: string;
+}
+
+export interface ProjectSummaryChartDatum extends ProjectChartDatum {
+  caption: string;
+}
+
+export function getTaskStatusChartData(
+  analytics: ProjectAnalyticsSummary,
+): TaskChartDatum[] {
+  return taskStatusOrder.map((status) => ({
+    label: taskStatusLabels[status],
+    value: analytics.statusCounts[status],
+    color: taskStatusColors[status],
+  }));
+}
+
+export function getTaskPriorityChartData(
+  analytics: ProjectAnalyticsSummary,
+): TaskChartDatum[] {
+  return taskPriorityOrder.map((priority) => ({
+    label: priorityLabels[priority],
+    value: analytics.priorityCounts[priority],
+    color: taskPriorityColors[priority],
+  }));
+}
+
+export function getPendingProjectChartData(
+  analytics: ProjectAnalyticsSummary,
+  limit: number,
+): ProjectSummaryChartDatum[] {
+  return analytics.projectSummaries
+    .filter(({ totalTasks }) => totalTasks > 0)
+    .slice()
+    .sort(
+      (left, right) =>
+        right.totalTasks -
+        right.completedTasks -
+        (left.totalTasks - left.completedTasks),
+    )
+    .slice(0, limit)
+    .map(({ project, totalTasks, completedTasks }) => ({
+      label: project.name,
+      value: totalTasks - completedTasks,
+      color: '#f59e0b',
+      caption: `${totalTasks - completedTasks} pendientes`,
+    }));
+}
+
+export function getProjectProgressChartData(
+  analytics: ProjectAnalyticsSummary,
+  limit: number,
+): ProjectSummaryChartDatum[] {
+  return analytics.projectSummaries
+    .slice()
+    .sort((left, right) => right.progress - left.progress)
+    .slice(0, limit)
+    .map(({ project, progress, completedTasks, totalTasks }) => ({
+      projectId: project.id,
+      label: project.name,
+      value: progress,
+      caption: `${completedTasks}/${totalTasks} tareas completadas`,
+    }));
+}
+
+export function sortProjectSummariesByRisk(
+  summaries: ProjectAnalytics[],
+): ProjectAnalytics[] {
+  const healthWeight: Record<ProjectHealth, number> = {
+    risk: 3,
+    attention: 2,
+    healthy: 1,
+  };
+
+  return summaries.slice().sort((left, right) =>
+    healthWeight[right.health] - healthWeight[left.health]
+    || (right.overdueTasks + right.blockedTasks)
+      - (left.overdueTasks + left.blockedTasks)
+    || right.progress - left.progress,
+  );
 }
 
 export interface TaskActivityTrendDatum {

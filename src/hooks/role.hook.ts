@@ -23,14 +23,23 @@ interface RoleQueryResult {
   role: ApiResponse<Role>;
 }
 
-interface RoleMutationResult {
+interface CreateRoleResult {
   createRole: ApiResponse<Role>;
+}
+
+interface UpdateRoleResult {
   updateRole: ApiResponse<Role>;
 }
 
-interface BooleanMutationResult {
+interface DeleteRoleResult {
   deleteRole: ApiResponse<boolean>;
+}
+
+interface AddPermissionsToRoleResult {
   addPermissionsToRole: ApiResponse<boolean>;
+}
+
+interface RemovePermissionsFromRoleResult {
   removePermissionsFromRole: ApiResponse<boolean>;
 }
 
@@ -51,15 +60,15 @@ export function useRole(id?: string) {
 
 export function useRoleMutations() {
   const [createRoleMutation, createState] =
-    useMutation<RoleMutationResult>(CREATE_ROLE);
+    useMutation<CreateRoleResult>(CREATE_ROLE);
   const [updateRoleMutation, updateState] =
-    useMutation<RoleMutationResult>(UPDATE_ROLE);
+    useMutation<UpdateRoleResult>(UPDATE_ROLE);
   const [deleteRoleMutation, deleteState] =
-    useMutation<BooleanMutationResult>(DELETE_ROLE);
+    useMutation<DeleteRoleResult>(DELETE_ROLE);
   const [addPermissionsMutation, addPermissionsState] =
-    useMutation<BooleanMutationResult>(ADD_PERMISSIONS_TO_ROLE);
+    useMutation<AddPermissionsToRoleResult>(ADD_PERMISSIONS_TO_ROLE);
   const [removePermissionsMutation, removePermissionsState] =
-    useMutation<BooleanMutationResult>(REMOVE_PERMISSIONS_FROM_ROLE);
+    useMutation<RemovePermissionsFromRoleResult>(REMOVE_PERMISSIONS_FROM_ROLE);
 
   const createRole = async (input: CreateRoleInput) => {
     const { data } = await createRoleMutation({

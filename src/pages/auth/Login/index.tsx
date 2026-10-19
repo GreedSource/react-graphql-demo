@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { toast } from 'react-toastify';
-import { useAuthActions } from '@/hooks/auth.hook';
+import { useLoginAction } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { isValidEmail } from '@/lib/validation';
 import { useUserStore } from '@/stores/user.store';
@@ -19,7 +19,7 @@ import type { LoginFormState } from './types';
 const LoginContent: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loginState } = useAuthActions();
+  const { login, loginState } = useLoginAction();
   const { user, accessToken } = useUserStore();
   const [formState, setFormState] = useState<LoginFormState>({
     email: '',

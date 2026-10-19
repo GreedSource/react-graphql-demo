@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
-import { useAuthActions } from '@/hooks/auth.hook';
+import { useImpersonateUserAction } from '@/hooks/auth.hook';
 import { useRoles } from '@/hooks/role.hook';
 import { useUserMutations, useUsers } from '@/hooks/user.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
@@ -24,7 +24,7 @@ export const useUsersPage = () => {
   const currentUser = useUserStore((state) => state.user);
   const impersonation = useUserStore((state) => state.impersonation);
   const location = useLocation();
-  const { impersonateUser, impersonateState } = useAuthActions();
+  const { impersonateUser, impersonateState } = useImpersonateUserAction();
   const { updateUser, deleteUser, updateState, deleteState } = useUserMutations();
   const users = useMemo(() => usersQuery.data?.users?.data ?? [], [usersQuery.data]);
   const roles = useMemo(() => rolesQuery.data?.roles?.data ?? [], [rolesQuery.data]);

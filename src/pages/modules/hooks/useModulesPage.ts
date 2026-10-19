@@ -51,14 +51,30 @@ export const useModulesPage = () => {
 
   const handleSave = async () => {
     try {
-      const response = dialogMode === 'create'
-        ? await createModule(formState)
-        : await updateModule(formState as UpdateModuleInput);
+      const response =
+        dialogMode === 'create'
+          ? await createModule(formState)
+          : await updateModule(buildUpdateInput());
       toast.success(response.message || (dialogMode === 'create' ? 'Modulo creado.' : 'Modulo actualizado.'));
       setDialogOpen(false);
     } catch (error) {
       toast.error(getApolloErrorMessage(error));
     }
+  };
+
+  const buildUpdateInput = (): UpdateModuleInput => {
+    const id = formState.id ?? selectedModule?.id;
+    if (!id) {
+      throw new Error('No se encontró el identificador del módulo a editar.');
+    }
+
+    return {
+      id,
+      name: formState.name,
+      key: formState.key,
+      description: formState.description,
+      active: formState.active,
+    };
   };
 
   return {

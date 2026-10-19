@@ -3,14 +3,14 @@ import ArrowBackRounded from '@mui/icons-material/ArrowBackRounded';
 import SecurityRounded from '@mui/icons-material/SecurityRounded';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
-import { useAuthActions } from '@/hooks/auth.hook';
+import { useStopImpersonationAction } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { useUserStore } from '@/stores/user.store';
 
 const ImpersonationBanner: React.FC = () => {
   const user = useUserStore((state) => state.user);
   const impersonation = useUserStore((state) => state.impersonation);
-  const { stopImpersonation, stopImpersonationState } = useAuthActions();
+  const { stopImpersonation, stopImpersonationState } = useStopImpersonationAction();
 
   if (!impersonation || !user) {
     return null;

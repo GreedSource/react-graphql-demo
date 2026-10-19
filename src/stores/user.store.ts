@@ -7,6 +7,17 @@ const KEY = 'userState';
 const DB_NAME = import.meta.env.VITE_INDEXED_DB_NAME;
 const ENC_KEY = import.meta.env.VITE_CRYPTO_SECRET || 'local-dev-secret';
 
+type PersistedUserState = Pick<
+  UserState,
+  'user' | 'accessToken' | 'refreshToken' | 'sessionChecked' | 'impersonation'
+>;
+
+function persistUserState(state: PersistedUserState) {
+  void saveState(DB_NAME, STORE_NAME, KEY, state, ENC_KEY).catch((error) => {
+    console.error('Failed to persist user state:', error);
+  });
+}
+
 /**
  * Persists the given partial state to IndexedDB after merging it with the
  * current store state. Centralises the set-and-save pattern so individual
@@ -14,7 +25,7 @@ const ENC_KEY = import.meta.env.VITE_CRYPTO_SECRET || 'local-dev-secret';
  */
 function persistState(currentState: UserState, patch: Partial<UserState>): Partial<UserState> {
   const nextState = { ...currentState, ...patch };
-  void saveState(DB_NAME, STORE_NAME, KEY, nextState, ENC_KEY);
+  persistUserState(nextState);
   return patch;
 }
 
@@ -134,7 +145,7 @@ export const useUserStore = create<UserState>((set) => ({
       impersonation: null,
     };
     set(clearedState);
-    void saveState(DB_NAME, STORE_NAME, KEY, clearedState, ENC_KEY);
+    persistUserState(clearedState);
   },
 }));
 

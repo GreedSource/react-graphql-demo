@@ -20,6 +20,45 @@ interface ConfirmDialogProps {
   loading?: boolean;
 }
 
+interface PendingDeleteToastProps {
+  onUndo: () => void;
+}
+
+const PendingDeleteToast: React.FC<PendingDeleteToastProps> = ({ onUndo }) => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      width: '100%',
+      color: '#ffffff',
+    }}
+  >
+    <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#ffffff' }}>
+      Eliminación pendiente
+    </span>
+    <button
+      type="button"
+      aria-label="Deshacer eliminación"
+      style={{
+        border: 0,
+        borderRadius: 7,
+        padding: '7px 11px',
+        background: '#fbbf24',
+        color: '#172033',
+        cursor: 'pointer',
+        fontSize: 12,
+        fontWeight: 800,
+        lineHeight: 1.2,
+        whiteSpace: 'nowrap',
+      }}
+      onClick={onUndo}
+    >
+      DESHACER
+    </button>
+  </div>
+);
+
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   open,
   title,
@@ -31,10 +70,10 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   destructive = false,
   loading = false,
 }) => {
-  const [phase, setPhase] = useState<'idle' | 'holding' | 'arming' | 'loading'>('idle');
+  const [phase, setPhase] = useState<'idle' | 'holding'>('idle');
   const [progress, setProgress] = useState(0);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const commitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastId = useRef<ReturnType<typeof toast> | null>(null);
 
@@ -45,19 +84,15 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     }
     return () => {
       if (holdTimer.current) clearTimeout(holdTimer.current);
-      if (countdownTimer.current) clearInterval(countdownTimer.current);
+      if (progressTimer.current) clearInterval(progressTimer.current);
     };
   }, [open]);
-
-  useEffect(() => {
-    if (loading) setPhase('loading');
-  }, [loading]);
 
   const cancelTimers = () => {
     if (holdTimer.current) clearTimeout(holdTimer.current);
     holdTimer.current = null;
-    if (countdownTimer.current) clearInterval(countdownTimer.current);
-    countdownTimer.current = null;
+    if (progressTimer.current) clearInterval(progressTimer.current);
+    progressTimer.current = null;
   };
 
   const cancelHold = () => {
@@ -79,9 +114,32 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       const cancelPending = () => {
         if (commitTimer.current) clearTimeout(commitTimer.current);
         commitTimer.current = null;
-        if (toastId.current) toast.dismiss(toastId.current);
+        if (toastId.current) {
+          toast.dismiss(toastId.current);
+          toastId.current = null;
+        }
       };
-      toastId.current = toast(({ closeToast }) => <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', color: '#ffffff' }}><span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#ffffff' }}>Eliminación pendiente</span><button type="button" aria-label="Deshacer eliminación" style={{ border: 0, borderRadius: 7, padding: '7px 11px', background: '#fbbf24', color: '#172033', cursor: 'pointer', fontSize: 12, fontWeight: 800, lineHeight: 1.2, whiteSpace: 'nowrap' }} onClick={() => { cancelPending(); closeToast?.(); }}>DESHACER</button></div>, { autoClose: false, closeButton: false, closeOnClick: false, className: 'pending-delete-toast', style: { background: '#172033', color: '#ffffff', minWidth: 310 } });
+      toastId.current = toast(
+        ({ closeToast }) => (
+          <PendingDeleteToast
+            onUndo={() => {
+              cancelPending();
+              closeToast?.();
+            }}
+          />
+        ),
+        {
+          autoClose: false,
+          closeButton: false,
+          closeOnClick: false,
+          className: 'pending-delete-toast',
+          style: {
+            background: '#172033',
+            color: '#ffffff',
+            minWidth: 310,
+          },
+        },
+      );
       commitTimer.current = setTimeout(() => {
         commitTimer.current = null;
         if (toastId.current) toast.dismiss(toastId.current);
@@ -89,10 +147,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         onConfirm();
       }, 2200);
     }, 900);
-    const progressTimer = setInterval(() => {
-      setProgress(Math.min(96, Math.round(((Date.now() - startedAt) / 900) * 100)));
+    progressTimer.current = setInterval(() => {
+      setProgress(
+        Math.min(96, Math.round(((Date.now() - startedAt) / 900) * 100)),
+      );
     }, 50);
-    setTimeout(() => clearInterval(progressTimer), 950);
   };
 
   const handleClose = () => {
@@ -103,7 +162,12 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={loading || phase === 'arming' ? undefined : handleClose} fullWidth maxWidth="xs">
+    <Dialog
+      open={open}
+      onClose={loading ? undefined : handleClose}
+      fullWidth
+      maxWidth="xs"
+    >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <p className="text-sm text-text-secondary">{description}</p>
@@ -117,14 +181,35 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           onPointerUp={destructive ? cancelHold : undefined}
           onPointerLeave={destructive ? cancelHold : undefined}
           onPointerCancel={destructive ? cancelHold : undefined}
-          onContextMenu={(event) => { if (destructive) event.preventDefault(); }}
+          onContextMenu={(event) => {
+            if (destructive) event.preventDefault();
+          }}
           variant="contained"
           color={destructive ? 'error' : 'primary'}
           disabled={loading}
-          sx={{ minWidth: destructive ? 150 : undefined, position: 'relative', overflow: 'hidden' }}
+          sx={{
+            minWidth: destructive ? 150 : undefined,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
         >
-          {destructive && phase === 'holding' ? 'Mantén presionado…' : destructive ? 'Mantén para eliminar' : confirmLabel}
-          {destructive && phase === 'holding' ? <LinearProgress variant="determinate" value={progress} color="inherit" sx={{ position: 'absolute', inset: 0, opacity: 0.28 }} /> : null}
+          {destructive && phase === 'holding'
+            ? 'Mantén presionado…'
+            : destructive
+              ? 'Mantén para eliminar'
+              : confirmLabel}
+          {destructive && phase === 'holding' ? (
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              color="inherit"
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                opacity: 0.28,
+              }}
+            />
+          ) : null}
         </Button>
       </DialogActions>
     </Dialog>
