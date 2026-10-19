@@ -1,6 +1,9 @@
 import * as React from 'react';
+import EditRounded from '@mui/icons-material/EditRounded';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import { DataTable } from '@/components/ui/DataTable';
 import { FormDialog } from '@/components/ui/FormDialog';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -8,14 +11,13 @@ import { SectionCard } from '@/components/ui/SectionCard';
 import { StateCard } from '@/components/ui/StateCard';
 import { StatusChip } from '@/components/ui/StatusChip';
 import { getApolloErrorMessage } from '@/lib/graphql';
-import ModuleDetailPanel from './components/ModuleDetailPanel';
 import ModuleFormFields from './components/ModuleFormFields';
 import { useModulesPage } from './hooks/useModulesPage';
 
 const ModulesPageContent: React.FC = () => {
   const {
-    modulesQuery, modules, selectedId, setSelectedId, dialogMode,
-    dialogOpen, setDialogOpen, formState, setFormState, selectedModule,
+    modulesQuery, modules, dialogMode,
+    dialogOpen, setDialogOpen, formState, setFormState,
     openCreate, openEdit, handleSave, createState, updateState,
   } = useModulesPage();
 
@@ -38,58 +40,71 @@ const ModulesPageContent: React.FC = () => {
         </Alert>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-        <SectionCard title="Listado de modulos" badge={modules.length}>
-          {modules.length ? (
-            <DataTable
-              rows={modules}
-              getRowKey={(item) => item.id}
-              selectedRowKey={selectedId}
-              onRowClick={(item) => setSelectedId(item.id)}
-              searchable
-              searchPlaceholder="Buscar por nombre o clave..."
-              searchableFields={[(item) => item.name, (item) => item.key]}
-              columns={[
-                {
-                  key: 'name',
-                  header: 'Módulo',
-                  render: (item) => (
-                    <span className="font-medium">{item.name}</span>
-                  ),
-                },
-                {
-                  key: 'key',
-                  header: 'Key',
-                  render: (item) => item.key,
-                },
-                {
-                  key: 'active',
-                  header: 'Estado',
-                  render: (item) => <StatusChip active={item.active} />,
-                },
-              ]}
-            />
-          ) : (
-            <StateCard
-              title="Sin modulos"
-              description="Crea el primer módulo para modelar permisos."
-            />
-          )}
-        </SectionCard>
-
-        <SectionCard title="Detalle">
-          <ModuleDetailPanel
-            selectedModule={selectedModule}
-            onEdit={openEdit}
+      <SectionCard title="Módulos" badge={modules.length}>
+        {modules.length ? (
+          <DataTable
+            rows={modules}
+            getRowKey={(item) => item.id}
+            searchable
+            searchPlaceholder="Buscar por nombre, clave o descripción..."
+            searchableFields={[
+              (item) => item.name,
+              (item) => item.key,
+              (item) => item.description ?? '',
+            ]}
+            columns={[
+              {
+                key: 'name',
+                header: 'Módulo',
+                render: (item) => <span className="font-medium">{item.name}</span>,
+              },
+              {
+                key: 'key',
+                header: 'Clave',
+                render: (item) => <span className="font-mono text-xs">{item.key}</span>,
+              },
+              {
+                key: 'description',
+                header: 'Descripción',
+                hideOnMobile: true,
+                render: (item) => item.description || 'Sin descripción',
+              },
+              {
+                key: 'active',
+                header: 'Estado',
+                render: (item) => <StatusChip active={item.active} />,
+              },
+              {
+                key: 'edit',
+                header: '',
+                align: 'right',
+                render: (item) => (
+                  <Tooltip title={`Editar ${item.name}`}>
+                    <IconButton
+                      size="small"
+                      aria-label={`Editar módulo ${item.name}`}
+                      onClick={() => openEdit(item)}
+                    >
+                      <EditRounded fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                ),
+              },
+            ]}
           />
-        </SectionCard>
-      </div>
+        ) : (
+          <StateCard
+            title="Sin módulos"
+            description="Crea el primer módulo para modelar permisos."
+          />
+        )}
+      </SectionCard>
 
       <FormDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         title={dialogMode === 'create' ? 'Crear módulo' : 'Editar módulo'}
-        subtitle="Define el nombre interno del módulo y su clave técnica."
+        subtitle="Define el nombre y la clave del módulo; agrega una descripción si ayuda a identificarlo."
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>

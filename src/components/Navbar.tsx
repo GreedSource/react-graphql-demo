@@ -20,7 +20,7 @@ const routeLabels = SIDEBAR_ROUTES.flatMap((route) =>
   'to' in route
     ? [{ to: route.to, label: route.label }]
     : route.children.map((child) => ({ to: child.to, label: child.label })),
-);
+).concat({ to: '/profile', label: 'Mi perfil' });
 
 const Navbar: React.FC = () => {
   const user = useUserStore((state) => state.user);

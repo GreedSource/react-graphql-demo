@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useActions } from '@/hooks/action.hook';
 import { useModules } from '@/hooks/module.hook';
@@ -27,47 +27,25 @@ export const usePermissionsPage = () => {
   const modules = modulesQuery.data?.modules?.data ?? [];
   const actions = actionsQuery.data?.actions?.data ?? [];
 
-  const [query, setQuery] = useState('');
   const [moduleFilter, setModuleFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Permission | null>(null);
   const [formState, setFormState] = useState<PermissionFormState>(emptyPermission);
-  const permissionsScrollRef = useRef<HTMLDivElement>(null);
 
-  const filteredPermissions = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    return permissions.filter((permission) => {
-      const matchesModule =
-        moduleFilter === 'all' || permission.moduleKey === moduleFilter;
-      const searchableText =
-        `${permission.moduleKey} ${permission.actionKey} ${permission.description ?? ''}`.toLowerCase();
-      return matchesModule && (!normalizedQuery || searchableText.includes(normalizedQuery));
-    });
-  }, [moduleFilter, permissions, query]);
-
-  const groupedPermissions = useMemo(
+  const filteredPermissions = useMemo(
     () =>
-      filteredPermissions.reduce<Record<string, Permission[]>>((groups, permission) => {
-        (groups[permission.moduleKey] ??= []).push(permission);
-        return groups;
-      }, {}),
-    [filteredPermissions],
-  );
-
-  const moduleCount = useMemo(
-    () => new Set(permissions.map((p) => p.moduleKey)).size,
-    [permissions],
-  );
-  const actionCount = useMemo(
-    () => new Set(permissions.map((p) => p.actionKey)).size,
-    [permissions],
+      moduleFilter === 'all'
+        ? permissions
+        : permissions.filter(
+            (permission) => permission.moduleKey === moduleFilter,
+          ),
+    [moduleFilter, permissions],
   );
 
   const queryError = permissionsQuery.error || modulesQuery.error || actionsQuery.error;
 
   const handleModuleFilterChange = (moduleKey: string) => {
     setModuleFilter(moduleKey);
-    permissionsScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const openCreate = () => setDialogOpen(true);
@@ -104,8 +82,6 @@ export const usePermissionsPage = () => {
     permissions,
     modules,
     actions,
-    query,
-    setQuery,
     moduleFilter,
     handleModuleFilterChange,
     dialogOpen,
@@ -116,14 +92,10 @@ export const usePermissionsPage = () => {
     formState,
     setFormState,
     filteredPermissions,
-    groupedPermissions,
-    moduleCount,
-    actionCount,
     queryError,
     handleCreate,
     handleDelete,
     createState,
     deleteState,
-    permissionsScrollRef,
   };
 };

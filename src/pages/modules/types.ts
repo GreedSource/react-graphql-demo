@@ -8,11 +8,6 @@ export interface ModuleSummary {
   description?: string | null;
 }
 
-export interface ModuleDetailPanelProps {
-  selectedModule: ModuleSummary | undefined;
-  onEdit: () => void;
-}
-
 export interface ModuleFormFieldsProps {
   formState: CreateModuleInput & { id?: string };
   dialogMode: 'create' | 'edit';
