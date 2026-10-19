@@ -55,6 +55,16 @@ export const REFRESH_TOKEN = gql`
           name
           lastname
           email
+          role {
+            id
+            name
+            description
+            active
+            permissions {
+              type
+              action
+            }
+          }
         }
       }
     }
