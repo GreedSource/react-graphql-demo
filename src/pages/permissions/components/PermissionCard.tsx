@@ -2,12 +2,7 @@ import type * as React from 'react';
 import DeleteOutlineRounded from '@mui/icons-material/DeleteOutlineRounded';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import type { Permission } from '@/types/admin';
-
-interface PermissionCardProps {
-  permission: Permission;
-  onDelete: (permission: Permission) => void;
-}
+import type { PermissionCardProps } from '../types';
 
 const PermissionCard: React.FC<PermissionCardProps> = ({ permission, onDelete }) => {
   return (

@@ -5,14 +5,23 @@ import { BrowserRouter } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { apolloClient } from './apollo/client';
-import { initializeStores } from './stores/init'; // 👈 asegúrate de exportar bien
+import { initializeStores } from './stores/init';
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 async function bootstrap() {
-  await initializeStores(); // 👈 Espera a cargar el store desde IndexedDB
+  try {
+    await initializeStores();
+  } catch (error) {
+    console.error('Critical error during store initialization:', error);
+  }
 
-  createRoot(document.getElementById('root')!).render(
+  const container = document.getElementById('root');
+  if (!container) {
+    throw new Error("Root container '#root' was not found in the DOM.");
+  }
+
+  createRoot(container).render(
     <StrictMode>
       <ApolloProvider client={apolloClient}>
         <HelmetProvider>
@@ -25,4 +34,6 @@ async function bootstrap() {
   );
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Fatal application bootstrap failure:', error);
+});

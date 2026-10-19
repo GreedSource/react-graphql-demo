@@ -138,12 +138,36 @@ export const useTasksPage = () => {
     }
   };
 
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
+  const confirmDeleteTask = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteTask(deleteTarget);
+      setDeleteTarget(null);
+      setSelectedTask(null);
+      toast.success('Tarea eliminada');
+    } catch (error) {
+      toast.error(getApolloErrorMessage(error));
+    }
+  };
+
+  const handleCompleteTask = async (taskId: string) => {
+    try {
+      await completeTask(taskId);
+      toast.success('Tarea completada');
+    } catch (error) {
+      toast.error(getApolloErrorMessage(error));
+    }
+  };
+
   return {
     can, tasksQuery, users, query, setQuery, projectId, setProjectId, view, setView,
     dialogOpen, selectedTask, setSelectedTask, draggedTaskId, setDraggedTaskId,
     dragOverStatus, setDragOverStatus, title, setTitle, assignee, setAssignee,
     newProjectId, setNewProjectId, newStatus, apiProjects, projectName, filteredTasks,
-    closeCreate, openCreate, createTask, updateTask, moveTask, completeTask, deleteTask,
-    createState, updateState,
+    closeCreate, openCreate, createTask, updateTask, moveTask, deleteTask,
+    createState, updateState, deleteTarget, setDeleteTarget, confirmDeleteTask,
+    handleCompleteTask,
   };
 };

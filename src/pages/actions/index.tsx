@@ -14,9 +14,9 @@ import { StatusChip } from '@/components/ui/StatusChip';
 import { useActionMutations, useActions } from '@/hooks/action.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
 import { slugifyKey } from '@/lib/validation';
-import type { CreateActionInput } from '@/types/admin';
+import type { ActionsFormState } from './types';
 
-const emptyAction: CreateActionInput = {
+const emptyAction: ActionsFormState = {
   name: '',
   key: '',
   description: '',
@@ -28,7 +28,7 @@ const ActionsPageContent: React.FC = () => {
   const { createAction, createState } = useActionMutations();
   const actions = actionsQuery.data?.actions?.data ?? [];
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [formState, setFormState] = useState<CreateActionInput>(emptyAction);
+  const [formState, setFormState] = useState<ActionsFormState>(emptyAction);
 
   const handleSave = async () => {
     try {

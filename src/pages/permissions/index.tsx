@@ -3,95 +3,47 @@ import LayersRounded from '@mui/icons-material/LayersRounded';
 import KeyRounded from '@mui/icons-material/KeyRounded';
 import PlayCircleOutlineRounded from '@mui/icons-material/PlayCircleOutlineRounded';
 import SearchRounded from '@mui/icons-material/SearchRounded';
-import { useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import { toast } from 'react-toastify';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { FormDialog } from '@/components/ui/FormDialog';
 import { MetricCard } from '@/components/ui/MetricCard';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StateCard } from '@/components/ui/StateCard';
-import { useActions } from '@/hooks/action.hook';
-import { useModules } from '@/hooks/module.hook';
-import {
-  usePermissionMutations,
-  usePermissions,
-} from '@/hooks/permission.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
-import type { CreatePermissionInput, Permission } from '@/types/admin';
 import PermissionCard from './components/PermissionCard';
-
-const emptyPermission: CreatePermissionInput = {
-  moduleId: '',
-  actionId: '',
-  description: '',
-};
+import { usePermissionsPage } from './hooks/usePermissionsPage';
 
 const PermissionsPageContent: React.FC = () => {
-  const permissionsQuery = usePermissions();
-  const modulesQuery = useModules();
-  const actionsQuery = useActions();
-  const { createPermission, deletePermission, createState, deleteState } =
-    usePermissionMutations();
-  const permissions = React.useMemo(
-    () => permissionsQuery.data?.permissions?.data ?? [],
-    [permissionsQuery.data],
-  );
-  const modules = modulesQuery.data?.modules?.data ?? [];
-  const actions = actionsQuery.data?.actions?.data ?? [];
-  const [query, setQuery] = useState('');
-  const [moduleFilter, setModuleFilter] = useState('all');
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<Permission | null>(null);
-  const [formState, setFormState] =
-    useState<CreatePermissionInput>(emptyPermission);
-  const permissionsScrollRef = React.useRef<HTMLDivElement>(null);
-  const filteredPermissions = React.useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    return permissions.filter((permission) => {
-      const matchesModule = moduleFilter === 'all' || permission.moduleKey === moduleFilter;
-      const searchableText = `${permission.moduleKey} ${permission.actionKey} ${permission.description ?? ''}`.toLowerCase();
-      return matchesModule && (!normalizedQuery || searchableText.includes(normalizedQuery));
-    });
-  }, [moduleFilter, permissions, query]);
-  const groupedPermissions = React.useMemo(() => filteredPermissions.reduce<Record<string, Permission[]>>((groups, permission) => {
-    (groups[permission.moduleKey] ??= []).push(permission);
-    return groups;
-  }, {}), [filteredPermissions]);
-  const moduleCount = new Set(permissions.map((permission) => permission.moduleKey)).size;
-  const actionCount = new Set(permissions.map((permission) => permission.actionKey)).size;
-  const queryError = permissionsQuery.error || modulesQuery.error || actionsQuery.error;
-  const handleModuleFilterChange = (moduleKey: string) => {
-    setModuleFilter(moduleKey);
-    permissionsScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCreate = async () => {
-    try {
-      const response = await createPermission(formState);
-      toast.success(response.message || 'Permiso creado.');
-      setDialogOpen(false);
-      setFormState(emptyPermission);
-    } catch (error) {
-      toast.error(getApolloErrorMessage(error));
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-
-    try {
-      await deletePermission(deleteTarget.id);
-      toast.success('Permiso eliminado.');
-      setDeleteTarget(null);
-    } catch (error) {
-      toast.error(getApolloErrorMessage(error));
-    }
-  };
+  const {
+    permissionsQuery,
+    permissions,
+    modules,
+    actions,
+    query,
+    setQuery,
+    moduleFilter,
+    handleModuleFilterChange,
+    dialogOpen,
+    openCreate,
+    closeCreate,
+    deleteTarget,
+    setDeleteTarget,
+    formState,
+    setFormState,
+    filteredPermissions,
+    groupedPermissions,
+    moduleCount,
+    actionCount,
+    queryError,
+    handleCreate,
+    handleDelete,
+    createState,
+    deleteState,
+    permissionsScrollRef,
+  } = usePermissionsPage();
 
   return (
     <div className="space-y-6">
@@ -100,7 +52,7 @@ const PermissionsPageContent: React.FC = () => {
         title="Catálogo de permisos"
         description="Crea permisos a partir de módulo + acción y elimínalos cuando ya no apliquen."
         actions={
-          <Button variant="contained" onClick={() => setDialogOpen(true)}>
+          <Button variant="contained" onClick={openCreate}>
             Nuevo permiso
           </Button>
         }
@@ -158,10 +110,11 @@ const PermissionsPageContent: React.FC = () => {
         </div>
 
         {permissionsQuery.loading && !permissions.length ? (
-          <div className="flex min-h-64 flex-col items-center justify-center gap-3 p-8 text-center">
-            <CircularProgress size={28} sx={{ color: 'var(--accent)' }} />
-            <p className="text-sm text-text-secondary">Cargando catálogo de permisos...</p>
-          </div>
+          <StateCard
+            title="Cargando catálogo de permisos..."
+            description="Espera mientras cargamos los permisos disponibles."
+            loading
+          />
         ) : null}
 
         {!permissionsQuery.loading && !permissions.length ? (
@@ -170,7 +123,7 @@ const PermissionsPageContent: React.FC = () => {
               title="Aún no hay permisos"
               description="Crea la primera regla para después asignarla a un rol."
               actionLabel="Crear permiso"
-              onAction={() => setDialogOpen(true)}
+              onAction={openCreate}
               icon={<KeyRounded fontSize="small" />}
             />
           </div>
@@ -180,7 +133,7 @@ const PermissionsPageContent: React.FC = () => {
           <div className="p-10 text-center">
             <p className="text-sm font-semibold text-text">No encontramos permisos con esos filtros</p>
             <p className="mt-1 text-sm text-text-muted">Limpia la búsqueda o cambia el módulo seleccionado.</p>
-            <Button className="mt-4" size="small" onClick={() => { setQuery(''); setModuleFilter('all'); }}>Limpiar filtros</Button>
+            <Button className="mt-4" size="small" onClick={() => { setQuery(''); handleModuleFilterChange('all'); }}>Limpiar filtros</Button>
           </div>
         ) : null}
 
@@ -208,12 +161,12 @@ const PermissionsPageContent: React.FC = () => {
 
       <FormDialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={closeCreate}
         title="Crear permiso"
         subtitle="Combina un módulo y una acción para definir un permiso asignable."
         actions={
           <>
-            <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={closeCreate}>Cancelar</Button>
             <Button
               onClick={() => void handleCreate()}
               variant="contained"
@@ -229,10 +182,7 @@ const PermissionsPageContent: React.FC = () => {
           select
           value={formState.moduleId}
           onChange={(event) =>
-            setFormState((current) => ({
-              ...current,
-              moduleId: event.target.value,
-            }))
+            setFormState((current) => ({ ...current, moduleId: event.target.value }))
           }
           size="small"
           fullWidth
@@ -248,10 +198,7 @@ const PermissionsPageContent: React.FC = () => {
           select
           value={formState.actionId}
           onChange={(event) =>
-            setFormState((current) => ({
-              ...current,
-              actionId: event.target.value,
-            }))
+            setFormState((current) => ({ ...current, actionId: event.target.value }))
           }
           size="small"
           fullWidth
@@ -266,10 +213,7 @@ const PermissionsPageContent: React.FC = () => {
           label="Descripción"
           value={formState.description ?? ''}
           onChange={(event) =>
-            setFormState((current) => ({
-              ...current,
-              description: event.target.value,
-            }))
+            setFormState((current) => ({ ...current, description: event.target.value }))
           }
           multiline
           minRows={3}
@@ -281,7 +225,7 @@ const PermissionsPageContent: React.FC = () => {
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Eliminar permiso"
-        description={`Se eliminara el permiso ${deleteTarget?.moduleKey || ''}:${deleteTarget?.actionKey || ''}.`}
+        description={`Se eliminará el permiso ${deleteTarget?.moduleKey || ''}:${deleteTarget?.actionKey || ''}.`}
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => void handleDelete()}
         destructive

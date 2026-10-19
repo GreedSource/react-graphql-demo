@@ -219,20 +219,18 @@ export const DataTable: DataTableComponent = <T,>({
               >
                 {enableRowSelection && (
                   <TableCell padding="checkbox" sx={{ width: 48 }}>
-                    {enableRowSelection && (
-                      <Checkbox
-                        indeterminate={isSomeSelected}
-                        checked={isAllSelected}
-                        onChange={handleSelectAll}
-                        size="small"
-                        sx={{
-                          color: 'var(--text-muted)',
-                          '&.Mui-checked': {
-                            color: 'var(--accent)',
-                          },
-                        }}
-                      />
-                    )}
+                    <Checkbox
+                      indeterminate={isSomeSelected}
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                      size="small"
+                      sx={{
+                        color: 'var(--text-muted)',
+                        '&.Mui-checked': {
+                          color: 'var(--accent)',
+                        },
+                      }}
+                    />
                   </TableCell>
                 )}
                 {columns.map((column) => (
@@ -298,19 +296,17 @@ export const DataTable: DataTableComponent = <T,>({
                     >
                       {enableRowSelection && (
                         <TableCell padding="checkbox">
-                          {enableRowSelection && (
-                            <Checkbox
-                              checked={isRowSelected}
-                              onChange={() => handleSelectRow(rowKey)}
-                              size="small"
-                              sx={{
-                                color: 'var(--text-muted)',
-                                '&.Mui-checked': {
-                                  color: 'var(--accent)',
-                                },
-                              }}
-                            />
-                          )}
+                          <Checkbox
+                            checked={isRowSelected}
+                            onChange={() => handleSelectRow(rowKey)}
+                            size="small"
+                            sx={{
+                              color: 'var(--text-muted)',
+                              '&.Mui-checked': {
+                                color: 'var(--accent)',
+                              },
+                            }}
+                          />
                         </TableCell>
                       )}
                       {columns.map((column) => (

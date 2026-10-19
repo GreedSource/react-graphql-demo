@@ -1,12 +1,18 @@
-// src/stores/init.ts
 import { initializeUserStore } from './user.store';
-// importa los demás aquí
-// import { initializeOtherStore } from './other.store';
 
+/**
+ * Initializes all persisted Zustand stores before the application renders.
+ * Each initializer resolves independently; a failure in one store does not
+ * prevent others from loading. Add new store initializers to the array below.
+ */
 export async function initializeStores() {
-  await Promise.all([
+  const results = await Promise.allSettled([
     initializeUserStore(),
-    // initializeOtherStore(),
-    // ...
   ]);
+
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      console.warn(`Store initializer at index ${index} failed:`, result.reason);
+    }
+  });
 }

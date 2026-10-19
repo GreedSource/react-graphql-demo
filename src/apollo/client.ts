@@ -28,6 +28,20 @@ function getGraphQlWsEndpoint(httpEndpoint: string) {
   }
 }
 
+/**
+ * Terminates the current session. When an impersonation is active the user is
+ * returned to their original account; otherwise a full logout is performed.
+ */
+function handleSessionExpiry() {
+  const userStore = useUserStore.getState();
+  if (userStore.impersonation) {
+    userStore.restoreOriginalSession();
+    toast.info('La sesión temporal terminó. Regresaste a tu cuenta.');
+  } else {
+    userStore.logout();
+  }
+}
+
 const httpLink = new HttpLink({
   uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || '/graphql',
   credentials: 'include',
@@ -105,13 +119,7 @@ function refreshTokenFlow(
         forward(operation).subscribe(observer);
       })
       .catch((error) => {
-        const userStore = useUserStore.getState();
-        if (userStore.impersonation) {
-          userStore.restoreOriginalSession();
-          toast.info('La sesión temporal terminó. Regresaste a tu cuenta.');
-        } else {
-          userStore.logout();
-        }
+        handleSessionExpiry();
         observer.error(error);
       });
   });
@@ -144,13 +152,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   const { refreshToken } = useUserStore.getState();
 
   if (!refreshToken) {
-    const userStore = useUserStore.getState();
-    if (userStore.impersonation) {
-      userStore.restoreOriginalSession();
-      toast.info('La sesión temporal terminó. Regresaste a tu cuenta.');
-    } else {
-      userStore.logout();
-    }
+    handleSessionExpiry();
     return;
   }
 

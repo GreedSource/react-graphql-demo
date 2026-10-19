@@ -88,9 +88,6 @@ export const useUsersPage = () => {
 
   const handleUpdate = async () => {
     if (!validate()) return;
-    const canEditRole = Boolean(
-      currentUser?.id && formState.id && formState.id !== currentUser.id,
-    );
     try {
       const response = await updateUser({
         id: formState.id,

@@ -24,10 +24,10 @@ interface PasswordInputProps {
 }
 
 const strengthConfig = {
-  none: { color: '#94a3b8', width: '0%', label: '' },
-  weak: { color: '#ef4444', width: '33%', label: 'Debil' },
-  medium: { color: '#f59e0b', width: '66%', label: 'Media' },
-  strong: { color: '#22c55e', width: '100%', label: 'Fuerte' },
+  none: { color: 'var(--text-muted)', width: '0%', label: '' },
+  weak: { color: 'var(--error, #ef4444)', width: '33%', label: 'Debil' },
+  medium: { color: 'var(--warning, #f59e0b)', width: '66%', label: 'Media' },
+  strong: { color: 'var(--success, #22c55e)', width: '100%', label: 'Fuerte' },
 };
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
@@ -69,9 +69,9 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
                   sx={{
-                    color: '#94a3b8',
+                    color: 'var(--text-muted)',
                     transition: 'all 200ms',
-                    '&:hover': { color: '#e2e8f0' },
+                    '&:hover': { color: 'var(--text-secondary)' },
                   }}
                 >
                   {showPassword ? (
@@ -83,9 +83,9 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                 {matchValue !== undefined && value.length > 0 && (
                   <span className="ml-1 text-base">
                     {passwordsMatch ? (
-                      <Check sx={{ color: '#22c55e', fontSize: 18 }} />
+                      <Check sx={{ color: 'var(--success, #22c55e)', fontSize: 18 }} />
                     ) : (
-                      <Close sx={{ color: '#ef4444', fontSize: 18 }} />
+                      <Close sx={{ color: 'var(--error, #ef4444)', fontSize: 18 }} />
                     )}
                   </span>
                 )}
@@ -95,10 +95,10 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
               '& .MuiOutlinedInput-root': {
                 transition: 'all 200ms',
                 '&:hover fieldset': {
-                  borderColor: validation.isValid ? '#22c55e' : '#38bdf8',
+                  borderColor: validation.isValid ? 'var(--success, #22c55e)' : 'var(--accent)',
                 },
                 ...(validation.isValid && {
-                  '& fieldset': { borderColor: '#22c55e' },
+                  '& fieldset': { borderColor: 'var(--success, #22c55e)' },
                 }),
               },
             },

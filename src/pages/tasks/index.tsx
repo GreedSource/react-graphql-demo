@@ -9,7 +9,6 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import { toast } from 'react-toastify';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PermissionAction } from '@/components/project-platform/PermissionAction';
 import { priorityLabels, taskStatusLabels } from '@/lib/project-platform-labels';
@@ -29,14 +28,10 @@ const TasksPageContent: React.FC = () => {
     dialogOpen, selectedTask, setSelectedTask, draggedTaskId, setDraggedTaskId,
     dragOverStatus, setDragOverStatus, title, setTitle, assignee, setAssignee,
     newProjectId, setNewProjectId, newStatus, apiProjects, projectName, filteredTasks,
-    closeCreate, openCreate, createTask, updateTask, moveTask, completeTask, deleteTask,
-    createState, updateState,
+    closeCreate, openCreate, createTask, updateTask, moveTask,
+    createState, updateState, deleteTarget, setDeleteTarget, confirmDeleteTask,
+    handleCompleteTask,
   } = useTasksPage();
-  const [deleteTarget, setDeleteTarget] = React.useState<string | null>(null);
-  const confirmDeleteTask = async () => {
-    if (!deleteTarget) return;
-    try { await deleteTask(deleteTarget); setDeleteTarget(null); setSelectedTask(null); toast.success('Tarea eliminada'); } catch (error) { toast.error(getApolloErrorMessage(error)); }
-  };
 
   return (
   <div className="flex h-full min-h-0 flex-col gap-5">
@@ -66,7 +61,7 @@ const TasksPageContent: React.FC = () => {
               <div className="flex items-center gap-2"><span className={`h-2.5 w-2.5 rounded-full ring-4 ring-white/5 ${status === 'blocked' ? 'bg-rose-400' : status === 'done' ? 'bg-emerald-400' : status === 'in_progress' ? 'bg-sky-400' : 'bg-slate-400'}`} /><h2 className="text-xs font-bold uppercase tracking-[0.1em] text-text-secondary">{taskStatusLabels[status]}</h2><span className="rounded-full bg-surface-card px-2 py-0.5 text-[11px] font-bold text-text-muted shadow-sm">{columnTasks.length}</span></div>
               <IconButton aria-label={`Agregar a ${taskStatusLabels[status]}`} onClick={() => openCreate(status)} size="small" sx={{ color: 'var(--text-muted)', '&:hover': { bgcolor: 'var(--accent-soft)', color: 'var(--accent)' } }}><AddRounded fontSize="small" /></IconButton>
             </div>
-            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:var(--accent-soft)_transparent]">{columnTasks.map((task) => <TaskCard key={task.id} task={task} projectName={projectName(task.projectId)} onOpen={setSelectedTask} canDelete={can('tasks.delete')} canComplete={can('tasks.complete') && task.status !== 'done'} onDelete={() => setDeleteTarget(task.id)} onComplete={async () => { try { await completeTask(task.id); toast.success('Tarea completada'); } catch (error) { toast.error(getApolloErrorMessage(error)); } }} draggable={can('tasks.update')} onDragStart={setDraggedTaskId} onDragEnd={() => { setDraggedTaskId(null); setDragOverStatus(null); }} />)}{columnTasks.length === 0 ? <div className={`rounded-xl border border-dashed p-7 text-center text-xs transition-colors ${dragOverStatus === status ? 'border-accent bg-accent-soft text-accent' : 'border-border/80 text-text-muted'}`}><InboxOutlined className="mb-2 text-text-muted" fontSize="small" />{draggedTaskId ? 'Suelta la tarea aquí' : 'No hay tareas en esta etapa'}</div> : null}</div>
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:var(--accent-soft)_transparent]">{columnTasks.map((task) => <TaskCard key={task.id} task={task} projectName={projectName(task.projectId)} onOpen={setSelectedTask} canDelete={can('tasks.delete')} canComplete={can('tasks.complete') && task.status !== 'done'} onDelete={() => setDeleteTarget(task.id)} onComplete={() => handleCompleteTask(task.id)} draggable={can('tasks.update')} onDragStart={setDraggedTaskId} onDragEnd={() => { setDraggedTaskId(null); setDragOverStatus(null); }} />)}{columnTasks.length === 0 ? <div className={`rounded-xl border border-dashed p-7 text-center text-xs transition-colors ${dragOverStatus === status ? 'border-accent bg-accent-soft text-accent' : 'border-border/80 text-text-muted'}`}><InboxOutlined className="mb-2 text-text-muted" fontSize="small" />{draggedTaskId ? 'Suelta la tarea aquí' : 'No hay tareas en esta etapa'}</div> : null}</div>
           </section>
         );
       })}
