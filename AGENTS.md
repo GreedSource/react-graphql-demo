@@ -111,6 +111,20 @@ These are also passed as build args in the Docker configuration.
 
 ## Development Conventions
 
+### Code Quality
+
+- Follow Clean Code and SOLID principles in every change. Treat them as design constraints, not as a reason to add layers or patterns that make a small feature harder to understand.
+- Choose names that express intent and domain meaning. Keep functions, hooks, and components focused on one cohesive task; extract a helper when it clarifies a meaningful operation, not merely to shorten a file.
+- Keep control flow easy to follow: prefer guard clauses over deep nesting, avoid duplicated logic, and handle errors at the layer that can respond meaningfully. Do not hide failures or use vague catch-all behavior.
+- Keep data and behavior close to the module that owns them. Limit mutable state and side effects, make dependencies visible, and avoid reaching into unrelated modules' internal details.
+- Prefer small, cohesive modules with explicit inputs and outputs. Use comments to explain non-obvious reasons or constraints, not to restate the code.
+- **Single Responsibility:** give each component, hook, utility, and module one cohesive reason to change. In pages, keep rendering focused and move substantial orchestration into page hooks as described below.
+- **Open/Closed:** when behavior needs variation, extend through a clear existing seam (such as a component prop or focused helper) instead of repeatedly modifying unrelated callers. Do not introduce generic extension points for hypothetical needs.
+- **Liskov Substitution:** implementations of a shared contract must honor its types and behavioral expectations, so callers can use them interchangeably without special cases.
+- **Interface Segregation:** keep props, interfaces, and function contracts limited to what their consumers need. Avoid large option objects or broad interfaces that force callers to provide unrelated data.
+- **Dependency Inversion:** keep high-level behavior independent of low-level details where that separation is useful. Pass dependencies through existing React/Apollo/Zustand patterns or focused function parameters; avoid hard-coding infrastructure into domain logic and avoid creating interfaces for a single implementation without a real boundary.
+- Apply each principle proportionally to this codebase. Do not split cohesive code, add indirection, or duplicate validation solely to demonstrate a principle; preserve security, authorization, error handling, and data integrity regardless of simplicity.
+
 ### React Components and Interfaces
 
 - Always implement React components as function components typed with `React.FC`.
