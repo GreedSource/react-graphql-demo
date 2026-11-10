@@ -13,29 +13,40 @@
     BlinkMacSystemFont,
     'Segoe UI', sans-serif;
 
-  --bg-primary: hsl(80 18% 97%);
-  --bg-secondary: hsl(140 20% 94%);
+  --bg-primary: hsl(155 32% 97%);
+  --bg-secondary: hsl(150 28% 94%);
   --bg-card: hsl(0 0% 100%);
-  --bg-card-hover: hsl(144 26% 96%);
+  --bg-card-hover: hsl(153 38% 96%);
   --bg-elevated: hsl(0 0% 100%);
-  --border-primary: hsl(150 20% 88%);
+  --border-primary: hsl(155 20% 87%);
   --text-primary: hsl(216 41% 18%);
   --text-secondary: hsl(215 19% 43%);
   --text-muted: hsl(216 15% 59%);
-  --accent: hsl(5 51% 52%);
-  --accent-hover: hsl(4 51% 45%);
-  --accent-soft: hsl(10 100% 95%);
+  --accent: hsl(263 48% 48%);
+  --accent-hover: hsl(263 52% 41%);
+  --accent-soft: hsl(264 100% 97%);
   --accent-contrast: hsl(0 0% 100%);
   --nav-bg: hsl(0 0% 100%);
   --nav-surface: hsl(140 20% 94%);
   --nav-text: hsl(216 41% 18%);
   --nav-muted: hsl(216 15% 47%);
-  --nav-active: hsl(10 100% 95%);
+  --nav-active: hsl(264 100% 97%);
   --nav-hover: hsl(216 41% 18% / 0.06);
   --nav-border: hsl(216 41% 18% / 0.1);
   --nav-icon-active: hsl(5 51% 52% / 0.12);
   --nav-overlay: hsl(215 49% 15% / 0.38);
   --success: hsl(158 55% 39%);
+  --chart-created: hsl(202 78% 48%);
+  --chart-completed: hsl(153 52% 39%);
+  --chart-due: hsl(36 82% 43%);
+  --chart-success: hsl(153 52% 39%);
+  --chart-warning: hsl(36 82% 43%);
+  --chart-danger: hsl(0 62% 53%);
+  --chart-critical: hsl(0 62% 53%);
+  --chart-urgent: hsl(18 75% 46%);
+  --chart-high: hsl(36 82% 43%);
+  --chart-medium: hsl(202 78% 43%);
+  --chart-low: hsl(215 16% 48%);
   --warning-soft: hsl(37 78% 42% / 0.14);
   --danger-soft: hsl(0 50% 51% / 0.12);
   --disabled-button-bg: hsl(140 12% 90%);
@@ -48,29 +59,40 @@
   background: hsl(216 50% 12%);
   color-scheme: dark;
 
-  --bg-primary: hsl(216 50% 12%);
-  --bg-secondary: hsl(215 49% 15%);
-  --bg-card: hsl(214 47% 18%);
-  --bg-card-hover: hsl(214 44% 23%);
-  --bg-elevated: hsl(214 47% 20%);
-  --border-primary: hsl(212 39% 28%);
+  --bg-primary: hsl(236 28% 12%);
+  --bg-secondary: hsl(237 25% 16%);
+  --bg-card: hsl(238 23% 19%);
+  --bg-card-hover: hsl(239 24% 24%);
+  --bg-elevated: hsl(238 23% 21%);
+  --border-primary: hsl(238 20% 30%);
   --text-primary: hsl(146 26% 95%);
   --text-secondary: hsl(211 27% 78%);
   --text-muted: hsl(211 21% 59%);
-  --accent: hsl(7 100% 78%);
-  --accent-hover: hsl(8 100% 82%);
-  --accent-soft: hsl(7 100% 78% / 0.16);
-  --accent-contrast: hsl(218 43% 16%);
-  --nav-bg: hsl(215 56% 12%);
-  --nav-surface: hsl(214 52% 19%);
+  --accent: hsl(265 82% 80%);
+  --accent-hover: hsl(265 88% 86%);
+  --accent-soft: hsl(265 82% 80% / 0.15);
+  --accent-contrast: hsl(238 28% 14%);
+  --nav-bg: hsl(236 29% 12%);
+  --nav-surface: hsl(238 24% 20%);
   --nav-text: hsl(150 33% 98%);
   --nav-muted: hsl(211 29% 70%);
-  --nav-active: hsl(210 47% 29%);
+  --nav-active: hsl(265 32% 29%);
   --nav-hover: hsl(0 0% 100% / 0.07);
   --nav-border: hsl(0 0% 100% / 0.1);
   --nav-icon-active: hsl(0 0% 100% / 0.1);
   --nav-overlay: hsl(0 0% 0% / 0.55);
   --success: hsl(155 56% 61%);
+  --chart-created: hsl(199 88% 73%);
+  --chart-completed: hsl(151 55% 68%);
+  --chart-due: hsl(39 92% 72%);
+  --chart-success: hsl(151 55% 68%);
+  --chart-warning: hsl(39 92% 72%);
+  --chart-danger: hsl(0 82% 76%);
+  --chart-critical: hsl(0 82% 76%);
+  --chart-urgent: hsl(20 92% 72%);
+  --chart-high: hsl(39 92% 72%);
+  --chart-medium: hsl(199 88% 73%);
+  --chart-low: hsl(211 21% 72%);
   --warning-soft: hsl(43 96% 56% / 0.14);
   --danger-soft: hsl(0 91% 71% / 0.14);
   --disabled-button-bg: hsl(213 37% 26%);
@@ -126,13 +148,13 @@ body::before {
   border: 1px solid var(--border-primary);
   background: var(--bg-card);
   border-radius: 20px;
-  box-shadow: 0 2px 4px hsl(211 46% 17% / 0.025), 0 18px 40px hsl(211 46% 17% / 0.045);
+  box-shadow: 0 2px 4px hsl(245 30% 30% / 0.025), 0 18px 40px hsl(245 30% 30% / 0.045);
   transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
 }
 
 .workspace-card:hover {
   border-color: color-mix(in srgb, var(--accent) 24%, var(--border-primary));
-  box-shadow: 0 18px 42px hsl(211 46% 17% / 0.075);
+  box-shadow: 0 18px 42px hsl(245 30% 30% / 0.075);
 }
 
 .dark .workspace-card {

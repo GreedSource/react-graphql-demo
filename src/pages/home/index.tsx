@@ -62,6 +62,11 @@ const HomePageContent: React.FC = () => {
   const priorityData = getTaskPriorityChartData(analytics);
   const pendingProjectData = getPendingProjectChartData(analytics, 6);
   const projectProgress = getProjectProgressChartData(analytics, 6);
+  const projectHealthData = [
+    { label: 'En control', value: analytics.projectSummaries.filter(({ health }) => health === 'healthy').length, color: 'var(--chart-success)' },
+    { label: 'Próximo vencimiento', value: analytics.projectSummaries.filter(({ health }) => health === 'attention').length, color: 'var(--chart-warning)' },
+    { label: 'Requiere atención', value: analytics.projectSummaries.filter(({ health }) => health === 'risk').length, color: 'var(--chart-danger)' },
+  ];
   const prioritizedProjects = sortProjectSummariesByRisk(
     analytics.projectSummaries,
   ).slice(0, 5);
@@ -91,7 +96,7 @@ const HomePageContent: React.FC = () => {
         <MetricCard label="Próximos vencimientos" value={analytics.dueSoonTasks.length} detail={`${analytics.unassignedTasks.length} sin asignar`} icon={<ScheduleRounded />} tone="amber" />
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[1.35fr_0.65fr]">
+      <section className="grid gap-5 xl:grid-cols-[1.2fr_0.9fr_0.9fr]" aria-label="Analítica general">
         <SectionCard
           title="Avance del portafolio"
           description="Los proyectos con mayor porcentaje de tareas completadas aparecen primero."
@@ -103,6 +108,9 @@ const HomePageContent: React.FC = () => {
         </SectionCard>
         <SectionCard title="Estado del trabajo" description="Distribución de las tareas por etapa actual." icon={<AssignmentRounded />}>
           <DonutChart data={statusData} centerValue={analytics.totalTasks} centerLabel="tareas" />
+        </SectionCard>
+        <SectionCard title="Salud del portafolio" description="Proyectos agrupados según riesgo y vencimientos." icon={<CheckCircleRounded />}>
+          <DonutChart data={projectHealthData} centerValue={analytics.projectSummaries.length} centerLabel="proyectos" />
         </SectionCard>
       </section>
 

@@ -13,10 +13,10 @@ interface MetricCardProps {
 
 const toneStyles: Record<MetricTone, { icon: string; glow: string }> = {
   accent: { icon: 'bg-accent-soft text-accent', glow: 'from-accent/14' },
-  blue: { icon: 'bg-sky-500/12 text-sky-600 dark:text-sky-300', glow: 'from-sky-500/12' },
-  green: { icon: 'bg-emerald-500/12 text-emerald-600 dark:text-emerald-300', glow: 'from-emerald-500/12' },
-  amber: { icon: 'bg-amber-500/12 text-amber-600 dark:text-amber-300', glow: 'from-amber-500/12' },
-  rose: { icon: 'bg-rose-500/12 text-rose-600 dark:text-rose-300', glow: 'from-rose-500/12' },
+  blue: { icon: 'bg-sky-100 text-sky-700 dark:bg-sky-400/15 dark:text-sky-200', glow: 'from-sky-300/25' },
+  green: { icon: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-200', glow: 'from-emerald-300/25' },
+  amber: { icon: 'bg-amber-100 text-amber-700 dark:bg-amber-400/15 dark:text-amber-200', glow: 'from-amber-300/25' },
+  rose: { icon: 'bg-rose-100 text-rose-700 dark:bg-rose-400/15 dark:text-rose-200', glow: 'from-rose-300/25' },
 };
 
 export const MetricCard: React.FC<MetricCardProps> = ({

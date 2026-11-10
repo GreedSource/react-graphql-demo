@@ -27,7 +27,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
   const variantStyles: Record<string, string> = {
     default: 'workspace-card',
     outlined: 'border-border/70 bg-transparent shadow-none',
-    elevated: 'workspace-card shadow-[0_22px_48px_rgba(24,44,65,0.1)]',
+    elevated: 'workspace-card shadow-[0_22px_48px_hsl(245_30%_30%_/_0.1)]',
   };
 
   return (

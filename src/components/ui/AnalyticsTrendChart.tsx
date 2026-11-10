@@ -15,9 +15,9 @@ interface AnalyticsTrendChartProps {
 }
 
 const series: TrendSeries[] = [
-  { key: 'created', label: 'Creadas', color: '#38bdf8' },
-  { key: 'completed', label: 'Completadas', color: '#34d399' },
-  { key: 'due', label: 'Vencen', color: '#f59e0b' },
+  { key: 'created', label: 'Creadas', color: 'var(--chart-created)' },
+  { key: 'completed', label: 'Completadas', color: 'var(--chart-completed)' },
+  { key: 'due', label: 'Vencen', color: 'var(--chart-due)' },
 ];
 
 const CHART_WIDTH = 720;

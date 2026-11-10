@@ -24,18 +24,18 @@ export const taskPriorityOrder: TaskPriority[] = [
 ];
 
 export const taskStatusColors: Record<TaskStatus, string> = {
-  todo: '#94a3b8',
-  in_progress: '#38bdf8',
-  blocked: '#fb7185',
-  done: '#34d399',
+  todo: 'var(--chart-low)',
+  in_progress: 'var(--chart-created)',
+  blocked: 'var(--chart-danger)',
+  done: 'var(--chart-completed)',
 };
 
 export const taskPriorityColors: Record<TaskPriority, string> = {
-  critical: '#e11d48',
-  urgent: '#ea580c',
-  high: '#d97706',
-  medium: '#0284c7',
-  low: '#64748b',
+  critical: 'var(--chart-critical)',
+  urgent: 'var(--chart-urgent)',
+  high: 'var(--chart-high)',
+  medium: 'var(--chart-medium)',
+  low: 'var(--chart-low)',
 };
 
 export interface ProjectAnalytics {
@@ -123,7 +123,7 @@ export function getPendingProjectChartData(
     .map(({ project, totalTasks, completedTasks }) => ({
       label: project.name,
       value: totalTasks - completedTasks,
-      color: '#f59e0b',
+      color: 'var(--chart-warning)',
       caption: `${totalTasks - completedTasks} pendientes`,
     }));
 }
