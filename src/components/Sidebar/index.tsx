@@ -1,5 +1,6 @@
 import type * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import MobileOverlay from './mobile-overlay';
 import MobileToggle from './mobile-toggle';
 import SidebarHeader from './sidebar-header';
@@ -12,11 +13,16 @@ const TRANSITION_TIMING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 50);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   const openSidebar = () => setIsOpen(true);
   const closeSidebar = () => setIsOpen(false);

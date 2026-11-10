@@ -27,11 +27,11 @@ const CRMDashboardPage: React.FC = () => {
     ['Actividades', summary?.activities ?? 0, <EventRounded />, 'rose'],
   ] as const;
   const resourceData = [
-    { label: 'Empresas', value: summary?.companies ?? 0, color: '#818cf8' },
-    { label: 'Contactos', value: summary?.contacts ?? 0, color: '#38bdf8' },
-    { label: 'Leads', value: summary?.leads ?? 0, color: '#fbbf24' },
-    { label: 'Oportunidades', value: summary?.opportunities ?? 0, color: '#34d399' },
-    { label: 'Actividades', value: summary?.activities ?? 0, color: '#fb7185' },
+    { label: 'Empresas', value: summary?.companies ?? 0, color: 'var(--chart-primary)' },
+    { label: 'Contactos', value: summary?.contacts ?? 0, color: 'var(--chart-created)' },
+    { label: 'Leads', value: summary?.leads ?? 0, color: 'var(--chart-due)' },
+    { label: 'Oportunidades', value: summary?.opportunities ?? 0, color: 'var(--chart-completed)' },
+    { label: 'Actividades', value: summary?.activities ?? 0, color: 'var(--chart-danger)' },
   ];
 
   return <div className="space-y-5">

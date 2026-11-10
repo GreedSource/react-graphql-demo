@@ -5,52 +5,53 @@
 
 /* Friendly workspace theme */
 :root {
-  color: hsl(216 41% 18%);
-  background: hsl(80 18% 97%);
+  color: hsl(230 28% 18%);
+  background: hsl(225 32% 97%);
   color-scheme: light;
   font-family:
     'Avenir Next', Avenir, Inter, ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont,
     'Segoe UI', sans-serif;
 
-  --bg-primary: hsl(155 32% 97%);
-  --bg-secondary: hsl(150 28% 94%);
+  --bg-primary: hsl(225 32% 97%);
+  --bg-secondary: hsl(226 30% 94%);
   --bg-card: hsl(0 0% 100%);
-  --bg-card-hover: hsl(153 38% 96%);
+  --bg-card-hover: hsl(231 35% 97%);
   --bg-elevated: hsl(0 0% 100%);
-  --border-primary: hsl(155 20% 87%);
-  --text-primary: hsl(216 41% 18%);
-  --text-secondary: hsl(215 19% 43%);
-  --text-muted: hsl(216 15% 59%);
-  --accent: hsl(263 48% 48%);
-  --accent-hover: hsl(263 52% 41%);
-  --accent-soft: hsl(264 100% 97%);
+  --border-primary: hsl(228 22% 88%);
+  --text-primary: hsl(230 28% 18%);
+  --text-secondary: hsl(226 17% 43%);
+  --text-muted: hsl(225 13% 56%);
+  --accent: hsl(252 58% 52%);
+  --accent-hover: hsl(252 62% 44%);
+  --accent-soft: hsl(252 100% 97%);
   --accent-contrast: hsl(0 0% 100%);
   --nav-bg: hsl(0 0% 100%);
-  --nav-surface: hsl(140 20% 94%);
-  --nav-text: hsl(216 41% 18%);
-  --nav-muted: hsl(216 15% 47%);
-  --nav-active: hsl(264 100% 97%);
-  --nav-hover: hsl(216 41% 18% / 0.06);
-  --nav-border: hsl(216 41% 18% / 0.1);
-  --nav-icon-active: hsl(5 51% 52% / 0.12);
-  --nav-overlay: hsl(215 49% 15% / 0.38);
-  --success: hsl(158 55% 39%);
-  --chart-created: hsl(202 78% 48%);
-  --chart-completed: hsl(153 52% 39%);
-  --chart-due: hsl(36 82% 43%);
-  --chart-success: hsl(153 52% 39%);
-  --chart-warning: hsl(36 82% 43%);
-  --chart-danger: hsl(0 62% 53%);
-  --chart-critical: hsl(0 62% 53%);
-  --chart-urgent: hsl(18 75% 46%);
-  --chart-high: hsl(36 82% 43%);
-  --chart-medium: hsl(202 78% 43%);
-  --chart-low: hsl(215 16% 48%);
+  --nav-surface: hsl(226 30% 94%);
+  --nav-text: hsl(230 28% 18%);
+  --nav-muted: hsl(226 17% 47%);
+  --nav-active: hsl(252 100% 97%);
+  --nav-hover: hsl(230 28% 18% / 0.06);
+  --nav-border: hsl(230 28% 18% / 0.1);
+  --nav-icon-active: hsl(252 58% 52% / 0.12);
+  --nav-overlay: hsl(230 28% 18% / 0.38);
+  --success: hsl(154 48% 40%);
+  --chart-primary: hsl(263 66% 68%);
+  --chart-created: hsl(199 75% 65%);
+  --chart-completed: hsl(151 55% 60%);
+  --chart-due: hsl(38 85% 64%);
+  --chart-success: hsl(151 55% 60%);
+  --chart-warning: hsl(38 85% 64%);
+  --chart-danger: hsl(350 68% 68%);
+  --chart-critical: hsl(350 68% 68%);
+  --chart-urgent: hsl(18 77% 64%);
+  --chart-high: hsl(40 83% 61%);
+  --chart-medium: hsl(199 72% 64%);
+  --chart-low: hsl(220 24% 68%);
   --warning-soft: hsl(37 78% 42% / 0.14);
   --danger-soft: hsl(0 50% 51% / 0.12);
   --disabled-button-bg: hsl(140 12% 90%);
-  --disabled-button-text: hsl(218 15% 53%);
+  --disabled-button-text: hsl(224 13% 50%);
 }
 
 /* Dark mode */
@@ -82,17 +83,18 @@
   --nav-icon-active: hsl(0 0% 100% / 0.1);
   --nav-overlay: hsl(0 0% 0% / 0.55);
   --success: hsl(155 56% 61%);
-  --chart-created: hsl(199 88% 73%);
-  --chart-completed: hsl(151 55% 68%);
-  --chart-due: hsl(39 92% 72%);
-  --chart-success: hsl(151 55% 68%);
-  --chart-warning: hsl(39 92% 72%);
-  --chart-danger: hsl(0 82% 76%);
-  --chart-critical: hsl(0 82% 76%);
-  --chart-urgent: hsl(20 92% 72%);
-  --chart-high: hsl(39 92% 72%);
-  --chart-medium: hsl(199 88% 73%);
-  --chart-low: hsl(211 21% 72%);
+  --chart-primary: hsl(265 72% 78%);
+  --chart-created: hsl(199 76% 73%);
+  --chart-completed: hsl(151 50% 69%);
+  --chart-due: hsl(39 78% 73%);
+  --chart-success: hsl(151 50% 69%);
+  --chart-warning: hsl(39 78% 73%);
+  --chart-danger: hsl(350 68% 76%);
+  --chart-critical: hsl(350 68% 76%);
+  --chart-urgent: hsl(20 76% 72%);
+  --chart-high: hsl(39 78% 70%);
+  --chart-medium: hsl(199 76% 73%);
+  --chart-low: hsl(211 20% 72%);
   --warning-soft: hsl(43 96% 56% / 0.14);
   --danger-soft: hsl(0 91% 71% / 0.14);
   --disabled-button-bg: hsl(213 37% 26%);

@@ -30,7 +30,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           aria-label="Ir al resumen"
           className="group flex items-center gap-3 rounded-2xl px-2 py-1.5 transition-colors hover:bg-[var(--nav-hover)]"
         >
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(145deg,var(--accent),#f4a68d)] text-lg font-black text-white shadow-lg shadow-black/20 transition-transform duration-200 group-hover:rotate-3 group-hover:scale-105">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--accent)] text-lg font-black text-[var(--accent-contrast)] transition-transform duration-200 group-hover:scale-105">
             {(APP_CONFIG.name || 'Workspace').slice(0, 1).toUpperCase()}
           </div>
           <div className="min-w-0">

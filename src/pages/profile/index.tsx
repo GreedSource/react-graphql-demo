@@ -7,31 +7,24 @@ import Collapse from '@mui/material/Collapse';
 import CheckRounded from '@mui/icons-material/CheckRounded';
 import ExpandMoreRounded from '@mui/icons-material/ExpandMoreRounded';
 import ShieldRounded from '@mui/icons-material/ShieldRounded';
-import { useMemo, useState } from 'react';
+import EditRounded from '@mui/icons-material/EditRounded';
+import { useState } from 'react';
+import TextField from '@mui/material/TextField';
+import { FormDialog } from '@/components/ui/FormDialog';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionCard } from '@/components/ui/SectionCard';
-import { useLogoutAction, useProfileQuery } from '@/hooks/auth.hook';
+import { useLogoutAction } from '@/hooks/auth.hook';
 import { getApolloErrorMessage } from '@/lib/graphql';
+import { useProfilePage } from './hooks/useProfilePage';
 
 const ProfilePageContent: React.FC = () => {
   const { performLogout } = useLogoutAction();
-  const profileQuery = useProfileQuery();
-  const profile = profileQuery.data?.profile?.data;
+  const {
+    profileQuery, profile, groupEntries, enabledPermissionCount,
+    editOpen, name, lastname, errors, updateState,
+    setName, setLastname, openEdit, closeEdit, saveProfile,
+  } = useProfilePage();
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({});
-
-  const permissionGroups = useMemo(() => {
-    const permissions = profile?.role?.permissions ?? [];
-    return permissions.reduce<Record<string, string[]>>((groups, permission) => {
-      const key = permission.type || 'general';
-      groups[key] = [...(groups[key] ?? []), permission.action];
-      return groups;
-    }, {});
-  }, [profile]);
-  const groupEntries = Object.entries(permissionGroups);
-  const enabledPermissionCount = groupEntries.reduce(
-    (total, [, actions]) => total + actions.length,
-    0,
-  );
 
   return (
     <div className="space-y-7">
@@ -40,13 +33,23 @@ const ProfilePageContent: React.FC = () => {
         title="Tu espacio de trabajo"
         description="Administra tu identidad y revisa, de un vistazo, las capacidades heredadas de tu rol."
         actions={
-          <Button
-            color="error"
-            variant="outlined"
-            onClick={() => void performLogout()}
-          >
-            Cerrar sesion
-          </Button>
+          <>
+            <Button
+              variant="outlined"
+              startIcon={<EditRounded />}
+              onClick={openEdit}
+              disabled={!profile}
+            >
+              Editar nombre
+            </Button>
+            <Button
+              color="error"
+              variant="outlined"
+              onClick={() => void performLogout()}
+            >
+              Cerrar sesión
+            </Button>
+          </>
         }
       />
 
@@ -198,6 +201,47 @@ const ProfilePageContent: React.FC = () => {
           )}
         </SectionCard>
       </div>
+
+      <FormDialog
+        open={editOpen}
+        title="Editar nombre"
+        subtitle="Actualiza el nombre que aparece en tu perfil y en el espacio de trabajo."
+        onClose={closeEdit}
+        actions={
+          <>
+            <Button onClick={closeEdit} disabled={updateState.loading}>
+              Cancelar
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => void saveProfile()}
+              disabled={updateState.loading}
+            >
+              {updateState.loading ? 'Guardando…' : 'Guardar cambios'}
+            </Button>
+          </>
+        }
+      >
+        <TextField
+          autoFocus
+          required
+          fullWidth
+          label="Nombre"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          error={Boolean(errors.name)}
+          helperText={errors.name || 'Mínimo 3 caracteres.'}
+        />
+        <TextField
+          required
+          fullWidth
+          label="Apellidos"
+          value={lastname}
+          onChange={(event) => setLastname(event.target.value)}
+          error={Boolean(errors.lastname)}
+          helperText={errors.lastname || 'Mínimo 3 caracteres.'}
+        />
+      </FormDialog>
     </div>
   );
 };

@@ -101,6 +101,21 @@ export const LOGOUT = gql`
   }
 `;
 
+export const UPDATE_MY_PROFILE = gql`
+  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {
+    updateMyProfile(input: $input) {
+      status
+      message
+      data {
+        id
+        name
+        lastname
+        email
+      }
+    }
+  }
+`;
+
 const AUTH_PAYLOAD_FIELDS = `
   accessToken
   refreshToken

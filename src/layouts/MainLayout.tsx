@@ -23,7 +23,7 @@ const MainLayout: React.FC = () => {
         <ImpersonationBanner />
         <Navbar />
         <main className="main-scroll-area min-h-0 flex-1 overflow-y-auto">
-          <div className="mx-auto h-full min-h-full w-full max-w-[1920px] px-4 py-5 sm:px-7 sm:py-6 lg:px-10 lg:py-8">
+          <div className="mx-auto min-h-full w-full max-w-[1920px] px-4 pt-5 pb-12 sm:px-7 sm:pt-6 sm:pb-14 lg:px-10 lg:pt-8 lg:pb-16">
             <Suspense fallback={<MainContentFallback />}>
               <PageTransition>
                 <Outlet />

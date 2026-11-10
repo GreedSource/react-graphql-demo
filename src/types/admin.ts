@@ -85,6 +85,11 @@ export interface UpdateUserInput {
   roleId?: string;
 }
 
+export interface UpdateMyProfileInput {
+  name: string;
+  lastname: string;
+}
+
 export interface CreateRoleInput {
   name: string;
   description?: string;

@@ -140,6 +140,7 @@ export function getProjectProgressChartData(
       projectId: project.id,
       label: project.name,
       value: progress,
+      color: 'var(--chart-primary)',
       caption: `${completedTasks}/${totalTasks} tareas completadas`,
     }));
 }
